@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Planificador de Comidas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e2e8f0;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        .calendar-day {
+            min-height: 120px;
+            background-color: white;
+            padding: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .calendar-day:hover {
+            background-color: #f1f5f9;
+        }
+        .today {
+            background-color: #eff6ff;
+        }
+        .other-month {
+            background-color: #f8fafc;
+            color: #cbd5e1;
+        }
+        .meal-tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 2px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .lunch-tag { background-color: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+        .dinner-tag { background-color: #fef9c3; color: #854d0e; border-left: 3px solid #eab308; }
+        
+        /* Modal transitions */
+        .modal {
+            transition: opacity 0.25s ease;
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navegación -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <div class="bg-indigo-600 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h1 class="text-xl font-bold text-slate-800">Planificador de Comidas</h1>
+        </div>
+        
+        <div id="auth-section">
+            <button id="login-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition flex items-center gap-2 shadow-sm">
+                <span>Acceder con Google</span>
+            </button>
+            <div id="user-info" class="hidden flex items-center gap-3">
+                <img id="user-photo" class="w-10 h-10 rounded-full border-2 border-indigo-100" src="" alt="Avatar">
+                <button id="logout-btn" class="text-sm font-medium text-slate-500 hover:text-red-500 transition">Salir</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8">
+        
+        <!-- Vista Estado Desconectado -->
+        <div id="logged-out-view" class="py-20 text-center">
+            <div class="max-w-md mx-auto">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Organiza tus menús semanales.</h2>
+                <p class="text-slate-600 mb-8">Inicia sesión para empezar a planificar tus comidas y cenas de forma sencilla y visual.</p>
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=400" alt="Platos saludables" class="rounded-xl mb-6 w-full h-48 object-cover">
+                    <p class="text-sm text-slate-400 mb-4 italic">"Comer bien es una forma de respetarse a uno mismo."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Estado Conectado -->
+        <div id="app-view" class="hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 id="current-month-display" class="text-2xl font-bold text-slate-800 capitalize">Marzo 2024</h2>
+                    <p class="text-slate-500">Haz clic en un día para editar el menú.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-200">
+                    <button id="prev-month" class="p-2 hover:bg-slate-100 rounded-lg transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="today-btn" class="px-4 py-1 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition">Hoy</button>
+                    <button id="next-month" class="p-2 hover:bg-slate-100 rounded-lg transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200">
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Lun</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Mar</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Mié</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Jue</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Vie</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Sáb</div>
+                    <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Dom</div>
+                </div>
+                <div id="calendar-body" class="calendar-grid">
+                    <!-- Los días se generarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Editar Menú -->
+    <div id="meal-modal" class="modal fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-800" id="modal-date-title">Editar Menú</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Comida (Almuerzo)
+                    </label>
+                    <textarea id="lunch-input" rows="2" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none" placeholder="¿Qué toca comer hoy?"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-yellow-400"></span> Cena
+                    </label>
+                    <textarea id="dinner-input" rows="2" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none" placeholder="¿Y para cenar?"></textarea>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 flex gap-3">
+                <button onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+                <button id="save-meal-btn" class="flex-1 px-4 py-3 rounded-xl font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-md shadow-indigo-200">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configuración proporcionada por el usuario
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5IjDs741vM3DW1Y63dUrQWIcWjW1-2S8",
+            authDomain: "calendario-comidas-dee40.firebaseapp.com",
+            projectId: "calendario-comidas-dee40",
+            storageBucket: "calendario-comidas-dee40.firebasestorage.app",
+            messagingSenderId: "876372232275",
+            appId: "1:876372232275:web:4cf1607cefbbbac17f5ea6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        const appId = "calendario-comidas-amaya"; // Identificador único para los documentos
+
+        // Estado de la App
+        let currentUser = null;
+        let currentDate = new Date();
+        let mealsData = {};
+        let selectedDateKey = null;
+
+        // Elementos DOM
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userInfo = document.getElementById('user-info');
+        const userPhoto = document.getElementById('user-photo');
+        const loggedOutView = document.getElementById('logged-out-view');
+        const appView = document.getElementById('app-view');
+        const calendarBody = document.getElementById('calendar-body');
+        const monthDisplay = document.getElementById('current-month-display');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const todayBtn = document.getElementById('today-btn');
+        const mealModal = document.getElementById('meal-modal');
+        const saveMealBtn = document.getElementById('save-meal-btn');
+        const lunchInput = document.getElementById('lunch-input');
+        const dinnerInput = document.getElementById('dinner-input');
+        const modalDateTitle = document.getElementById('modal-date-title');
+
+        // Autenticación
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch(err => console.error("Error login:", err));
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userPhoto.src = user.photoURL || 'https://via.placeholder.com/40';
+                loggedOutView.classList.add('hidden');
+                appView.classList.remove('hidden');
+                
+                // Cargar datos del usuario
+                setupDataListener(user.uid);
+            } else {
+                currentUser = null;
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                loggedOutView.classList.remove('hidden');
+                appView.classList.add('hidden');
+            }
+        });
+
+        // Escuchar cambios en Firestore (Siguiendo REGLA 1 y 2)
+        function setupDataListener(uid) {
+            // Ruta específica según REGLA 1
+            const userMealsRef = collection(db, 'artifacts', appId, 'users', uid, 'meals');
+            
+            // onSnapshot para actualizaciones en tiempo real
+            onSnapshot(userMealsRef, (snapshot) => {
+                mealsData = {};
+                snapshot.forEach(doc => {
+                    mealsData[doc.id] = doc.data();
+                });
+                renderCalendar();
+            }, (error) => {
+                console.error("Error fetching meals:", error);
+            });
+        }
+
+        // Navegación Calendario
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date();
+            renderCalendar();
+        });
+
+        // Renderizado de Calendario
+        function renderCalendar() {
+            calendarBody.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Ajustar para que la semana empiece en Lunes (0-Dom, 1-Lun...)
+            let startDay = firstDay.getDay(); 
+            startDay = startDay === 0 ? 6 : startDay - 1; // 0 (Lun) a 6 (Dom)
+
+            monthDisplay.textContent = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(currentDate);
+
+            // Días del mes anterior para rellenar
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                const dayDiv = createDayElement(prevMonthLastDay - i, true);
+                calendarBody.appendChild(dayDiv);
+            }
+
+            // Días del mes actual
+            const today = new Date();
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const isToday = today.getDate() === i && today.getMonth() === month && today.getFullYear() === year;
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const dayDiv = createDayElement(i, false, isToday, dateKey);
+                calendarBody.appendChild(dayDiv);
+            }
+
+            // Días del mes siguiente para rellenar hasta completar 42 celdas (6 semanas)
+            const totalCells = 42;
+            const remainingCells = totalCells - calendarBody.children.length;
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayDiv = createDayElement(i, true);
+                calendarBody.appendChild(dayDiv);
+            }
+        }
+
+        function createDayElement(day, isOtherMonth, isToday, dateKey) {
+            const div = document.createElement('div');
+            div.className = `calendar-day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
+            
+            const dayNum = document.createElement('span');
+            dayNum.className = `text-sm font-bold ${isToday ? 'text-indigo-600 bg-indigo-50 w-7 h-7 flex items-center justify-center rounded-full' : 'text-slate-600'}`;
+            dayNum.textContent = day;
+            div.appendChild(dayNum);
+
+            if (!isOtherMonth && dateKey) {
+                div.onclick = () => openModal(dateKey);
+                
+                const meal = mealsData[dateKey];
+                if (meal) {
+                    if (meal.lunch) {
+                        const lunch = document.createElement('span');
+                        lunch.className = 'meal-tag lunch-tag';
+                        lunch.textContent = `🥗 ${meal.lunch}`;
+                        div.appendChild(lunch);
+                    }
+                    if (meal.dinner) {
+                        const dinner = document.createElement('span');
+                        dinner.className = 'meal-tag dinner-tag';
+                        dinner.textContent = `🌙 ${meal.dinner}`;
+                        div.appendChild(dinner);
+                    }
+                }
+            }
+            
+            return div;
+        }
+
+        // Modal Logic
+        function openModal(dateKey) {
+            selectedDateKey = dateKey;
+            const [y, m, d] = dateKey.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            modalDateTitle.textContent = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
+            
+            const existing = mealsData[dateKey] || { lunch: '', dinner: '' };
+            lunchInput.value = existing.lunch || '';
+            dinnerInput.value = existing.dinner || '';
+            
+            mealModal.classList.add('active');
+        }
+
+        window.closeModal = function() {
+            mealModal.classList.remove('active');
+        };
+
+        saveMealBtn.onclick = async () => {
+            if (!currentUser || !selectedDateKey) return;
+
+            const lunch = lunchInput.value.trim();
+            const dinner = dinnerInput.value.trim();
+
+            try {
+                // Guardar en Firestore siguiendo REGLA 1
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'meals', selectedDateKey);
+                await setDoc(docRef, {
+                    lunch,
+                    dinner,
+                    updatedAt: new Date().toISOString()
+                });
+                closeModal();
+            } catch (error) {
+                console.error("Error saving meal:", error);
+                alert("Vaya, algo ha fallado al guardar. Sebastian lo siente mucho.");
+            }
+        };
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = (event) => {
+            if (event.target == mealModal) closeModal();
+        };
+
+        // Inicializar
+        renderCalendar();
+    </script>
+</body>
+</html>
