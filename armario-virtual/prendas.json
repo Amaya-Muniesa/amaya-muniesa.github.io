@@ -1,0 +1,620 @@
+[
+    {
+        "imagen": "img\/img_1.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_2.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_3.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_4.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_5.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_6.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_7.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_8.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_9.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_10.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_11.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_12.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_13.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_14.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_15.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_16.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_17.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta sin mangas",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_18.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_19.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_20.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_21.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_22.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_23.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_24.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_25.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_26.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_27.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_28.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_29.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_30.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_31.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_32.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_33.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_34.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_35.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_36.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_37.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_38.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_39.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_40.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_41.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_42.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_43.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_44.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Top",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_45.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_46.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_47.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camisa manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_48.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_49.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_50.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Blusa manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_51.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camisa manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_52.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camisa manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_53.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camisa manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_54.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_55.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camisa manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_56.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Sudadera",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_57.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_58.png",
+        "categoria": "Vestido",
+        "subcategoria": "Largo",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_59.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_60.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_61.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_62.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_63.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_64.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Body",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_65.png",
+        "categoria": "Vestido",
+        "subcategoria": "Largo",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_66.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_67.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta de tirantes",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_68.png",
+        "categoria": "Vestido",
+        "subcategoria": "Largo",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_69.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_70.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_71.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_72.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_73.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_74.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_75.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_76.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_77.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_78.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_79.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_80.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_81.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga larga",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_82.png",
+        "categoria": "Vestido",
+        "subcategoria": "Corto",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_83.png",
+        "categoria": "Vestido",
+        "subcategoria": "Largo",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_84.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Vaquero",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_85.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Vaquero",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_86.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Vaquero",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_87.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Vaquero",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_88.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Campana",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_89.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_90.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_91.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Deportivo",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_92.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_93.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_94.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_95.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_96.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_97.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_98.png",
+        "categoria": "Prenda Exterior",
+        "subcategoria": "Abrigo",
+        "tiempo": "Fr\u00edo"
+    },
+    {
+        "imagen": "img\/img_99.png",
+        "categoria": "Prenda Exterior",
+        "subcategoria": "Chaqueta",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_100.png",
+        "categoria": "Prenda Exterior",
+        "subcategoria": "Chaqueta",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_101.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Camiseta manga corta",
+        "tiempo": "Calor"
+    },
+    {
+        "imagen": "img\/img_102.png",
+        "categoria": "Pantal\u00f3n",
+        "subcategoria": "Leggins",
+        "tiempo": "Entretiempo"
+    },
+    {
+        "imagen": "img\/img_103.png",
+        "categoria": "Parte de Arriba",
+        "subcategoria": "Jersey",
+        "tiempo": "Fr\u00edo"
+    }
+]
