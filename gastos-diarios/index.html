@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Gastos - Amaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .tab-active { border-bottom: 2px solid #4f46e5; color: #4f46e5; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <div id="auth-container" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-xs w-full">
+            <div class="mb-6 text-indigo-600">
+                <i class="fa-solid fa-vault text-5xl"></i>
+            </div>
+            <h2 class="text-xl font-bold mb-2">Bienvenida, Amaya</h2>
+            <p class="text-slate-500 text-sm mb-6">Accede para ver tus finanzas bajo control.</p>
+            <button id="google-login" class="w-full flex items-center justify-center gap-2 bg-white border border-slate-200 py-3 rounded-2xl hover:bg-slate-50 transition-all font-semibold">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+                Entrar con Google
+            </button>
+        </div>
+    </div>
+
+    <div id="app" class="max-w-md mx-auto p-4 opacity-0 transition-opacity duration-500">
+        <!-- Header -->
+        <header class="py-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Hola, Amaya ✨</h1>
+                <p class="text-slate-500 text-sm" id="header-subtitle">¿En qué hemos pecado hoy?</p>
+            </div>
+            <button id="logout-btn" class="text-slate-400 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </header>
+
+        <!-- Navegación -->
+        <div class="flex gap-4 mb-6 border-b border-slate-200 text-sm font-medium text-slate-400">
+            <button id="tab-current" class="pb-2 tab-active">Este Mes</button>
+            <button id="tab-history" class="pb-2">Historial</button>
+        </div>
+
+        <div id="current-view">
+            <!-- Resumen del Mes -->
+            <div class="glass border border-white rounded-3xl p-6 shadow-sm mb-6 bg-gradient-to-br from-white to-indigo-50/30">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-slate-700 font-semibold" id="month-label">Marzo 2026</h2>
+                    <span class="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full font-bold">META: 260€</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-wider">Gastado</p>
+                        <p class="text-xl font-bold text-slate-800" id="total-spent">0,00 €</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-wider">Límite Diario</p>
+                        <p class="text-xl font-bold text-indigo-600" id="daily-avg">0,00 €</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="bg-indigo-500 h-full transition-all duration-700" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between mt-2">
+                    <p class="text-[10px] text-slate-400" id="spent-percent">0% del total</p>
+                    <p class="text-[10px] font-semibold text-slate-600" id="remaining-text">Te quedan 260,00 €</p>
+                </div>
+            </div>
+
+            <!-- Formulario Rápido -->
+            <div class="glass border border-white rounded-3xl p-6 shadow-sm mb-6">
+                <form id="expense-form" class="space-y-3">
+                    <input type="text" id="desc" placeholder="¿En qué? (ej. Comida, Copas...)" required
+                        class="w-full px-4 py-3 rounded-2xl border-none bg-slate-100 focus:ring-2 focus:ring-indigo-400 outline-none transition-all text-sm">
+                    <div class="flex gap-2">
+                        <input type="number" id="amount" step="0.01" placeholder="Importe €" required
+                            class="w-full px-4 py-3 rounded-2xl border-none bg-slate-100 focus:ring-2 focus:ring-indigo-400 outline-none transition-all text-sm font-bold">
+                        <button type="submit" class="bg-indigo-600 text-white px-6 rounded-2xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Gastos Recientes -->
+            <div class="space-y-3" id="expenses-list">
+                <div class="text-center py-10 text-slate-400 italic text-sm">Cargando...</div>
+            </div>
+        </div>
+
+        <div id="history-view" class="hidden">
+            <h3 class="font-bold text-slate-700 mb-4">Resumen de meses</h3>
+            <div id="month-stats" class="space-y-3">
+                <!-- Estadísticas de meses anteriores -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrZuEY_AcAMlH8_Q5cKp9FMds83yjq8wQ",
+            authDomain: "gastos-diarios-62718.firebaseapp.com",
+            projectId: "gastos-diarios-62718",
+            storageBucket: "gastos-diarios-62718.firebasestorage.app",
+            messagingSenderId: "625618245401",
+            appId: "1:625618245401:web:0d706a978fecfd36c75788"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        const appId = "gastos-amaya-2026-v2";
+        const BUDGET_MONTHLY = 260.00;
+
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app');
+        const loginBtn = document.getElementById('google-login');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Login / Logout
+        loginBtn.addEventListener('click', () => signInWithPopup(auth, provider).catch(console.error));
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authContainer.classList.add('hidden');
+                appContainer.classList.replace('opacity-0', 'opacity-100');
+                loadExpenses(user.uid);
+            } else {
+                authContainer.classList.remove('hidden');
+                appContainer.classList.replace('opacity-100', 'opacity-0');
+            }
+        });
+
+        // Tabs
+        const currentTab = document.getElementById('tab-current');
+        const historyTab = document.getElementById('tab-history');
+        const currentView = document.getElementById('current-view');
+        const historyView = document.getElementById('history-view');
+
+        currentTab.addEventListener('click', () => {
+            currentTab.classList.add('tab-active');
+            historyTab.classList.remove('tab-active');
+            currentView.classList.remove('hidden');
+            historyView.classList.add('hidden');
+        });
+
+        historyTab.addEventListener('click', () => {
+            historyTab.classList.add('tab-active');
+            currentTab.classList.remove('tab-active');
+            historyView.classList.remove('hidden');
+            currentView.classList.add('hidden');
+        });
+
+        // Formulario
+        const expenseForm = document.getElementById('expense-form');
+        expenseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const desc = document.getElementById('desc').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = new Date();
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gastos'), {
+                    descripcion: desc,
+                    importe: amount,
+                    fecha: serverTimestamp(),
+                    usuario: user.uid,
+                    mes: date.getMonth(),
+                    anio: date.getFullYear(),
+                    dia: date.getDate()
+                });
+                expenseForm.reset();
+            } catch (err) { console.error(err); }
+        });
+
+        function loadExpenses(userId) {
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'gastos'), orderBy('fecha', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                let monthTotal = 0;
+                let currentHtml = '';
+                const historyData = {}; // Para agrupar por mes
+
+                snapshot.forEach((docSnap) => {
+                    const item = docSnap.data();
+                    const id = docSnap.id;
+                    const key = `${item.mes}-${item.anio}`;
+
+                    // Historial total
+                    if (!historyData[key]) historyData[key] = { total: 0, count: 0, label: getMonthName(item.mes) + ' ' + item.anio };
+                    historyData[key].total += item.importe;
+                    historyData[key].count++;
+
+                    // Mostrar solo los del mes actual en la vista principal
+                    if (item.mes === currentMonth && item.anio === currentYear) {
+                        monthTotal += item.importe;
+                        currentHtml += renderExpenseRow(item, id);
+                    }
+                });
+
+                // Actualizar UI principal
+                document.getElementById('expenses-list').innerHTML = currentHtml || '<div class="text-center py-10 text-slate-400 italic text-sm">No hay gastos este mes.</div>';
+                updateStats(monthTotal);
+                renderHistory(historyData);
+
+            }, (err) => console.error(err));
+        }
+
+        function updateStats(total) {
+            const totalEl = document.getElementById('total-spent');
+            const dailyAvgEl = document.getElementById('daily-avg');
+            const progress = document.getElementById('progress-bar');
+            const remainingEl = document.getElementById('remaining-text');
+            const percentEl = document.getElementById('spent-percent');
+
+            const now = new Date();
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysLeft = Math.max(lastDay - now.getDate() + 1, 1);
+            
+            const remaining = BUDGET_MONTHLY - total;
+            const dailyAverage = Math.max(remaining / daysLeft, 0);
+
+            totalEl.innerText = `${total.toFixed(2).replace('.', ',')} €`;
+            dailyAvgEl.innerText = `${dailyAverage.toFixed(2).replace('.', ',')} €`;
+            
+            const perc = Math.min((total / BUDGET_MONTHLY) * 100, 100);
+            progress.style.width = `${perc}%`;
+            progress.className = `h-full transition-all duration-700 ${perc > 90 ? 'bg-red-500' : 'bg-indigo-500'}`;
+            
+            percentEl.innerText = `${perc.toFixed(0)}% del total`;
+            remainingEl.innerText = remaining > 0 ? `Quedan ${remaining.toFixed(2)} €` : `Exceso: ${Math.abs(remaining).toFixed(2)} €`;
+        }
+
+        function renderHistory(data) {
+            const container = document.getElementById('month-stats');
+            let html = '';
+            
+            // Ordenamos meses (esto es simple, se podría mejorar)
+            Object.values(data).forEach(m => {
+                const statusColor = m.total > BUDGET_MONTHLY ? 'text-red-500' : 'text-green-500';
+                html += `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-slate-50">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter">${m.label}</p>
+                        <p class="text-lg font-bold text-slate-700">${m.total.toFixed(2)} €</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-400">Total movimientos: ${m.count}</p>
+                        <p class="text-xs font-bold ${statusColor}">${m.total > BUDGET_MONTHLY ? 'Sobregastado' : 'Bajo control'}</p>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html || '<p class="text-slate-400 text-sm italic">Sin datos históricos aún.</p>';
+        }
+
+        function renderExpenseRow(item, id) {
+            return `
+            <div class="glass border border-white flex justify-between items-center p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 text-sm">
+                        ${getIcon(item.descripcion)}
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 text-sm">${item.descripcion}</p>
+                        <p class="text-[10px] text-slate-400">${item.fecha ? new Date(item.fecha.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...'}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold text-slate-700 text-sm">${item.importe.toFixed(2)} €</span>
+                    <button onclick="deleteExpense('${id}')" class="text-slate-200 hover:text-red-400 transition-colors">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+                </div>
+            </div>`;
+        }
+
+        window.deleteExpense = async (id) => {
+            if(confirm('¿Borrar este gasto?')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gastos', id));
+            }
+        };
+
+        function getMonthName(m) {
+            return ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"][m];
+        }
+
+        function getIcon(desc) {
+            const d = desc.toLowerCase();
+            if (d.includes('comida') || d.includes('cena')) return '<i class="fa-solid fa-utensils"></i>';
+            if (d.includes('copas') || d.includes('bebida') || d.includes('caf')) return '<i class="fa-solid fa-martini-glass"></i>';
+            if (d.includes('compra') || d.includes('super')) return '<i class="fa-solid fa-basket-shopping"></i>';
+            if (d.includes('transporte') || d.includes('taxi')) return '<i class="fa-solid fa-car"></i>';
+            return '<i class="fa-solid fa-tag"></i>';
+        }
+    </script>
+</body>
+</html>
