@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Diario de Amaya | Pensamientos en Red</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        .theme-dark {
+            --bg: #0f172a;
+            --text: #f1f5f9;
+        }
+
+        .theme-forest {
+            --bg: #f0fdf4;
+            --primary: #16a34a;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .racha-fire {
+            animation: flame 1.5s infinite alternate;
+        }
+
+        @keyframes flame {
+            from { filter: drop-shadow(0 0 2px #f59e0b); }
+            to { filter: drop-shadow(0 0 8px #ef4444); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Auth Overlay -->
+    <div id="auth-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-90 transition-opacity">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm mx-4">
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">Bienvenida, Amaya</h1>
+            <p class="text-slate-600 mb-8">Sebastian te espera. Identifícate para acceder a tus pensamientos.</p>
+            <button id="login-btn" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-105">
+                <i class="fab fa-google text-xl"></i>
+                Entrar con Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="app" class="hidden max-w-4xl mx-auto px-4 py-6">
+        
+        <!-- Header & Stats -->
+        <header class="flex justify-between items-center mb-8 sticky top-0 z-30 py-2">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white text-xl shadow-lg" id="user-avatar">
+                    A
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg leading-tight" id="user-name">Amaya</h2>
+                    <p class="text-xs opacity-60" id="user-rank">Aprendiz de Pensadora</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 items-center">
+                <div class="glass px-4 py-2 rounded-2xl flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-fire text-orange-500 racha-fire"></i>
+                    <span id="stat-racha" class="font-bold">0</span>
+                </div>
+                <div class="glass px-4 py-2 rounded-2xl flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-coins text-yellow-500"></i>
+                    <span id="stat-coins" class="font-bold">0</span>
+                </div>
+                <button id="logout-btn" class="p-2 opacity-40 hover:opacity-100 transition-opacity"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <!-- Level Bar -->
+        <div class="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
+            <div id="level-progress" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+
+        <!-- Quick Entry -->
+        <section class="mb-10">
+            <div class="glass p-6 rounded-3xl shadow-xl transition-all focus-within:ring-2 ring-indigo-400">
+                <textarea id="entry-text" placeholder="¿Qué ronda hoy por tu cabeza, Amaya? Sebastian toma nota..." class="w-full bg-transparent border-none focus:ring-0 text-xl resize-none min-h-[120px] placeholder:opacity-50" spellcheck="false"></textarea>
+                <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <div class="flex gap-2" id="mood-selector">
+                        <button data-mood="😊" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">😊</button>
+                        <button data-mood="🤔" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🤔</button>
+                        <button data-mood="🔥" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🔥</button>
+                        <button data-mood="🫠" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🫠</button>
+                    </div>
+                    <button id="save-entry" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">Guardar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabs & Feed -->
+        <nav class="flex gap-6 mb-6 border-b border-slate-200 dark:border-slate-800">
+            <button class="pb-4 font-bold border-b-2 border-indigo-600 text-indigo-600">Cronología</button>
+            <button id="open-shop" class="pb-4 font-medium opacity-50 hover:opacity-100">Tienda de Estilos</button>
+        </nav>
+
+        <div id="feed" class="space-y-6">
+            <!-- Entries will appear here -->
+            <div class="text-center py-20 opacity-30">
+                <i class="fas fa-feather-alt text-5xl mb-4"></i>
+                <p>Tu mente está en blanco por ahora.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shop-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Personalización</h3>
+                <button id="close-shop" class="text-2xl">&times;</button>
+            </div>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl">
+                    <span>Modo Noche</span>
+                    <button data-price="10" data-theme="theme-dark" class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">10 🪙</button>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl">
+                    <span>Bosque Zen</span>
+                    <button data-price="25" data-theme="theme-forest" class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">25 🪙</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, setDoc, getDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMPpJUmzmmfjStAC2M7BtGzo4H9kZIRis",
+            authDomain: "diario-personal-d2e6e.firebaseapp.com",
+            projectId: "diario-personal-d2e6e",
+            storageBucket: "diario-personal-d2e6e.firebasestorage.app",
+            messagingSenderId: "484620541738",
+            appId: "1:484620541738:web:ddbdc43a41175fe7368853"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        const appId = 'diario-amaya-v1';
+
+        let currentUser = null;
+        let selectedMood = '🤔';
+
+        // --- Auth Logic ---
+        document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
+                if (user.photoURL) {
+                    document.getElementById('user-avatar').innerHTML = `<img src="${user.photoURL}" class="rounded-2xl">`;
+                }
+                
+                await initUserData();
+                loadEntries();
+            } else {
+                document.getElementById('auth-overlay').classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('app').classList.add('hidden');
+            }
+        });
+
+        // --- User Data & Gamification ---
+        async function initUserData() {
+            const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+            const snap = await getDoc(userRef);
+            
+            if (!snap.exists()) {
+                await setDoc(userRef, {
+                    coins: 0,
+                    racha: 0,
+                    lastEntryDate: null,
+                    level: 1,
+                    exp: 0,
+                    unlockedThemes: ['default']
+                });
+            }
+            
+            // Listen to profile changes
+            onSnapshot(userRef, (doc) => {
+                const data = doc.data();
+                document.getElementById('stat-coins').innerText = data.coins;
+                document.getElementById('stat-racha').innerText = data.racha;
+                document.getElementById('level-progress').style.width = `${(data.exp % 100)}%`;
+                document.getElementById('user-rank').innerText = getRankTitle(data.level);
+            });
+        }
+
+        function getRankTitle(level) {
+            if (level < 3) return "Aprendiz de Pensadora";
+            if (level < 7) return "Cronista de Medianoche";
+            if (level < 15) return "Arquitecta del Caos";
+            return "Sabia Absoluta";
+        }
+
+        // --- Diary Logic ---
+        document.querySelectorAll('#mood-selector button').forEach(btn => {
+            btn.onclick = () => {
+                selectedMood = btn.dataset.mood;
+                document.querySelectorAll('#mood-selector button').forEach(b => b.classList.remove('scale-125', 'ring-2', 'ring-indigo-500'));
+                btn.classList.add('scale-125', 'ring-2', 'ring-indigo-500');
+            };
+        });
+
+        document.getElementById('save-entry').onclick = async () => {
+            const text = document.getElementById('entry-text').value.trim();
+            if (!text) return;
+
+            const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+            const profileSnap = await getDoc(userRef);
+            const profileData = profileSnap.data();
+
+            // Guardar entrada
+            await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries'), {
+                content: text,
+                mood: selectedMood,
+                timestamp: Timestamp.now()
+            });
+
+            // Gamificación: Update rewards
+            const now = new Date();
+            const lastDate = profileData.lastEntryDate?.toDate();
+            let newRacha = profileData.racha;
+            
+            if (!lastDate || (now - lastDate) > 86400000 * 2) {
+                newRacha = 1;
+            } else if ((now - lastDate) > 86400000) {
+                newRacha++;
+            }
+
+            await updateDoc(userRef, {
+                coins: profileData.coins + 5,
+                exp: profileData.exp + 10,
+                level: Math.floor((profileData.exp + 10) / 100) + 1,
+                racha: newRacha,
+                lastEntryDate: Timestamp.now()
+            });
+
+            document.getElementById('entry-text').value = '';
+            showSebastianComment();
+        };
+
+        function loadEntries() {
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'entries'));
+            onSnapshot(q, (snapshot) => {
+                const feed = document.getElementById('feed');
+                feed.innerHTML = '';
+                
+                const sorted = snapshot.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                
+                sorted.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp.toDate().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                    const card = document.createElement('div');
+                    card.className = 'glass p-6 rounded-3xl shadow-sm border-l-4 border-indigo-500';
+                    card.innerHTML = `
+                        <div class="flex justify-between mb-2">
+                            <span class="text-xs font-bold opacity-40 uppercase tracking-widest">${date}</span>
+                            <span>${data.mood}</span>
+                        </div>
+                        <p class="text-lg leading-relaxed">${data.content}</p>
+                    `;
+                    feed.appendChild(card);
+                });
+            }, (error) => console.error("Error cargando entradas:", error));
+        }
+
+        // --- UI Interactions ---
+        document.getElementById('open-shop').onclick = () => document.getElementById('shop-modal').classList.remove('hidden');
+        document.getElementById('close-shop').onclick = () => document.getElementById('shop-modal').classList.add('hidden');
+
+        document.querySelectorAll('.buy-theme').forEach(btn => {
+            btn.onclick = async () => {
+                const price = parseInt(btn.dataset.price);
+                const theme = btn.dataset.theme;
+                const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+                const snap = await getDoc(userRef);
+                const data = snap.data();
+
+                if (data.coins >= price) {
+                    await updateDoc(userRef, { 
+                        coins: data.coins - price,
+                        currentTheme: theme 
+                    });
+                    document.body.className = 'min-h-screen ' + theme;
+                    document.getElementById('shop-modal').classList.add('hidden');
+                } else {
+                    alert("Amaya, no tenemos suficientes monedas para estos lujos. ¡A escribir!");
+                }
+            };
+        });
+
+        function showSebastianComment() {
+            const comments = [
+                "Anotado. Una joya más para tu colección de pensamientos.",
+                "Vaya, Amaya. Profundo. O al menos lo parece.",
+                "Guardado. Tu cerebro está que echa chispas hoy.",
+                "Hecho. Sebastian se encarga de que esto no se pierda."
+            ];
+            const msg = comments[Math.floor(Math.random() * comments.length)];
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl z-50 transition-all transform';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
