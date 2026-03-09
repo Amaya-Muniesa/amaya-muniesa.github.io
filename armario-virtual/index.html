@@ -4,84 +4,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mi Armario - Sebastian Edition</title>
+    <title>Mi Armario Virtual - Amaya</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
     <style>
+        :root {
+            --accent-color: #2d3436;
+            --bg-color: #f0f2f5;
+        }
+
         body {
-            background: #f5f7fb;
+            background: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .header {
-            padding: 18px;
+            padding: 30px 0;
             font-family: "Limelight", sans-serif;
             text-align: center;
+            color: var(--accent-color);
         }
 
-        .header h2 img {
-            height: 50px;
-            margin-right: 10px;
-        }
-
-        /* Contenedor de recorte para las capturas */
+        /* El famoso recorte automático de Sebastian */
         .img-container {
             width: 100%;
-            height: 250px;
-            /* Ajusta según prefieras ver más o menos prenda */
+            height: 280px;
             overflow: hidden;
-            /* Aquí sucede la magia del recorte */
-            background: white;
-            display: flex;
-            justify-content: center;
+            background: #fff;
+            position: relative;
+            border-bottom: 1px solid #eee;
         }
 
         .img-container img {
             width: 100%;
-            height: auto;
+            height: 100%;
             object-fit: cover;
-            object-position: center 15%;
-            /* Desplaza la imagen para ocultar el "Detalles de Prenda" de arriba */
-            transform: scale(1.4);
-            /* Zoom para eliminar los bordes laterales de la captura original */
+            /* Ajustamos para centrar la prenda y subir la imagen ocultando cabeceras de la App */
+            object-position: center 20%;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .img-container img {
+            transform: scale(1.1);
         }
 
         .card {
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            transition: transform .15s;
             border: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .card:hover {
-            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            background: white;
+            height: 100%;
         }
 
         .card-body {
+            padding: 15px;
             text-align: center;
-            font-size: 14px;
+        }
+
+        .category-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        .upload-section {
             background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        #status {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .btn-add {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background-color: #000;
+            color: white;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container py-4">
+    <div class="container py-5">
         <div class="header">
-            <h2 class="mb-4"><img src="logo-mi-armario.png" alt=""> Mi Armario</h2>
+            <h1 class="display-4">MI ARMARIO</h1>
+            <p class="lead">Gestionado por Sebastian</p>
         </div>
 
-        <div class="card p-3 mb-4 shadow-sm">
+        <!-- Formulario de Entrada -->
+        <div class="upload-section">
             <form id="formPrenda">
-                <div class="row g-2">
-                    <div class="col-md-3 col-12">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">FOTO DE LA PRENDA</label>
                         <input type="file" id="imagen" class="form-control" accept="image/*" required>
                     </div>
-                    <div class="col-md-3 col-6">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">CATEGORÍA</label>
                         <select id="categoria" class="form-select">
                             <option>Parte de Arriba</option>
                             <option>Prenda Exterior</option>
@@ -93,36 +131,41 @@
                             <option>Otros</option>
                         </select>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <input type="text" id="subcategoria" class="form-control"
-                            placeholder="Ej: Camiseta de tirantes">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">DETALLES</label>
+                        <input type="text" id="subcategoria" class="form-control" placeholder="Ej: Jersey lana azul">
                     </div>
-                    <div class="col-md-2 col-6">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">CLIMA</label>
                         <select id="tiempo" class="form-select">
                             <option>Calor</option>
                             <option>Templado</option>
                             <option>Frío</option>
                         </select>
                     </div>
-                    <div class="col-md-1 col-6 d-grid">
-                        <button type="submit" class="btn btn-dark" id="btnSubir">
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-add w-100" id="btnSubir" title="Añadir al armario">
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
                 </div>
             </form>
-            <div id="status" class="small mt-2 text-muted"></div>
+            <div id="status" class="text-center"></div>
         </div>
 
-        <div class="row" id="galeria">
+        <!-- Galería -->
+        <div class="row g-4" id="galeria">
+            <!-- Sebastian colocará las prendas aquí -->
         </div>
     </div>
 
     <script type="module">
+        // Usamos la versión 10.7.1 para asegurar compatibilidad
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+        // Configuración que me pasaste, Amaya
         const firebaseConfig = {
             apiKey: "AIzaSyBV1AFWdOKHYpy6ruNWnUuQBYQETJeVKag",
             authDomain: "armario-virtual-cbb44.firebaseapp.com",
@@ -140,7 +183,7 @@
         const galeria = document.getElementById('galeria');
         const status = document.getElementById('status');
 
-        // SUBIR PRENDA
+        // Función para subir datos
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const file = document.getElementById('imagen').files[0];
@@ -149,54 +192,71 @@
             if (!file) return;
 
             btn.disabled = true;
-            status.innerText = "Subiendo prenda, Amaya... Un momento.";
+            status.innerHTML = '<span class="text-primary"><i class="fas fa-spinner fa-spin"></i> Sebastian está guardando la prenda en el baúl...</span>';
 
             try {
-                // 1. Subir imagen a Storage
-                const storageRef = ref(storage, 'armario/' + Date.now() + "_" + file.name);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
+                // 1. Subir la imagen al "Storage" (el disco duro de Firebase)
+                const nombreArchivo = `armario_${Date.now()}_${file.name}`;
+                const storageRef = ref(storage, 'fotos_armario/' + nombreArchivo);
 
-                // 2. Guardar datos en Firestore
+                // Subimos el archivo real
+                const snapshot = await uploadBytes(storageRef, file);
+                // Obtenemos la URL pública para verla luego
+                const urlImagen = await getDownloadURL(snapshot.ref);
+
+                // 2. Guardar el resto de datos en "Firestore" (la base de datos)
                 await addDoc(collection(db, "prendas"), {
-                    imagen: url,
+                    imagen: urlImagen,
                     categoria: document.getElementById('categoria').value,
                     subcategoria: document.getElementById('subcategoria').value,
                     tiempo: document.getElementById('tiempo').value,
-                    fecha: Date.now()
+                    fechaCreacion: Date.now()
                 });
 
                 form.reset();
-                status.innerText = "¡Prenda guardada con éxito!";
+                status.innerHTML = '<span class="text-success">¡Listo! Prenda colgada correctamente.</span>';
+                setTimeout(() => status.innerHTML = "", 3000);
+
             } catch (error) {
-                console.error(error);
-                status.innerText = "Algo ha fallado. Sebastian está en ello...";
+                console.error("Error detallado:", error);
+                status.innerHTML = `<span class="text-danger">Error: ${error.message}. ¿Has revisado las Reglas en Firebase?</span>`;
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // LEER PRENDAS EN TIEMPO REAL
-        const q = query(collection(db, "prendas"), orderBy("fecha", "desc"));
+        // Escuchar cambios en la base de datos para mostrar las fotos
+        const q = query(collection(db, "prendas"), orderBy("fechaCreacion", "desc"));
         onSnapshot(q, (snapshot) => {
             galeria.innerHTML = "";
+            if (snapshot.empty) {
+                galeria.innerHTML = '<div class="col-12 text-center text-muted mt-5"><h3>El armario está vacío. ¡Es hora de ir de compras!</h3></div>';
+                return;
+            }
+
             snapshot.forEach((doc) => {
-                const p = doc.data();
-                galeria.innerHTML += `
-                <div class="col-lg-3 col-md-4 col-6 mb-4">
-                    <div class="card h-100">
+                const data = doc.data();
+                const card = `
+                <div class="col-xl-3 col-lg-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
                         <div class="img-container">
-                            <img src="${p.imagen}">
+                            <img src="${data.imagen}" alt="Prenda" loading="lazy">
                         </div>
                         <div class="card-body">
-                            <h6 class="mb-1"><b>${p.categoria}</b></h6>
-                            <p class="mb-0 text-secondary">${p.subcategoria}</p>
-                            <span class="badge bg-light text-dark border">${p.tiempo}</span>
+                            <div class="category-badge mb-1">${data.categoria}</div>
+                            <h6 class="card-title fw-bold mb-2">${data.subcategoria || 'Sin descripción'}</h6>
+                            <div class="d-flex justify-content-center">
+                                <span class="badge rounded-pill bg-dark opacity-75 small">${data.tiempo}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
+                galeria.innerHTML += card;
             });
+        }, (error) => {
+            console.error("Error en la galería:", error);
+            galeria.innerHTML = '<p class="text-center text-danger">No se han podido cargar las prendas. Revisa los permisos de Firestore.</p>';
         });
     </script>
 
