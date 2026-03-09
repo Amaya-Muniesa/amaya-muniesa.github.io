@@ -42,13 +42,14 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center 22%; 
-            transform: scale(1.15); /* Un poquito más de zoom para asegurar el recorte */
+            /* Subimos la imagen y ampliamos para quitar bordes de la captura original */
+            object-position: center 20%; 
+            transform: scale(1.2); 
             transition: transform 0.3s ease;
         }
 
         .card:hover .img-container img {
-            transform: scale(1.25) translateY(-5px);
+            transform: scale(1.3) translateY(-5px);
         }
 
         .card { 
@@ -162,9 +163,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // CONFIGURACIÓN CLOUDINARY
-    const CLOUD_NAME = "armario-virtual-cbb44"; // Basado en tu proyecto Firebase
-    const UPLOAD_PRESET = "nqlcmyzi"; 
+    // CONFIGURACIÓN CLOUDINARY ACTUALIZADA
+    const CLOUD_NAME = "armario-virtual-cbb44"; 
+    const UPLOAD_PRESET = "armariovirtual"; 
 
     const form = document.getElementById('formPrenda');
     const galeria = document.getElementById('galeria');
@@ -182,7 +183,7 @@
         status.innerHTML = '<span class="text-primary"><i class="fas fa-spinner fa-spin"></i> Sebastian está procesando tu nueva adquisición...</span>';
 
         try {
-            // 1. SUBIDA A CLOUDINARY (Unsigned)
+            // SUBIDA A CLOUDINARY
             const formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", UPLOAD_PRESET);
@@ -197,7 +198,7 @@
             if (result.secure_url) {
                 const urlImagen = result.secure_url;
 
-                // 2. GUARDAR DATOS EN FIRESTORE
+                // GUARDAR DATOS EN FIRESTORE
                 await addDoc(collection(db, "prendas"), {
                     imagen: urlImagen,
                     categoria: document.getElementById('categoria').value,
