@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mi Armario Virtual - Amaya</title>
-
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
@@ -16,23 +15,24 @@
             --bg-color: #f0f2f5;
         }
 
-        body {
-            background: var(--bg-color);
+        body { 
+            background: var(--bg-color); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .header {
-            padding: 30px 0;
-            font-family: "Limelight", sans-serif;
+        .header { 
+            padding: 30px 0; 
+            font-family: "Limelight", sans-serif; 
             text-align: center;
             color: var(--accent-color);
         }
 
-        /* Recorte automático Sebastian-Style */
+        /* Recorte automático Sebastian-Style: 
+           Zoom y desplazamiento para ocultar menús de capturas */
         .img-container {
             width: 100%;
-            height: 280px;
-            overflow: hidden;
+            height: 280px; 
+            overflow: hidden; 
             background: #fff;
             position: relative;
             border-bottom: 1px solid #eee;
@@ -42,28 +42,27 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Zoom y posición para ignorar menús de capturas de pantalla */
-            object-position: center 22%;
-            transform: scale(1.1);
+            object-position: center 22%; 
+            transform: scale(1.15); /* Un poquito más de zoom para asegurar el recorte */
             transition: transform 0.3s ease;
         }
 
         .card:hover .img-container img {
-            transform: scale(1.2) translateY(-5px);
+            transform: scale(1.25) translateY(-5px);
         }
 
-        .card {
-            border-radius: 15px;
-            overflow: hidden;
+        .card { 
+            border-radius: 15px; 
+            overflow: hidden; 
             border: none;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             background: white;
             height: 100%;
         }
 
-        .card-body {
+        .card-body { 
             padding: 15px;
-            text-align: center;
+            text-align: center; 
         }
 
         .category-badge {
@@ -79,7 +78,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .btn-add {
@@ -94,139 +93,142 @@
         }
     </style>
 </head>
-
 <body>
 
-    <div class="container py-5">
-        <div class="header">
-            <h1 class="display-4">MI ARMARIO</h1>
-            <p class="lead">Solución Gratuita gestionada por Sebastian</p>
-        </div>
-
-        <div class="upload-section">
-            <form id="formPrenda">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold text-muted">CAPTURA DE PRENDA</label>
-                        <input type="file" id="imagen" class="form-control" accept="image/*" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">CATEGORÍA</label>
-                        <select id="categoria" class="form-select">
-                            <option>Parte de Arriba</option>
-                            <option>Prenda Exterior</option>
-                            <option>Vestido</option>
-                            <option>Pantalón</option>
-                            <option>Falda</option>
-                            <option>Zapatos</option>
-                            <option>Bolsos</option>
-                            <option>Otros</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold text-muted">DETALLES</label>
-                        <input type="text" id="subcategoria" class="form-control" placeholder="Ej: Top Zara seda">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">CLIMA</label>
-                        <select id="tiempo" class="form-select">
-                            <option>Calor</option>
-                            <option>Templado</option>
-                            <option>Frío</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-add w-100" id="btnSubir">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <div id="status" class="text-center mt-3"></div>
-        </div>
-
-        <div class="row g-4" id="galeria"></div>
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">MI ARMARIO</h1>
+        <p class="lead">Personalizado para Amaya</p>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div class="upload-section">
+        <form id="formPrenda">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted">CAPTURA DE PRENDA</label>
+                    <input type="file" id="imagen" class="form-control" accept="image/*" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">CATEGORÍA</label>
+                    <select id="categoria" class="form-select">
+                        <option>Parte de Arriba</option>
+                        <option>Prenda Exterior</option>
+                        <option>Vestido</option>
+                        <option>Pantalón</option>
+                        <option>Falda</option>
+                        <option>Zapatos</option>
+                        <option>Bolsos</option>
+                        <option>Otros</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">DETALLES</label>
+                    <input type="text" id="subcategoria" class="form-control" placeholder="Ej: Top Zara seda">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">CLIMA</label>
+                    <select id="tiempo" class="form-select">
+                        <option>Calor</option>
+                        <option>Templado</option>
+                        <option>Frío</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-add w-100" id="btnSubir">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="status" class="text-center mt-3"></div>
+    </div>
 
-        // Tu configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBV1AFWdOKHYpy6ruNWnUuQBYQETJeVKag",
-            authDomain: "armario-virtual-cbb44.firebaseapp.com",
-            projectId: "armario-virtual-cbb44",
-            storageBucket: "armario-virtual-cbb44.firebasestorage.app",
-            messagingSenderId: "248808343836",
-            appId: "1:248808343836:web:10fdf22ed5dab93e3b92d9"
-        };
+    <div class="row g-4" id="galeria"></div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // API Key de ImgBB (Gratuita para Sebastian y Amaya)
-        const IMGBB_API_KEY = "69438089408018e698822003886580f5";
+    const firebaseConfig = {
+        apiKey: "AIzaSyBV1AFWdOKHYpy6ruNWnUuQBYQETJeVKag",
+        authDomain: "armario-virtual-cbb44.firebaseapp.com",
+        projectId: "armario-virtual-cbb44",
+        storageBucket: "armario-virtual-cbb44.firebasestorage.app",
+        messagingSenderId: "248808343836",
+        appId: "1:248808343836:web:10fdf22ed5dab93e3b92d9"
+    };
 
-        const form = document.getElementById('formPrenda');
-        const galeria = document.getElementById('galeria');
-        const status = document.getElementById('status');
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('imagen').files[0];
-            const btn = document.getElementById('btnSubir');
+    // CONFIGURACIÓN CLOUDINARY
+    const CLOUD_NAME = "armario-virtual-cbb44"; // Basado en tu proyecto Firebase
+    const UPLOAD_PRESET = "nqlcmyzi"; 
 
-            if (!file) return;
+    const form = document.getElementById('formPrenda');
+    const galeria = document.getElementById('galeria');
+    const status = document.getElementById('status');
 
-            btn.disabled = true;
-            status.innerHTML = '<span class="text-primary"><i class="fas fa-spinner fa-spin"></i> Subiendo imagen a la nube...</span>';
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const file = document.getElementById('imagen').files[0];
+        const btn = document.getElementById('btnSubir');
+        
+        if(!file) return;
 
-            try {
-                // 1. SUBIDA A IMGBB (Gratis y sin complicaciones)
-                const formData = new FormData();
-                formData.append("image", file);
+        btn.disabled = true;
+        status.innerHTML = '<span class="text-primary"><i class="fas fa-spinner fa-spin"></i> Sebastian está procesando tu nueva adquisición...</span>';
 
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: "POST",
-                    body: formData
+        try {
+            // 1. SUBIDA A CLOUDINARY (Unsigned)
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                method: "POST",
+                body: formData
+            });
+            
+            const result = await response.json();
+
+            if (result.secure_url) {
+                const urlImagen = result.secure_url;
+
+                // 2. GUARDAR DATOS EN FIRESTORE
+                await addDoc(collection(db, "prendas"), {
+                    imagen: urlImagen,
+                    categoria: document.getElementById('categoria').value,
+                    subcategoria: document.getElementById('subcategoria').value,
+                    tiempo: document.getElementById('tiempo').value,
+                    fechaCreacion: Date.now()
                 });
-                const result = await response.json();
 
-                if (result.success) {
-                    const urlImagen = result.data.url;
-
-                    // 2. GUARDAR DATOS EN FIRESTORE
-                    await addDoc(collection(db, "prendas"), {
-                        imagen: urlImagen,
-                        categoria: document.getElementById('categoria').value,
-                        subcategoria: document.getElementById('subcategoria').value,
-                        tiempo: document.getElementById('tiempo').value,
-                        fechaCreacion: Date.now()
-                    });
-
-                    form.reset();
-                    status.innerHTML = '<span class="text-success">¡Prenda guardada en el armario!</span>';
-                } else {
-                    throw new Error("Fallo en la subida a ImgBB");
-                }
-
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = '<span class="text-danger">Sebastian no ha podido guardar la prenda. Revisa la consola.</span>';
-            } finally {
-                btn.disabled = false;
-                setTimeout(() => status.innerHTML = "", 3000);
+                form.reset();
+                status.innerHTML = '<span class="text-success">¡Prenda guardada! Ha quedado ideal en la percha.</span>';
+            } else {
+                console.error("Cloudinary Error:", result);
+                throw new Error(result.error ? result.error.message : "Fallo en la subida");
             }
-        });
 
-        // Leer prendas
-        const q = query(collection(db, "prendas"), orderBy("fechaCreacion", "desc"));
-        onSnapshot(q, (snapshot) => {
-            galeria.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                galeria.innerHTML += `
+        } catch (error) {
+            console.error(error);
+            status.innerHTML = `<span class="text-danger">Vaya, Amaya. Ha ocurrido un error: ${error.message}</span>`;
+        } finally {
+            btn.disabled = false;
+            setTimeout(() => status.innerHTML = "", 4000);
+        }
+    });
+
+    // Leer prendas en tiempo real
+    const q = query(collection(db, "prendas"), orderBy("fechaCreacion", "desc"));
+    onSnapshot(q, (snapshot) => {
+        galeria.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            galeria.innerHTML += `
                 <div class="col-xl-3 col-lg-4 col-sm-6">
                     <div class="card shadow-sm h-100">
                         <div class="img-container">
@@ -240,9 +242,8 @@
                     </div>
                 </div>
             `;
-            });
         });
-    </script>
+    });
+</script>
 </body>
-
 </html>
