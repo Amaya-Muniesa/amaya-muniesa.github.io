@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovejitas de Ensueño</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importamos FontAwesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap');
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(to bottom, #1a1c2c 0%, #4a192c 100%);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at center, #ffffff 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30vh;
+            background: #2d5a27;
+            border-top: 10px solid #3d7a35;
+        }
+
+        .fence {
+            position: absolute;
+            bottom: 25vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 60px;
+            background: #5d4037;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .sheep {
+            position: absolute;
+            bottom: 25vh;
+            left: 10vw;
+            font-size: 3.5rem;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        @keyframes jumpRight {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            40% { transform: translate(30vw, -180px) rotate(180deg); }
+            100% { transform: translate(70vw, 0) rotate(360deg); }
+        }
+
+        .jump-animation {
+            animation: jumpRight 2.8s ease-in-out forwards;
+        }
+
+        .coin-pop {
+            position: absolute;
+            color: #ffd700;
+            font-weight: bold;
+            pointer-events: none;
+            animation: fadeUp 1.2s ease-out forwards;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        #peace-message {
+            position: absolute;
+            top: 25%;
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.6);
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-60px); }
+        }
+
+        .ui-panel {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .coin-icon {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center text-white">
+    <div class="stars"></div>
+    <div id="peace-message" class="opacity-0">Inhala paz, exhala tensión...</div>
+
+    <!-- UI Superior -->
+    <div class="mt-8 z-50 text-center">
+        <h1 class="text-xl font-light tracking-widest opacity-60">Dulces Sueños, Amaya</h1>
+        <div class="text-4xl font-bold mt-2 flex items-center justify-center gap-2">
+            <span id="money-display">0</span>
+            <i class="fa-solid fa-coins coin-icon"></i>
+        </div>
+    </div>
+
+    <!-- Área de Juego -->
+    <div class="flex-grow w-full relative" id="game-area">
+        <div class="fence">
+            <div class="absolute top-[-10px] w-full h-2 bg-stone-700"></div>
+        </div>
+        <div class="grass"></div>
+    </div>
+
+    <!-- UI Inferior (Mejoras) -->
+    <div class="ui-panel w-full max-w-md mb-8 p-6 rounded-3xl mx-4 z-50">
+        <div class="grid grid-cols-2 gap-4">
+            <button id="upgrade-value" class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
+                <div class="text-xs opacity-60 uppercase tracking-tighter">Lana de Oro</div>
+                <div class="font-bold text-lg flex items-center justify-center gap-1">
+                    <span id="val-cost">10</span>
+                    <i class="fa-solid fa-coins text-sm coin-icon"></i>
+                </div>
+                <div class="text-[10px] mt-1 opacity-50">Mejora el valor</div>
+            </button>
+            <button id="upgrade-speed" class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
+                <div class="text-xs opacity-60 uppercase tracking-tighter">Pezuñas Ligeras</div>
+                <div class="font-bold text-lg flex items-center justify-center gap-1">
+                    <span id="speed-cost">25</span>
+                    <i class="fa-solid fa-coins text-sm coin-icon"></i>
+                </div>
+                <div class="text-[10px] mt-1 opacity-50">Más frecuencia</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let money = 0;
+        let sheepValue = 1;
+        let spawnInterval = 6000;
+        let upgradeValCost = 10;
+        let upgradeSpeedCost = 25;
+        let lastSpawn = 0;
+        let messageTimer = 0;
+
+        const messages = [
+            "Inhala paz, exhala tensión...",
+            "Todo está bien ahora.",
+            "Tu mente está tranquila.",
+            "Las estrellas te cuidan.",
+            "Suelta el peso del día.",
+            "Descansa, Amaya.",
+            "Mañana será un gran día.",
+            "Siente la calma del prado.",
+            "Una ovejita más..."
+        ];
+
+        const moneyDisplay = document.getElementById('money-display');
+        const gameArea = document.getElementById('game-area');
+        const valCostDisplay = document.getElementById('val-cost');
+        const speedCostDisplay = document.getElementById('speed-cost');
+        const peaceMsg = document.getElementById('peace-message');
+
+        function updateUI() {
+            moneyDisplay.innerText = Math.floor(money);
+            valCostDisplay.innerText = upgradeValCost;
+            speedCostDisplay.innerText = upgradeSpeedCost;
+        }
+
+        function showPeaceMessage() {
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            peaceMsg.innerText = msg;
+            peaceMsg.classList.replace('opacity-0', 'opacity-100');
+            
+            setTimeout(() => {
+                peaceMsg.classList.replace('opacity-100', 'opacity-0');
+            }, 4000);
+        }
+
+        function createSheep() {
+            const sheep = document.createElement('div');
+            sheep.className = 'sheep';
+            sheep.innerText = '🐑';
+            gameArea.appendChild(sheep);
+
+            setTimeout(() => {
+                sheep.classList.add('jump-animation');
+                
+                setTimeout(() => {
+                    gainMoney(sheepValue, gameArea.offsetWidth / 2, gameArea.offsetHeight * 0.45);
+                }, 1100);
+
+                setTimeout(() => {
+                    sheep.remove();
+                }, 3000);
+            }, 50);
+        }
+
+        function gainMoney(amount, x, y) {
+            money += amount;
+            updateUI();
+
+            const pop = document.createElement('div');
+            pop.className = 'coin-pop';
+            pop.innerHTML = `+${amount} <i class="fa-solid fa-coins text-xs"></i>`;
+            pop.style.left = `${x}px`;
+            pop.style.top = `${y}px`;
+            gameArea.appendChild(pop);
+
+            setTimeout(() => pop.remove(), 1200);
+        }
+
+        gameArea.addEventListener('click', (e) => {
+            createSheep();
+        });
+
+        document.getElementById('upgrade-value').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (money >= upgradeValCost) {
+                money -= upgradeValCost;
+                sheepValue += 1;
+                upgradeValCost = Math.floor(upgradeValCost * 1.6);
+                updateUI();
+            }
+        });
+
+        document.getElementById('upgrade-speed').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (money >= upgradeSpeedCost) {
+                money -= upgradeSpeedCost;
+                spawnInterval = Math.max(1500, spawnInterval - 600);
+                upgradeSpeedCost = Math.floor(upgradeSpeedCost * 1.9);
+                updateUI();
+            }
+        });
+
+        function gameLoop(timestamp) {
+            if (!lastSpawn) lastSpawn = timestamp;
+            if (!messageTimer) messageTimer = timestamp;
+
+            if (timestamp - lastSpawn > spawnInterval) {
+                createSheep();
+                lastSpawn = timestamp;
+            }
+
+            if (timestamp - messageTimer > 12000) {
+                showPeaceMessage();
+                messageTimer = timestamp;
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        requestAnimationFrame(gameLoop);
+        updateUI();
+        setTimeout(showPeaceMessage, 2000);
+    </script>
+</body>
+</html>
