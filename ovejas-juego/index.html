@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ovejitas de Ensueño</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Importamos FontAwesome para los iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap');
@@ -60,9 +60,17 @@
         }
 
         @keyframes jumpRight {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            40% { transform: translate(30vw, -180px) rotate(180deg); }
-            100% { transform: translate(70vw, 0) rotate(360deg); }
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(30vw, -180px) rotate(180deg);
+            }
+
+            100% {
+                transform: translate(70vw, 0) rotate(360deg);
+            }
         }
 
         .jump-animation {
@@ -96,8 +104,15 @@
         }
 
         @keyframes fadeUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-60px); }
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-60px);
+            }
         }
 
         .ui-panel {
@@ -105,17 +120,17 @@
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .coin-icon {
             color: #ffd700;
         }
     </style>
 </head>
+
 <body class="h-screen w-screen flex flex-col items-center text-white">
     <div class="stars"></div>
     <div id="peace-message" class="opacity-0">Inhala paz, exhala tensión...</div>
 
-    <!-- UI Superior -->
     <div class="mt-8 z-50 text-center">
         <h1 class="text-xl font-light tracking-widest opacity-60">Dulces Sueños, Amaya</h1>
         <div class="text-4xl font-bold mt-2 flex items-center justify-center gap-2">
@@ -124,7 +139,6 @@
         </div>
     </div>
 
-    <!-- Área de Juego -->
     <div class="flex-grow w-full relative" id="game-area">
         <div class="fence">
             <div class="absolute top-[-10px] w-full h-2 bg-stone-700"></div>
@@ -132,10 +146,10 @@
         <div class="grass"></div>
     </div>
 
-    <!-- UI Inferior (Mejoras) -->
     <div class="ui-panel w-full max-w-md mb-8 p-6 rounded-3xl mx-4 z-50">
         <div class="grid grid-cols-2 gap-4">
-            <button id="upgrade-value" class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
+            <button id="upgrade-value"
+                class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
                 <div class="text-xs opacity-60 uppercase tracking-tighter">Lana de Oro</div>
                 <div class="font-bold text-lg flex items-center justify-center gap-1">
                     <span id="val-cost">10</span>
@@ -143,7 +157,8 @@
                 </div>
                 <div class="text-[10px] mt-1 opacity-50">Mejora el valor</div>
             </button>
-            <button id="upgrade-speed" class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
+            <button id="upgrade-speed"
+                class="bg-indigo-900/40 hover:bg-indigo-800/60 p-4 rounded-2xl transition-all active:scale-95 border border-indigo-400/20">
                 <div class="text-xs opacity-60 uppercase tracking-tighter">Pezuñas Ligeras</div>
                 <div class="font-bold text-lg flex items-center justify-center gap-1">
                     <span id="speed-cost">25</span>
@@ -152,14 +167,21 @@
                 <div class="text-[10px] mt-1 opacity-50">Más frecuencia</div>
             </button>
         </div>
+        <div class="flex justify-center mt-4">
+            <button id="reset-game"
+                class="text-[10px] opacity-30 hover:opacity-100 transition-opacity uppercase tracking-widest">Reiniciar
+                Progreso</button>
+        </div>
     </div>
 
     <script>
+        // Variables de estado inicial
         let money = 0;
         let sheepValue = 1;
         let spawnInterval = 6000;
         let upgradeValCost = 10;
         let upgradeSpeedCost = 25;
+
         let lastSpawn = 0;
         let messageTimer = 0;
 
@@ -181,6 +203,39 @@
         const speedCostDisplay = document.getElementById('speed-cost');
         const peaceMsg = document.getElementById('peace-message');
 
+        // --- FUNCIONES DE PERSISTENCIA ---
+        function saveGame() {
+            const gameState = {
+                money: money,
+                sheepValue: sheepValue,
+                spawnInterval: spawnInterval,
+                upgradeValCost: upgradeValCost,
+                upgradeSpeedCost: upgradeSpeedCost
+            };
+            localStorage.setItem('amaya_sheep_save', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('amaya_sheep_save');
+            if (savedData) {
+                const state = JSON.parse(savedData);
+                money = state.money || 0;
+                sheepValue = state.sheepValue || 1;
+                spawnInterval = state.spawnInterval || 6000;
+                upgradeValCost = state.upgradeValCost || 10;
+                upgradeSpeedCost = state.upgradeSpeedCost || 25;
+            }
+            updateUI();
+        }
+
+        function resetGame() {
+            if (confirm("¿Seguro que quieres reiniciar tu granja de sueños, Amaya?")) {
+                localStorage.removeItem('amaya_sheep_save');
+                location.reload();
+            }
+        }
+        // ---------------------------------
+
         function updateUI() {
             moneyDisplay.innerText = Math.floor(money);
             valCostDisplay.innerText = upgradeValCost;
@@ -191,7 +246,7 @@
             const msg = messages[Math.floor(Math.random() * messages.length)];
             peaceMsg.innerText = msg;
             peaceMsg.classList.replace('opacity-0', 'opacity-100');
-            
+
             setTimeout(() => {
                 peaceMsg.classList.replace('opacity-100', 'opacity-0');
             }, 4000);
@@ -205,7 +260,7 @@
 
             setTimeout(() => {
                 sheep.classList.add('jump-animation');
-                
+
                 setTimeout(() => {
                     gainMoney(sheepValue, gameArea.offsetWidth / 2, gameArea.offsetHeight * 0.45);
                 }, 1100);
@@ -219,6 +274,7 @@
         function gainMoney(amount, x, y) {
             money += amount;
             updateUI();
+            saveGame(); // Guardar al ganar dinero
 
             const pop = document.createElement('div');
             pop.className = 'coin-pop';
@@ -241,6 +297,7 @@
                 sheepValue += 1;
                 upgradeValCost = Math.floor(upgradeValCost * 1.6);
                 updateUI();
+                saveGame();
             }
         });
 
@@ -251,8 +308,11 @@
                 spawnInterval = Math.max(1500, spawnInterval - 600);
                 upgradeSpeedCost = Math.floor(upgradeSpeedCost * 1.9);
                 updateUI();
+                saveGame();
             }
         });
+
+        document.getElementById('reset-game').addEventListener('click', resetGame);
 
         function gameLoop(timestamp) {
             if (!lastSpawn) lastSpawn = timestamp;
@@ -271,9 +331,11 @@
             requestAnimationFrame(gameLoop);
         }
 
+        // Cargar datos al iniciar
+        loadGame();
         requestAnimationFrame(gameLoop);
-        updateUI();
         setTimeout(showPeaceMessage, 2000);
     </script>
 </body>
+
 </html>
