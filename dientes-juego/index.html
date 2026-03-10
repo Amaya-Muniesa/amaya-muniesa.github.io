@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brushing Quest - Tu Rutina Dental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .pixel-font {
+            font-family: 'Press+Start+2P', cursive;
+        }
+
+        .brush-animation {
+            animation: brush 0.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes brush {
+            from {
+                transform: translateX(-10px) rotate(-5deg);
+            }
+
+            to {
+                transform: translateX(10px) rotate(5deg);
+            }
+        }
+
+        .progress-ring {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="max-w-md w-full bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-700">
+        <!-- Header / Stats -->
+        <div class="p-6 bg-slate-900 border-b border-slate-700">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="pixel-font text-[10px] text-blue-400">BRUSHING QUEST</h1>
+                <div class="flex items-center gap-2">
+                    <span id="streak-count" class="text-orange-400 font-bold">0</span>
+                    <span class="text-xl">🔥</span>
+                </div>
+            </div>
+
+            <div class="flex justify-around text-center">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase">Nivel</p>
+                    <p id="user-level" class="font-bold text-blue-300 italic">Novato del Hilo</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase">XP Total</p>
+                    <p id="total-xp" class="font-bold text-green-400">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="game-container" class="p-8 text-center">
+            <!-- Initial State -->
+            <div id="start-screen">
+                <div class="mb-8 flex justify-center">
+                    <div
+                        class="w-32 h-32 bg-slate-700 rounded-full flex items-center justify-center text-6xl shadow-inner">
+                        🦷
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">¿Lista para la batalla, Amaya?</h2>
+                <p class="text-slate-400 mb-8">2 minutos para derrotar a las caries y ganar 50 XP.</p>
+                <button onclick="startQuest()"
+                    class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-lg transition-transform active:scale-95 shadow-lg shadow-blue-900/20">
+                    ¡EMPEZAR QUEST!
+                </button>
+            </div>
+
+            <!-- Timer State -->
+            <div id="timer-screen" class="hidden">
+                <div class="relative flex justify-center items-center mb-8">
+                    <svg class="w-48 h-48">
+                        <circle class="text-slate-700" stroke-width="8" stroke="currentColor" fill="transparent" r="80"
+                            cx="96" cy="96" />
+                        <circle id="progress-bar" class="text-blue-500 progress-ring" stroke-width="8"
+                            stroke-dasharray="502.6" stroke-dashoffset="0" stroke-linecap="round" stroke="currentColor"
+                            fill="transparent" r="80" cx="96" cy="96" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div id="timer-display" class="text-4xl font-bold mb-1">02:00</div>
+                        <div id="zone-display" class="text-xs uppercase text-blue-400 font-bold">Zona Frontal</div>
+                    </div>
+                </div>
+
+                <div id="brush-icon" class="text-5xl mb-6 brush-animation">🦷</div>
+
+                <p id="instruction" class="text-slate-300 italic mb-8">"Limpia esos molares como si fueran tesoros..."
+                </p>
+
+                <button onclick="cancelQuest()"
+                    class="text-slate-500 hover:text-red-400 transition-colors text-sm underline">
+                    Abandonar misión (Cobarde)
+                </button>
+            </div>
+
+            <!-- Success State -->
+            <div id="success-screen" class="hidden">
+                <div class="mb-6 text-6xl animate-bounce">🏆</div>
+                <h2 class="text-2xl font-bold mb-2 text-green-400">¡Victoria Magistral!</h2>
+                <p class="text-slate-300 mb-6">Tus encías te lo agradecen. Has ganado <span
+                        class="text-yellow-400 font-bold">+50 XP</span>.</p>
+                <button onclick="resetUI()"
+                    class="w-full py-4 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold transition-transform active:scale-95">
+                    Volver al cuartel
+                </button>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div class="p-4 bg-slate-900/50 border-t border-slate-700">
+            <p class="text-[10px] pixel-font text-slate-500 mb-2">ÚLTIMOS AVISTAMIENTOS</p>
+            <div id="log-container" class="space-y-1 max-h-24 overflow-y-auto text-xs text-slate-400 italic">
+                <!-- Log items go here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State - El progreso se guarda localmente en el navegador de Amaya
+        let stats = {
+            streak: 0,
+            xp: 0,
+            lastDate: null,
+            logs: []
+        };
+
+        let timeLeft = 120;
+        let timerId = null;
+        const totalTime = 120;
+
+        const zones = [
+            { time: 120, name: "Frontal Superior", icon: "🦷" },
+            { time: 90, name: "Lado Izquierdo", icon: "👈" },
+            { time: 60, name: "Lado Derecho", icon: "👉" },
+            { time: 30, name: "Zonas Internas", icon: "👅" }
+        ];
+
+        // Init
+        window.onload = () => {
+            loadStats();
+            updateUI();
+        };
+
+        // Recupera los datos del almacenamiento local del navegador
+        function loadStats() {
+            const saved = localStorage.getItem('brushing_quest_stats');
+            if (saved) {
+                stats = JSON.parse(saved);
+                // Verifica si la racha se ha roto (más de 36 horas sin cepillarse)
+                if (stats.lastDate) {
+                    const last = new Date(stats.lastDate);
+                    const now = new Date();
+                    const hoursDiff = (now - last) / (1000 * 60 * 60);
+                    if (hoursDiff > 36) {
+                        stats.streak = 0;
+                        addLog("¡Racha perdida! El sarro ha ganado esta batalla.");
+                    }
+                }
+            }
+        }
+
+        // Guarda el estado actual en localStorage para persistencia
+        function saveStats() {
+            localStorage.setItem('brushing_quest_stats', JSON.stringify(stats));
+        }
+
+        function updateUI() {
+            document.getElementById('streak-count').innerText = stats.streak;
+            document.getElementById('total-xp').innerText = stats.xp;
+
+            // Lógica de niveles basada en XP acumulada
+            let level = "Novato del Hilo";
+            if (stats.xp >= 500) level = "Guardián del Esmalte";
+            if (stats.xp >= 1500) level = "Caballero Dentífrico";
+            if (stats.xp >= 5000) level = "Soberano de la Sonrisa";
+            document.getElementById('user-level').innerText = level;
+
+            // Renderizado de los logs históricos
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = stats.logs.slice().reverse().map(log =>
+                `<div class="border-l-2 border-slate-700 pl-2 py-1">${log}</div>`
+            ).join('');
+        }
+
+        function startQuest() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('timer-screen').classList.remove('hidden');
+
+            timeLeft = totalTime;
+            runTimer();
+        }
+
+        function runTimer() {
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    completeQuest();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer-display').innerText =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            // Actualización visual del anillo de progreso
+            const circle = document.getElementById('progress-bar');
+            const radius = 80;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (timeLeft / totalTime) * circumference;
+            circle.style.strokeDashoffset = offset;
+
+            // Cambio dinámico de zonas de cepillado
+            const currentZone = zones.find(z => timeLeft >= z.time - 30) || zones[zones.length - 1];
+            document.getElementById('zone-display').innerText = currentZone.name;
+            document.getElementById('brush-icon').innerText = currentZone.icon;
+        }
+
+        function completeQuest() {
+            clearInterval(timerId);
+
+            const now = new Date();
+            const last = stats.lastDate ? new Date(stats.lastDate) : null;
+
+            // Evitamos spam: solo aumenta la racha una vez cada 6 horas
+            if (!last || (now - last) > (6 * 60 * 60 * 1000)) {
+                stats.streak++;
+                stats.xp += 50;
+                addLog(`Misión cumplida. +50 XP. Racha: ${stats.streak}`);
+            } else {
+                stats.xp += 10;
+                addLog("Limpieza extra. +10 XP. (Racha ya contada)");
+            }
+
+            stats.lastDate = now.toISOString();
+            saveStats();
+            updateUI();
+
+            document.getElementById('timer-screen').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+        }
+
+        function cancelQuest() {
+            if (confirm("Si abandonas ahora, los monstruos de la placa ganarán. ¿Seguro, Amaya?")) {
+                clearInterval(timerId);
+                resetUI();
+                addLog("Retirada táctica... el dentista no estará contento.");
+                updateUI();
+            }
+        }
+
+        function resetUI() {
+            document.getElementById('timer-screen').classList.add('hidden');
+            document.getElementById('success-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            clearInterval(timerId);
+        }
+
+        function addLog(msg) {
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            stats.logs.push(`[${timeStr}] ${msg}`);
+            if (stats.logs.length > 20) stats.logs.shift();
+            saveStats();
+        }
+    </script>
+</body>
+
+</html>
