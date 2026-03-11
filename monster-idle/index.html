@@ -430,7 +430,7 @@
         let state = {
             route: 1,
             maxUnlockedRoute: 1,
-            defeatedPerRoute: { 1: 0, 2: 0, 3: 0, 4: 0 }, // Ahora guarda derrotas por ID de ruta
+            defeatedPerRoute: { 1: 0, 2: 0, 3: 0, 4: 0 },
             requiredToAdvance: 10,
             dpc: 1,
             dps: 0,
@@ -455,7 +455,6 @@
                 const data = JSON.parse(saved);
                 state = { ...state, ...data };
                 state.caughtIds = new Set(data.caughtIds);
-                // Migración para partidas antiguas que no tenían defeatedPerRoute
                 if (!state.defeatedPerRoute) {
                     state.defeatedPerRoute = { 1: 0, 2: 0, 3: 0, 4: 0 };
                 }
@@ -488,7 +487,7 @@
             document.getElementById('creature-name').innerText = currentCreature.name.toUpperCase();
             document.getElementById('creature-sprite-container').innerHTML = createSVG(currentCreature.color);
             updateHPBar();
-            checkNextRouteButton(); // Actualizar visibilidad del botón al spawnear
+            checkNextRouteButton();
         }
 
         function createSVG(color) {
@@ -536,8 +535,10 @@
                 state.dps += 2;
                 showNotification(`¡${currentCreature.name} CAPTURADO!\nDPC +1 | DPS +2`);
             } else {
-                state.pc += 1;
-                showNotification(`¡${currentCreature.name} DERROTADO!\n+1 PC (Repetido)`);
+                // Recompensa escalada por ruta: Ruta 1 = 1PC, Ruta 2 = 2PC, etc.
+                const pcReward = state.route;
+                state.pc += pcReward;
+                showNotification(`¡${currentCreature.name} DERROTADO!\n+${pcReward} PC (Escalado)`);
             }
 
             state.defeatedPerRoute[state.route]++;
@@ -676,6 +677,7 @@
                 </div>
                 <div style="text-align:right">
                     <div>${isLocked ? 'BLOQUEADO' : caughtInRoute + '/' + creaturesInRoute.length}</div>
+                    <div style="font-size:7px; color:#d35400; margin-top:3px">+${r.id} PC/Derrota</div>
                 </div>
             `;
                 list.appendChild(div);
