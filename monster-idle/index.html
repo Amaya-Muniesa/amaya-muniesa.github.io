@@ -220,6 +220,30 @@
             background: #fff9e6;
         }
 
+        /* Routes List Styles */
+        .route-item {
+            border: 4px solid #000;
+            margin-bottom: 10px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .route-item.locked {
+            background: #ecf0f1;
+            color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .route-item.current {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+
         /* Shop Styles */
         .shop-item {
             border: 4px solid #000;
@@ -298,7 +322,6 @@
                 <span>CAPT: <span id="stat-caught">0/12</span></span>
                 <div class="pc-badge-container">
                     <div class="pc-badge">PC: <span id="stat-pc">0</span></div>
-                    <!-- Tooltip con niveles -->
                     <div class="upgrades-tooltip" id="upgrades-tooltip">
                         <div
                             style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px; color: #d35400;">
@@ -334,7 +357,7 @@
             <div class="btn" onclick="toggleOverlay('shop')">MEJORAS</div>
             <div class="btn" id="next-route-btn" style="opacity: 0.4; pointer-events: none;" onclick="nextRoute()">SIG.
                 RUTA</div>
-            <div class="btn" onclick="resetGame()" style="background: #ff7675; color: white;">RESET</div>
+            <div class="btn" onclick="toggleOverlay('map')">RUTAS</div>
         </div>
 
         <!-- Bestiary Overlay -->
@@ -344,6 +367,15 @@
                 <span onclick="toggleOverlay('bestiary')" style="cursor: pointer; color: #ff7675;">[X]</span>
             </div>
             <div class="overlay-content" id="bestiary-list"></div>
+        </div>
+
+        <!-- Map/Routes Overlay -->
+        <div id="map" class="overlay">
+            <div class="overlay-header">
+                <span>MAPA DE RUTAS</span>
+                <span onclick="toggleOverlay('map')" style="cursor: pointer; color: #ff7675;">[X]</span>
+            </div>
+            <div class="overlay-content" id="routes-list"></div>
         </div>
 
         <!-- Shop Overlay -->
@@ -363,6 +395,11 @@
                     <div id="shop-dps-cost" style="font-size: 9px; color: #d35400;">Coste: 25 PC</div>
                     <div class="shop-btn" id="btn-buy-dps" onclick="buyUpgrade('dps')">COMPRAR</div>
                 </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <div class="btn" onclick="resetGame()"
+                        style="background: #ff7675; color: white; display: inline-block; padding: 5px 10px; font-size: 8px;">
+                        BORRAR PARTIDA</div>
+                </div>
             </div>
         </div>
     </div>
@@ -370,10 +407,10 @@
     <script>
         // Initial Data
         const routes = [
-            { name: "Pradera Verde", hpRange: [10, 25] },
-            { name: "Bosque Oscuro", hpRange: [60, 120] },
-            { name: "Cueva Rocosa", hpRange: [250, 500] },
-            { name: "Volcán Ardiente", hpRange: [1000, 2000] }
+            { id: 1, name: "Pradera Verde", hpRange: [10, 25] },
+            { id: 2, name: "Bosque Oscuro", hpRange: [60, 120] },
+            { id: 3, name: "Cueva Rocosa", hpRange: [250, 500] },
+            { id: 4, name: "Volcán Ardiente", hpRange: [1000, 2000] }
         ];
 
         const allCreatures = [
@@ -394,6 +431,7 @@
         // Game State
         let state = {
             route: 1,
+            maxUnlockedRoute: 1,
             defeatedInRoute: 0,
             requiredToAdvance: 10,
             dpc: 1,
@@ -408,7 +446,7 @@
 
         let currentCreature = null;
 
-        // Local Storage Functions
+        // Local Storage
         function saveGame() {
             localStorage.setItem('pocketIdleSave', JSON.stringify({
                 ...state,
@@ -428,13 +466,13 @@
         }
 
         function resetGame() {
-            if (confirm("¿Seguro que quieres borrar todo tu progreso, Amaya?")) {
+            if (confirm("¿Estás segura de querer borrar todo el progreso, Amaya?")) {
                 localStorage.removeItem('pocketIdleSave');
                 location.reload();
             }
         }
 
-        // Core Mechanics
+        // Mechanics
         function spawnCreature() {
             const routeData = routes[state.route - 1];
             const possibleCreatures = allCreatures.filter(c => c.route === state.route);
@@ -475,8 +513,9 @@
             if (type === 'click' && event) {
                 showFloatingText(event.clientX, event.clientY, `-${dmg}`, '#ff4757');
             } else if (type === 'auto') {
-                const rect = document.querySelector('.creature').getBoundingClientRect();
-                if (rect) {
+                const sprite = document.querySelector('.creature');
+                if (sprite) {
+                    const rect = sprite.getBoundingClientRect();
                     showFloatingText(rect.left + Math.random() * rect.width, rect.top + Math.random() * rect.height, `-${dmg}`, '#ffa502');
                 }
             }
@@ -505,10 +544,13 @@
             updateUI();
             saveGame();
 
+            // El botón se habilita basándose solo en derrotados acumulados en la sesión actual de la ruta
             if (state.defeatedInRoute >= state.requiredToAdvance) {
-                const btn = document.getElementById('next-route-btn');
-                btn.style.opacity = "1";
-                btn.style.pointerEvents = "auto";
+                if (state.route === state.maxUnlockedRoute && state.route < routes.length) {
+                    const btn = document.getElementById('next-route-btn');
+                    btn.style.opacity = "1";
+                    btn.style.pointerEvents = "auto";
+                }
             }
             spawnCreature();
         }
@@ -533,7 +575,40 @@
             }
         }
 
-        // UI Updates
+        // Navigation
+        function changeRoute(routeId) {
+            if (routeId > state.maxUnlockedRoute) return;
+            state.route = routeId;
+            state.defeatedInRoute = 0;
+
+            // Reset del botón al cambiar de ruta
+            const btn = document.getElementById('next-route-btn');
+            btn.style.opacity = "0.4";
+            btn.style.pointerEvents = "none";
+
+            toggleOverlay('map');
+            updateUI();
+            saveGame();
+            spawnCreature();
+        }
+
+        function nextRoute() {
+            if (state.route === state.maxUnlockedRoute && state.route < routes.length) {
+                state.maxUnlockedRoute++;
+                state.route++;
+                state.defeatedInRoute = 0;
+
+                const btn = document.getElementById('next-route-btn');
+                btn.style.opacity = "0.4";
+                btn.style.pointerEvents = "none";
+
+                updateUI();
+                saveGame();
+                spawnCreature();
+            }
+        }
+
+        // UI Rendering
         function updateHPBar() {
             const pct = (currentCreature.currentHp / currentCreature.maxHp) * 100;
             const fill = document.getElementById('hp-fill');
@@ -548,8 +623,6 @@
             document.getElementById('stat-caught').innerText = `${state.caughtIds.size}/${allCreatures.length}`;
             document.getElementById('route-name').innerText = `RUTA ${state.route}: ${routes[state.route - 1].name.toUpperCase()}`;
             document.getElementById('route-progress').innerText = `DERROTADOS: ${state.defeatedInRoute} / ${state.requiredToAdvance}`;
-
-            // Actualizar niveles en el tooltip
             document.getElementById('lvl-dpc').innerText = state.upgrades.dpc;
             document.getElementById('lvl-dps').innerText = state.upgrades.dps;
         }
@@ -557,10 +630,8 @@
         function updateShopUI() {
             const dpcCost = getUpgradeCost('dpc');
             const dpsCost = getUpgradeCost('dps');
-
             document.getElementById('shop-dpc-cost').innerText = `Coste: ${dpcCost} PC`;
             document.getElementById('shop-dps-cost').innerText = `Coste: ${dpsCost} PC`;
-
             document.getElementById('btn-buy-dpc').className = `shop-btn ${state.pc < dpcCost ? 'disabled' : ''}`;
             document.getElementById('btn-buy-dps').className = `shop-btn ${state.pc < dpsCost ? 'disabled' : ''}`;
         }
@@ -568,14 +639,12 @@
         function toggleOverlay(id) {
             const el = document.getElementById(id);
             const isOpen = el.style.display === 'flex';
-
-            // Cierra todos
             document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
-
             if (!isOpen) {
                 el.style.display = 'flex';
                 if (id === 'bestiary') renderBestiary();
                 if (id === 'shop') updateShopUI();
+                if (id === 'map') renderRoutes();
             }
         }
 
@@ -589,6 +658,27 @@
                 div.innerHTML = caught ?
                     `<div style="width:30px;height:30px;background:${c.color};border:2px solid #000;margin-bottom:5px"></div>${c.name.toUpperCase()}` :
                     '<div style="font-size:16px">?</div>';
+                list.appendChild(div);
+            });
+        }
+
+        function renderRoutes() {
+            const list = document.getElementById('routes-list');
+            list.innerHTML = '';
+            routes.forEach(r => {
+                const isLocked = r.id > state.maxUnlockedRoute;
+                const isCurrent = r.id === state.route;
+                const div = document.createElement('div');
+                div.className = `route-item ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''}`;
+                div.onclick = () => changeRoute(r.id);
+
+                const creaturesInRoute = allCreatures.filter(c => c.route === r.id);
+                const caughtInRoute = creaturesInRoute.filter(c => state.caughtIds.has(c.id)).length;
+
+                div.innerHTML = `
+                <div>${r.id}. ${r.name.toUpperCase()}</div>
+                <div>${isLocked ? 'BLOQUEADO' : caughtInRoute + '/' + creaturesInRoute.length}</div>
+            `;
                 list.appendChild(div);
             });
         }
@@ -611,20 +701,7 @@
             setTimeout(() => span.remove(), 600);
         }
 
-        function nextRoute() {
-            if (state.route < routes.length) {
-                state.route++;
-                state.defeatedInRoute = 0;
-                const btn = document.getElementById('next-route-btn');
-                btn.style.opacity = "0.4";
-                btn.style.pointerEvents = "none";
-                updateUI();
-                saveGame();
-                spawnCreature();
-            }
-        }
-
-        // Game Loop
+        // Loop
         setInterval(() => dealDamage(null, 'auto'), 1000);
 
         window.onload = () => {
