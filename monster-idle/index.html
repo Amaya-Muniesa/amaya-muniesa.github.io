@@ -41,16 +41,15 @@
             box-shadow: 0 20px 0 #1a252f;
         }
 
-        /* Panel Superior de Estadísticas */
+        /* Top Stats Bar */
         .top-stats-bar {
             background: #fbc531;
-            padding: 15px;
+            padding: 10px 15px;
             border-bottom: 6px solid #000;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            font-size: 13px;
-            /* Fuente aumentada */
+            gap: 8px;
+            font-size: 11px;
             line-height: 1.4;
         }
 
@@ -59,12 +58,46 @@
             justify-content: space-between;
         }
 
+        .pc-badge-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .pc-badge {
+            background: #fff;
+            padding: 4px 8px;
+            border: 3px solid #000;
+            color: #d35400;
+            font-weight: bold;
+        }
+
+        /* Tooltip de Mejoras */
+        .upgrades-tooltip {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border: 3px solid #000;
+            padding: 10px;
+            width: 180px;
+            z-index: 150;
+            font-size: 9px;
+            display: none;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            margin-top: 5px;
+        }
+
+        .pc-badge-container:hover .upgrades-tooltip,
+        .pc-badge-container:active .upgrades-tooltip {
+            display: block;
+        }
+
         .route-header {
             background: #fff;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
-            font-size: 14px;
-            /* Fuente aumentada */
+            font-size: 12px;
             border-bottom: 4px solid #000;
         }
 
@@ -89,11 +122,11 @@
         }
 
         .hp-bar-container {
-            width: 240px;
-            height: 20px;
+            width: 200px;
+            height: 16px;
             background: #333;
             border: 4px solid #000;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             position: relative;
         }
 
@@ -101,27 +134,26 @@
             height: 100%;
             background: #4cd137;
             width: 100%;
-            transition: width 0.2s;
+            transition: width 0.1s;
         }
 
-        /* Panel Inferior de Botones */
+        /* Bottom Action Panel */
         .action-panel {
             background: #f1c40f;
-            padding: 20px;
+            padding: 15px;
             border-top: 6px solid #000;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
 
         .btn {
             background: #fff;
             border: 4px solid #000;
-            padding: 15px 5px;
+            padding: 12px 5px;
             text-align: center;
             cursor: pointer;
-            font-size: 14px;
-            /* Fuente aumentada */
+            font-size: 11px;
             box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
@@ -129,11 +161,12 @@
         }
 
         .btn:active {
-            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 0 rgba(0, 0, 0, 0.1);
             transform: translate(2px, 2px);
         }
 
-        .bestiary-overlay {
+        /* Overlay Menus */
+        .overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -147,16 +180,27 @@
             box-sizing: border-box;
         }
 
-        .bestiary-content {
+        .overlay-header {
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .overlay-content {
             background: #fff;
             border: 6px solid #000;
             flex-grow: 1;
             overflow-y: auto;
             padding: 15px;
+        }
+
+        /* Bestiary Styles */
+        #bestiary-list {
             display: grid;
-            /* Grid Responsive: se ajusta a columnas de mínimo 100px */
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
         }
 
         .bestiary-entry {
@@ -166,11 +210,9 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 11px;
-            /* Fuente aumentada */
-            position: relative;
+            font-size: 8px;
             text-align: center;
-            padding: 5px;
+            padding: 4px;
         }
 
         .bestiary-entry.caught {
@@ -178,13 +220,37 @@
             background: #fff9e6;
         }
 
+        /* Shop Styles */
+        .shop-item {
+            border: 4px solid #000;
+            margin-bottom: 15px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .shop-btn {
+            background: #4cd137;
+            border: 3px solid #000;
+            padding: 8px;
+            font-size: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .shop-btn.disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Visual Effects */
         .floating-text {
             position: absolute;
             font-weight: bold;
             pointer-events: none;
             animation: floatUp 0.6s ease-out forwards;
-            font-size: 18px;
-            /* Fuente aumentada */
+            font-size: 16px;
             z-index: 60;
             text-shadow: 2px 2px 0 #000;
         }
@@ -201,7 +267,7 @@
             }
         }
 
-        .captured-msg {
+        .notification {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -212,9 +278,9 @@
             z-index: 50;
             display: none;
             text-align: center;
-            font-size: 14px;
-            /* Fuente aumentada */
+            font-size: 12px;
             box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+            width: 80%;
         }
     </style>
 </head>
@@ -222,71 +288,92 @@
 <body>
 
     <div id="game-container">
-        <!-- Estadísticas Globales Superior -->
+        <!-- Top Stats Bar -->
         <div class="top-stats-bar">
             <div class="stat-row">
                 <span>CLIC: <span id="stat-dpc">1</span></span>
                 <span>AUTO: <span id="stat-dps">0</span></span>
             </div>
-            <div class="stat-row" style="justify-content: center; border-top: 2px solid rgba(0,0,0,0.1);">
-                <span>CAPTURADOS: <span id="stat-caught">0</span></span>
+            <div class="stat-row" style="align-items: center;">
+                <span>CAPT: <span id="stat-caught">0/12</span></span>
+                <div class="pc-badge-container">
+                    <div class="pc-badge">PC: <span id="stat-pc">0</span></div>
+                    <!-- Tooltip con niveles -->
+                    <div class="upgrades-tooltip" id="upgrades-tooltip">
+                        <div
+                            style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px; color: #d35400;">
+                            NIVELES:</div>
+                        <div>GARRAS: Lvl <span id="lvl-dpc">0</span></div>
+                        <div style="margin-top: 5px;">ALIADOS: Lvl <span id="lvl-dps">0</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Info de la Ruta -->
+        <!-- Route Info -->
         <div class="route-header">
-            <div id="route-name">RUTA 1</div>
-            <div id="route-progress" style="margin-top: 8px; color: #666; font-size: 11px;">DERROTADOS: 0 / 10</div>
+            <div id="route-name">RUTA 1: PRADERA VERDE</div>
+            <div id="route-progress" style="margin-top: 5px; color: #666; font-size: 10px;">DERROTADOS: 0 / 10</div>
         </div>
 
-        <!-- Área de Batalla -->
+        <!-- Battle Area -->
         <div class="battle-area" id="battle-area">
-            <div id="creature-name" style="margin-bottom: 15px; font-size: 20px; text-shadow: 1px 1px 0 #fff;">???</div>
+            <div id="creature-name" style="margin-bottom: 12px; font-size: 18px; text-shadow: 1px 1px 0 #fff;">???</div>
             <div class="hp-bar-container">
                 <div id="hp-fill" class="hp-bar-fill"></div>
             </div>
 
-            <div id="creature-sprite-container">
-                <!-- SVG dinámico -->
-            </div>
+            <div id="creature-sprite-container"></div>
 
-            <div id="captured-notification" class="captured-msg">¡CAPTURADO!</div>
+            <div id="game-notification" class="notification"></div>
         </div>
 
-        <!-- Panel de Acciones Inferior -->
+        <!-- Bottom Action Panel -->
         <div class="action-panel">
-            <div class="btn" onclick="toggleBestiary()">BESTIARIO</div>
+            <div class="btn" onclick="toggleOverlay('bestiary')">BESTIARIO</div>
+            <div class="btn" onclick="toggleOverlay('shop')">MEJORAS</div>
             <div class="btn" id="next-route-btn" style="opacity: 0.4; pointer-events: none;" onclick="nextRoute()">SIG.
                 RUTA</div>
+            <div class="btn" onclick="resetGame()" style="background: #ff7675; color: white;">RESET</div>
         </div>
 
-        <!-- Overlay Bestiario -->
-        <div id="bestiary" class="bestiary-overlay">
-            <div
-                style="color: white; margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 16px;">
+        <!-- Bestiary Overlay -->
+        <div id="bestiary" class="overlay">
+            <div class="overlay-header">
                 <span>BESTIARIO</span>
-                <span onclick="toggleBestiary()" style="cursor: pointer; color: #ff7675;">[CERRAR]</span>
+                <span onclick="toggleOverlay('bestiary')" style="cursor: pointer; color: #ff7675;">[X]</span>
             </div>
-            <div class="bestiary-content" id="bestiary-list"></div>
+            <div class="overlay-content" id="bestiary-list"></div>
+        </div>
+
+        <!-- Shop Overlay -->
+        <div id="shop" class="overlay">
+            <div class="overlay-header">
+                <span>MEJORAS (PC)</span>
+                <span onclick="toggleOverlay('shop')" style="cursor: pointer; color: #ff7675;">[X]</span>
+            </div>
+            <div class="overlay-content">
+                <div class="shop-item">
+                    <div style="font-size: 10px;">AFILAR GARRA (+1 DPC)</div>
+                    <div id="shop-dpc-cost" style="font-size: 9px; color: #d35400;">Coste: 10 PC</div>
+                    <div class="shop-btn" id="btn-buy-dpc" onclick="buyUpgrade('dpc')">COMPRAR</div>
+                </div>
+                <div class="shop-item">
+                    <div style="font-size: 10px;">ALIADO VELOZ (+2 DPS)</div>
+                    <div id="shop-dps-cost" style="font-size: 9px; color: #d35400;">Coste: 25 PC</div>
+                    <div class="shop-btn" id="btn-buy-dps" onclick="buyUpgrade('dps')">COMPRAR</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const state = {
-            route: 1,
-            defeatedInRoute: 0,
-            requiredToAdvance: 10,
-            dpc: 1,
-            dps: 0,
-            caughtIds: new Set(),
-            currentCreature: null
-        };
-
+        // Initial Data
         const routes = [
             { name: "Pradera Verde", hpRange: [10, 25] },
-            { name: "Bosque Oscuro", hpRange: [50, 100] },
-            { name: "Cueva Rocosa", hpRange: [200, 450] },
-            { name: "Volcán Ardiente", hpRange: [800, 1500] }
+            { name: "Bosque Oscuro", hpRange: [60, 120] },
+            { name: "Cueva Rocosa", hpRange: [250, 500] },
+            { name: "Volcán Ardiente", hpRange: [1000, 2000] }
         ];
 
         const allCreatures = [
@@ -304,9 +391,71 @@
             { id: 12, name: "Blaze", color: "#c0392b", route: 4 }
         ];
 
-        function createCreatureSVG(color) {
+        // Game State
+        let state = {
+            route: 1,
+            defeatedInRoute: 0,
+            requiredToAdvance: 10,
+            dpc: 1,
+            dps: 0,
+            pc: 0,
+            caughtIds: [],
+            upgrades: {
+                dpc: 0,
+                dps: 0
+            }
+        };
+
+        let currentCreature = null;
+
+        // Local Storage Functions
+        function saveGame() {
+            localStorage.setItem('pocketIdleSave', JSON.stringify({
+                ...state,
+                caughtIds: Array.from(state.caughtIds)
+            }));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('pocketIdleSave');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state = { ...state, ...data };
+                state.caughtIds = new Set(data.caughtIds);
+            } else {
+                state.caughtIds = new Set();
+            }
+        }
+
+        function resetGame() {
+            if (confirm("¿Seguro que quieres borrar todo tu progreso, Amaya?")) {
+                localStorage.removeItem('pocketIdleSave');
+                location.reload();
+            }
+        }
+
+        // Core Mechanics
+        function spawnCreature() {
+            const routeData = routes[state.route - 1];
+            const possibleCreatures = allCreatures.filter(c => c.route === state.route);
+            const base = possibleCreatures[Math.floor(Math.random() * possibleCreatures.length)];
+
+            const hp = Math.floor(Math.random() * (routeData.hpRange[1] - routeData.hpRange[0] + 1)) + routeData.hpRange[0];
+
+            currentCreature = {
+                ...base,
+                maxHp: hp,
+                currentHp: hp
+            };
+
+            document.getElementById('creature-name').innerText = currentCreature.name.toUpperCase();
+            document.getElementById('creature-sprite-container').innerHTML = createSVG(currentCreature.color);
+            updateHPBar();
+        }
+
+        function createSVG(color) {
             return `
-            <svg width="180" height="180" viewBox="0 0 10 10" class="creature" onclick="dealDamage(event, 'click')">
+            <svg width="160" height="160" viewBox="0 0 10 10" class="creature" onclick="dealDamage(event, 'click')">
                 <rect x="2" y="3" width="6" height="6" fill="${color}" />
                 <rect x="3" y="2" width="4" height="1" fill="${color}" />
                 <rect x="2" y="4" width="1" height="1" fill="white" />
@@ -316,75 +465,139 @@
         `;
         }
 
-        function spawnCreature() {
-            const routeData = routes[state.route - 1];
-            const possibleCreatures = allCreatures.filter(c => c.route === state.route);
-            const randomBase = possibleCreatures[Math.floor(Math.random() * possibleCreatures.length)];
-
-            const hp = Math.floor(Math.random() * (routeData.hpRange[1] - routeData.hpRange[0] + 1)) + routeData.hpRange[0];
-
-            state.currentCreature = {
-                ...randomBase,
-                maxHp: hp,
-                currentHp: hp
-            };
-
-            document.getElementById('creature-name').innerText = state.currentCreature.name.toUpperCase();
-            document.getElementById('creature-sprite-container').innerHTML = createCreatureSVG(state.currentCreature.color);
-            updateHPBar();
-        }
-
         function dealDamage(event, type) {
-            if (!state.currentCreature) return;
+            if (!currentCreature) return;
+            const dmg = type === 'click' ? state.dpc : state.dps;
+            if (dmg <= 0) return;
 
-            const damage = type === 'click' ? state.dpc : state.dps;
-            if (damage <= 0 && type === 'auto') return;
-
-            state.currentCreature.currentHp -= damage;
+            currentCreature.currentHp -= dmg;
 
             if (type === 'click' && event) {
-                showFloatingText(event.clientX, event.clientY, `-${damage}`, '#ff4757');
-            } else if (type === 'auto' && damage > 0) {
+                showFloatingText(event.clientX, event.clientY, `-${dmg}`, '#ff4757');
+            } else if (type === 'auto') {
                 const rect = document.querySelector('.creature').getBoundingClientRect();
-                const x = rect.left + Math.random() * rect.width;
-                const y = rect.top + Math.random() * rect.height;
-                showFloatingText(x, y, `-${damage}`, '#ffa502');
+                if (rect) {
+                    showFloatingText(rect.left + Math.random() * rect.width, rect.top + Math.random() * rect.height, `-${dmg}`, '#ffa502');
+                }
             }
 
-            if (state.currentCreature.currentHp <= 0) {
-                captureCreature();
+            if (currentCreature.currentHp <= 0) {
+                onDefeat();
             } else {
                 updateHPBar();
             }
         }
 
-        function captureCreature() {
-            const isNew = !state.caughtIds.has(state.currentCreature.id);
-            state.caughtIds.add(state.currentCreature.id);
-            state.defeatedInRoute++;
+        function onDefeat() {
+            const isNew = !state.caughtIds.has(currentCreature.id);
 
             if (isNew) {
+                state.caughtIds.add(currentCreature.id);
                 state.dpc += 1;
                 state.dps += 2;
-                showNotification(`¡${state.currentCreature.name} CAPTURADO!\nDPC +1 | DPS +2`);
+                showNotification(`¡${currentCreature.name} CAPTURADO!\nDPC +1 | DPS +2`);
+            } else {
+                state.pc += 1;
+                showNotification(`¡${currentCreature.name} DERROTADO!\n+1 PC (Repetido)`);
             }
 
+            state.defeatedInRoute++;
             updateUI();
+            saveGame();
 
             if (state.defeatedInRoute >= state.requiredToAdvance) {
                 const btn = document.getElementById('next-route-btn');
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
             }
-
             spawnCreature();
         }
 
+        // Upgrades
+        function getUpgradeCost(type) {
+            const count = state.upgrades[type];
+            if (type === 'dpc') return 10 + (count * 15);
+            if (type === 'dps') return 25 + (count * 30);
+        }
+
+        function buyUpgrade(type) {
+            const cost = getUpgradeCost(type);
+            if (state.pc >= cost) {
+                state.pc -= cost;
+                state.upgrades[type]++;
+                if (type === 'dpc') state.dpc += 1;
+                if (type === 'dps') state.dps += 2;
+                updateUI();
+                updateShopUI();
+                saveGame();
+            }
+        }
+
+        // UI Updates
+        function updateHPBar() {
+            const pct = (currentCreature.currentHp / currentCreature.maxHp) * 100;
+            const fill = document.getElementById('hp-fill');
+            fill.style.width = `${Math.max(0, pct)}%`;
+            fill.style.background = pct > 50 ? '#4cd137' : (pct > 20 ? '#f1c40f' : '#e74c3c');
+        }
+
+        function updateUI() {
+            document.getElementById('stat-dpc').innerText = state.dpc;
+            document.getElementById('stat-dps').innerText = state.dps;
+            document.getElementById('stat-pc').innerText = state.pc;
+            document.getElementById('stat-caught').innerText = `${state.caughtIds.size}/${allCreatures.length}`;
+            document.getElementById('route-name').innerText = `RUTA ${state.route}: ${routes[state.route - 1].name.toUpperCase()}`;
+            document.getElementById('route-progress').innerText = `DERROTADOS: ${state.defeatedInRoute} / ${state.requiredToAdvance}`;
+
+            // Actualizar niveles en el tooltip
+            document.getElementById('lvl-dpc').innerText = state.upgrades.dpc;
+            document.getElementById('lvl-dps').innerText = state.upgrades.dps;
+        }
+
+        function updateShopUI() {
+            const dpcCost = getUpgradeCost('dpc');
+            const dpsCost = getUpgradeCost('dps');
+
+            document.getElementById('shop-dpc-cost').innerText = `Coste: ${dpcCost} PC`;
+            document.getElementById('shop-dps-cost').innerText = `Coste: ${dpsCost} PC`;
+
+            document.getElementById('btn-buy-dpc').className = `shop-btn ${state.pc < dpcCost ? 'disabled' : ''}`;
+            document.getElementById('btn-buy-dps').className = `shop-btn ${state.pc < dpsCost ? 'disabled' : ''}`;
+        }
+
+        function toggleOverlay(id) {
+            const el = document.getElementById(id);
+            const isOpen = el.style.display === 'flex';
+
+            // Cierra todos
+            document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
+
+            if (!isOpen) {
+                el.style.display = 'flex';
+                if (id === 'bestiary') renderBestiary();
+                if (id === 'shop') updateShopUI();
+            }
+        }
+
+        function renderBestiary() {
+            const list = document.getElementById('bestiary-list');
+            list.innerHTML = '';
+            allCreatures.forEach(c => {
+                const caught = state.caughtIds.has(c.id);
+                const div = document.createElement('div');
+                div.className = `bestiary-entry ${caught ? 'caught' : ''}`;
+                div.innerHTML = caught ?
+                    `<div style="width:30px;height:30px;background:${c.color};border:2px solid #000;margin-bottom:5px"></div>${c.name.toUpperCase()}` :
+                    '<div style="font-size:16px">?</div>';
+                list.appendChild(div);
+            });
+        }
+
         function showNotification(text) {
-            const el = document.getElementById('captured-notification');
+            const el = document.getElementById('game-notification');
             el.innerText = text;
             el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 2000);
+            setTimeout(() => el.style.display = 'none', 1800);
         }
 
         function showFloatingText(x, y, text, color) {
@@ -398,25 +611,6 @@
             setTimeout(() => span.remove(), 600);
         }
 
-        function updateHPBar() {
-            const percent = (state.currentCreature.currentHp / state.currentCreature.maxHp) * 100;
-            document.getElementById('hp-fill').style.width = `${Math.max(0, percent)}%`;
-
-            // Cambio de color según la vida
-            const fill = document.getElementById('hp-fill');
-            if (percent > 50) fill.style.background = '#4cd137';
-            else if (percent > 20) fill.style.background = '#f1c40f';
-            else fill.style.background = '#e74c3c';
-        }
-
-        function updateUI() {
-            document.getElementById('route-name').innerText = `RUTA ${state.route}: ${routes[state.route - 1].name.toUpperCase()}`;
-            document.getElementById('route-progress').innerText = `DERROTADOS: ${state.defeatedInRoute} / ${state.requiredToAdvance}`;
-            document.getElementById('stat-dpc').innerText = state.dpc;
-            document.getElementById('stat-dps').innerText = state.dps;
-            document.getElementById('stat-caught').innerText = `${state.caughtIds.size} / ${allCreatures.length}`;
-        }
-
         function nextRoute() {
             if (state.route < routes.length) {
                 state.route++;
@@ -425,37 +619,16 @@
                 btn.style.opacity = "0.4";
                 btn.style.pointerEvents = "none";
                 updateUI();
+                saveGame();
                 spawnCreature();
             }
         }
 
-        function toggleBestiary() {
-            const b = document.getElementById('bestiary');
-            const list = document.getElementById('bestiary-list');
-
-            if (b.style.display === 'flex') {
-                b.style.display = 'none';
-            } else {
-                b.style.display = 'flex';
-                list.innerHTML = '';
-
-                allCreatures.forEach(c => {
-                    const caught = state.caughtIds.has(c.id);
-                    const div = document.createElement('div');
-                    div.className = `bestiary-entry ${caught ? 'caught' : ''}`;
-                    div.innerHTML = caught ?
-                        `<div><div style="width:40px;height:40px;background:${c.color};margin:0 auto 10px; border:2px solid #000"></div>${c.name.toUpperCase()}</div>` :
-                        '<div style="font-size: 20px;">?</div>';
-                    list.appendChild(div);
-                });
-            }
-        }
-
-        setInterval(() => {
-            dealDamage(null, 'auto');
-        }, 1000);
+        // Game Loop
+        setInterval(() => dealDamage(null, 'auto'), 1000);
 
         window.onload = () => {
+            loadGame();
             updateUI();
             spawnCreature();
         };
