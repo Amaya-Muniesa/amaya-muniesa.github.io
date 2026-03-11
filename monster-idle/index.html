@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Idle - Retro Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pixel-size: 4px;
+            --bg-color: #74c0fc;
+            --panel-color: #f8f9fa;
+            --pkmn-red: #ff0000;
+        }
+
+        body {
+            font-family: 'Press+Start+2P', cursive;
+            background-color: #2c3e50;
+            color: #333;
+            user-select: none;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            height: 95vh;
+            background: var(--bg-color);
+            border: 8px solid #000;
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 0 #1a252f;
+        }
+
+        /* Panel Superior de Estadísticas */
+        .top-stats-bar {
+            background: #fbc531;
+            padding: 15px;
+            border-bottom: 6px solid #000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 13px;
+            /* Fuente aumentada */
+            line-height: 1.4;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .route-header {
+            background: #fff;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            /* Fuente aumentada */
+            border-bottom: 4px solid #000;
+        }
+
+        .battle-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(#74c0fc 60%, #91d18b 60%);
+        }
+
+        .creature {
+            cursor: pointer;
+            transition: transform 0.1s;
+            image-rendering: pixelated;
+        }
+
+        .creature:active {
+            transform: scale(0.9);
+        }
+
+        .hp-bar-container {
+            width: 240px;
+            height: 20px;
+            background: #333;
+            border: 4px solid #000;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: #4cd137;
+            width: 100%;
+            transition: width 0.2s;
+        }
+
+        /* Panel Inferior de Botones */
+        .action-panel {
+            background: #f1c40f;
+            padding: 20px;
+            border-top: 6px solid #000;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: #fff;
+            border: 4px solid #000;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            /* Fuente aumentada */
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:active {
+            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            transform: translate(2px, 2px);
+        }
+
+        .bestiary-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bestiary-content {
+            background: #fff;
+            border: 6px solid #000;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: grid;
+            /* Grid Responsive: se ajusta a columnas de mínimo 100px */
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .bestiary-entry {
+            border: 3px solid #ccc;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            /* Fuente aumentada */
+            position: relative;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .bestiary-entry.caught {
+            border-color: #fbc531;
+            background: #fff9e6;
+        }
+
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            font-size: 18px;
+            /* Fuente aumentada */
+            z-index: 60;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-60px);
+                opacity: 0;
+            }
+        }
+
+        .captured-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 6px solid black;
+            padding: 15px;
+            z-index: 50;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            /* Fuente aumentada */
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <!-- Estadísticas Globales Superior -->
+        <div class="top-stats-bar">
+            <div class="stat-row">
+                <span>CLIC: <span id="stat-dpc">1</span></span>
+                <span>AUTO: <span id="stat-dps">0</span></span>
+            </div>
+            <div class="stat-row" style="justify-content: center; border-top: 2px solid rgba(0,0,0,0.1);">
+                <span>CAPTURADOS: <span id="stat-caught">0</span></span>
+            </div>
+        </div>
+
+        <!-- Info de la Ruta -->
+        <div class="route-header">
+            <div id="route-name">RUTA 1</div>
+            <div id="route-progress" style="margin-top: 8px; color: #666; font-size: 11px;">DERROTADOS: 0 / 10</div>
+        </div>
+
+        <!-- Área de Batalla -->
+        <div class="battle-area" id="battle-area">
+            <div id="creature-name" style="margin-bottom: 15px; font-size: 20px; text-shadow: 1px 1px 0 #fff;">???</div>
+            <div class="hp-bar-container">
+                <div id="hp-fill" class="hp-bar-fill"></div>
+            </div>
+
+            <div id="creature-sprite-container">
+                <!-- SVG dinámico -->
+            </div>
+
+            <div id="captured-notification" class="captured-msg">¡CAPTURADO!</div>
+        </div>
+
+        <!-- Panel de Acciones Inferior -->
+        <div class="action-panel">
+            <div class="btn" onclick="toggleBestiary()">BESTIARIO</div>
+            <div class="btn" id="next-route-btn" style="opacity: 0.4; pointer-events: none;" onclick="nextRoute()">SIG.
+                RUTA</div>
+        </div>
+
+        <!-- Overlay Bestiario -->
+        <div id="bestiary" class="bestiary-overlay">
+            <div
+                style="color: white; margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 16px;">
+                <span>BESTIARIO</span>
+                <span onclick="toggleBestiary()" style="cursor: pointer; color: #ff7675;">[CERRAR]</span>
+            </div>
+            <div class="bestiary-content" id="bestiary-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            route: 1,
+            defeatedInRoute: 0,
+            requiredToAdvance: 10,
+            dpc: 1,
+            dps: 0,
+            caughtIds: new Set(),
+            currentCreature: null
+        };
+
+        const routes = [
+            { name: "Pradera Verde", hpRange: [10, 25] },
+            { name: "Bosque Oscuro", hpRange: [50, 100] },
+            { name: "Cueva Rocosa", hpRange: [200, 450] },
+            { name: "Volcán Ardiente", hpRange: [800, 1500] }
+        ];
+
+        const allCreatures = [
+            { id: 1, name: "Bulby", color: "#4cd137", route: 1 },
+            { id: 2, name: "Leafy", color: "#44bd32", route: 1 },
+            { id: 3, name: "Seedler", color: "#10ac84", route: 1 },
+            { id: 4, name: "Spido", color: "#7f8c8d", route: 2 },
+            { id: 5, name: "Nighty", color: "#2c3e50", route: 2 },
+            { id: 6, name: "Shadow", color: "#2d3436", route: 2 },
+            { id: 7, name: "Stony", color: "#95a5a6", route: 3 },
+            { id: 8, name: "Crag", color: "#7f8c8d", route: 3 },
+            { id: 9, name: "Gravel", color: "#bdc3c7", route: 3 },
+            { id: 10, name: "Firy", color: "#e67e22", route: 4 },
+            { id: 11, name: "Magmu", color: "#d35400", route: 4 },
+            { id: 12, name: "Blaze", color: "#c0392b", route: 4 }
+        ];
+
+        function createCreatureSVG(color) {
+            return `
+            <svg width="180" height="180" viewBox="0 0 10 10" class="creature" onclick="dealDamage(event, 'click')">
+                <rect x="2" y="3" width="6" height="6" fill="${color}" />
+                <rect x="3" y="2" width="4" height="1" fill="${color}" />
+                <rect x="2" y="4" width="1" height="1" fill="white" />
+                <rect x="7" y="4" width="1" height="1" fill="white" />
+                <rect x="3" y="7" width="4" height="1" fill="rgba(0,0,0,0.2)" />
+            </svg>
+        `;
+        }
+
+        function spawnCreature() {
+            const routeData = routes[state.route - 1];
+            const possibleCreatures = allCreatures.filter(c => c.route === state.route);
+            const randomBase = possibleCreatures[Math.floor(Math.random() * possibleCreatures.length)];
+
+            const hp = Math.floor(Math.random() * (routeData.hpRange[1] - routeData.hpRange[0] + 1)) + routeData.hpRange[0];
+
+            state.currentCreature = {
+                ...randomBase,
+                maxHp: hp,
+                currentHp: hp
+            };
+
+            document.getElementById('creature-name').innerText = state.currentCreature.name.toUpperCase();
+            document.getElementById('creature-sprite-container').innerHTML = createCreatureSVG(state.currentCreature.color);
+            updateHPBar();
+        }
+
+        function dealDamage(event, type) {
+            if (!state.currentCreature) return;
+
+            const damage = type === 'click' ? state.dpc : state.dps;
+            if (damage <= 0 && type === 'auto') return;
+
+            state.currentCreature.currentHp -= damage;
+
+            if (type === 'click' && event) {
+                showFloatingText(event.clientX, event.clientY, `-${damage}`, '#ff4757');
+            } else if (type === 'auto' && damage > 0) {
+                const rect = document.querySelector('.creature').getBoundingClientRect();
+                const x = rect.left + Math.random() * rect.width;
+                const y = rect.top + Math.random() * rect.height;
+                showFloatingText(x, y, `-${damage}`, '#ffa502');
+            }
+
+            if (state.currentCreature.currentHp <= 0) {
+                captureCreature();
+            } else {
+                updateHPBar();
+            }
+        }
+
+        function captureCreature() {
+            const isNew = !state.caughtIds.has(state.currentCreature.id);
+            state.caughtIds.add(state.currentCreature.id);
+            state.defeatedInRoute++;
+
+            if (isNew) {
+                state.dpc += 1;
+                state.dps += 2;
+                showNotification(`¡${state.currentCreature.name} CAPTURADO!\nDPC +1 | DPS +2`);
+            }
+
+            updateUI();
+
+            if (state.defeatedInRoute >= state.requiredToAdvance) {
+                const btn = document.getElementById('next-route-btn');
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "auto";
+            }
+
+            spawnCreature();
+        }
+
+        function showNotification(text) {
+            const el = document.getElementById('captured-notification');
+            el.innerText = text;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 2000);
+        }
+
+        function showFloatingText(x, y, text, color) {
+            const span = document.createElement('span');
+            span.className = 'floating-text';
+            span.innerText = text;
+            span.style.color = color;
+            span.style.left = `${x}px`;
+            span.style.top = `${y}px`;
+            document.body.appendChild(span);
+            setTimeout(() => span.remove(), 600);
+        }
+
+        function updateHPBar() {
+            const percent = (state.currentCreature.currentHp / state.currentCreature.maxHp) * 100;
+            document.getElementById('hp-fill').style.width = `${Math.max(0, percent)}%`;
+
+            // Cambio de color según la vida
+            const fill = document.getElementById('hp-fill');
+            if (percent > 50) fill.style.background = '#4cd137';
+            else if (percent > 20) fill.style.background = '#f1c40f';
+            else fill.style.background = '#e74c3c';
+        }
+
+        function updateUI() {
+            document.getElementById('route-name').innerText = `RUTA ${state.route}: ${routes[state.route - 1].name.toUpperCase()}`;
+            document.getElementById('route-progress').innerText = `DERROTADOS: ${state.defeatedInRoute} / ${state.requiredToAdvance}`;
+            document.getElementById('stat-dpc').innerText = state.dpc;
+            document.getElementById('stat-dps').innerText = state.dps;
+            document.getElementById('stat-caught').innerText = `${state.caughtIds.size} / ${allCreatures.length}`;
+        }
+
+        function nextRoute() {
+            if (state.route < routes.length) {
+                state.route++;
+                state.defeatedInRoute = 0;
+                const btn = document.getElementById('next-route-btn');
+                btn.style.opacity = "0.4";
+                btn.style.pointerEvents = "none";
+                updateUI();
+                spawnCreature();
+            }
+        }
+
+        function toggleBestiary() {
+            const b = document.getElementById('bestiary');
+            const list = document.getElementById('bestiary-list');
+
+            if (b.style.display === 'flex') {
+                b.style.display = 'none';
+            } else {
+                b.style.display = 'flex';
+                list.innerHTML = '';
+
+                allCreatures.forEach(c => {
+                    const caught = state.caughtIds.has(c.id);
+                    const div = document.createElement('div');
+                    div.className = `bestiary-entry ${caught ? 'caught' : ''}`;
+                    div.innerHTML = caught ?
+                        `<div><div style="width:40px;height:40px;background:${c.color};margin:0 auto 10px; border:2px solid #000"></div>${c.name.toUpperCase()}</div>` :
+                        '<div style="font-size: 20px;">?</div>';
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        setInterval(() => {
+            dealDamage(null, 'auto');
+        }, 1000);
+
+        window.onload = () => {
+            updateUI();
+            spawnCreature();
+        };
+    </script>
+
+</body>
+
+</html>
