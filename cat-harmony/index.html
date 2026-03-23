@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gatitos Musicales - Cat Harmony</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+        
+        body {
+            font-family: 'Fredoka One', cursive;
+            background-color: #fef2f2;
+            overflow-x: hidden;
+        }
+
+        .grid-cell {
+            aspect-ratio: 1 / 1;
+            transition: all 0.2s ease;
+        }
+
+        .grid-cell:hover {
+            background-color: #ffe4e6;
+        }
+
+        .cat-note {
+            cursor: grab;
+            animation: bounce 0.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        @keyframes pulse-note {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.1); filter: brightness(1.3); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .playing {
+            animation: pulse-note 0.2s ease-out !important;
+        }
+
+        .speed-badge {
+            font-size: 0.6rem;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-4xl text-pink-600 mb-2">🐾 Cat Harmony 🐾</h1>
+            <p class="text-pink-400">¡Crea tu propia melodía gatuna, Amaya!</p>
+        </header>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar: Selector de Gatitos -->
+            <div class="w-full md:w-1/4 bg-white p-6 rounded-3xl shadow-xl border-4 border-pink-200">
+                <h2 class="text-lg text-pink-500 mb-4 text-center">Notas Gatunas</h2>
+                <div class="grid grid-cols-2 gap-3" id="cat-palette">
+                    <!-- Los gatitos se generan por JS -->
+                </div>
+                
+                <div class="mt-8">
+                    <h2 class="text-lg text-pink-500 mb-2 text-center">Herramientas</h2>
+                    <div class="space-y-2">
+                        <button id="clear-board" class="w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-xl transition-colors">Limpiar</button>
+                        <button id="stop-audio" class="w-full py-2 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-xl transition-colors">Silenciar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tablero Principal -->
+            <div class="flex-1 bg-white p-4 rounded-3xl shadow-2xl border-4 border-pink-300 relative overflow-hidden">
+                <div class="grid grid-cols-4 gap-4" id="game-board">
+                    <!-- 16 celdas del tablero -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Instrucciones -->
+        <footer class="mt-8 text-center text-pink-400 text-sm">
+            <p>Haz clic en un gatito de la izquierda y luego en el tablero.</p>
+            <p>Haz clic en un gatito del tablero para cambiar su velocidad (Blanca -> Negra -> Corchea).</p>
+        </footer>
+    </div>
+
+    <!-- Modal para habilitar Audio (Browsers modernos) -->
+    <div id="audio-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl text-center shadow-2xl">
+            <h3 class="text-2xl text-pink-600 mb-4">¿Lista para la música?</h3>
+            <button id="start-btn" class="px-8 py-3 bg-pink-500 text-white rounded-full text-xl hover:bg-pink-600 transition-all">¡Miau! (Empezar)</button>
+        </div>
+    </div>
+
+    <script>
+        const notes = [
+            { id: 'C', color: '#ffadad', name: 'DO', freq: 261.63 },
+            { id: 'D', color: '#ffd6a5', name: 'RE', freq: 293.66 },
+            { id: 'E', color: '#fdffb6', name: 'MI', freq: 329.63 },
+            { id: 'F', color: '#caffbf', name: 'FA', freq: 349.23 },
+            { id: 'G', color: '#9bf6ff', name: 'SOL', freq: 392.00 },
+            { id: 'A', color: '#a0c4ff', name: 'LA', freq: 440.00 },
+            { id: 'B', color: '#bdb2ff', name: 'SI', freq: 493.88 }
+        ];
+
+        const speeds = [
+            { id: 'white', label: 'Blanca', ms: 2000, color: 'bg-white border' },
+            { id: 'black', label: 'Negra', ms: 1000, color: 'bg-gray-800 text-white' },
+            { id: 'quaver', label: 'Corchea', ms: 500, color: 'bg-pink-500 text-white' }
+        ];
+
+        let selectedNote = null;
+        let audioCtx = null;
+        let boardState = Array(16).fill(null);
+        let intervals = Array(16).fill(null);
+
+        // Inicializar Audio
+        const initAudio = () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            document.getElementById('audio-modal').classList.add('hidden');
+        };
+
+        const playNote = (freq) => {
+            if (!audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine'; // Sonido suave para gatitos
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.6);
+        };
+
+        // UI: Generar paleta
+        const palette = document.getElementById('cat-palette');
+        notes.forEach(note => {
+            const btn = document.createElement('button');
+            btn.className = 'flex flex-col items-center p-2 rounded-xl border-2 border-transparent hover:border-pink-400 transition-all';
+            btn.innerHTML = `
+                <svg viewBox="0 0 100 100" class="w-12 h-12" style="fill: ${note.color}">
+                    <circle cx="50" cy="55" r="35" />
+                    <path d="M25 35 L15 10 L40 25 Z" />
+                    <path d="M75 35 L85 10 L60 25 Z" />
+                    <circle cx="40" cy="50" r="3" fill="#333" />
+                    <circle cx="60" cy="50" r="3" fill="#333" />
+                    <path d="M45 65 Q50 70 55 65" stroke="#333" fill="transparent" stroke-width="2" />
+                </svg>
+                <span class="text-xs mt-1 text-gray-600">${note.name}</span>
+            `;
+            btn.onclick = () => {
+                document.querySelectorAll('#cat-palette button').forEach(b => b.classList.remove('bg-pink-50'));
+                btn.classList.add('bg-pink-50');
+                selectedNote = note;
+            };
+            palette.appendChild(btn);
+        });
+
+        // UI: Generar Tablero
+        const board = document.getElementById('game-board');
+        for (let i = 0; i < 16; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell bg-pink-50 rounded-2xl border-2 border-dashed border-pink-200 flex items-center justify-center relative cursor-pointer overflow-hidden';
+            cell.dataset.index = i;
+            
+            cell.onclick = () => {
+                if (boardState[i]) {
+                    // Si ya hay gato, cambiar velocidad
+                    cycleSpeed(i);
+                } else if (selectedNote) {
+                    // Colocar nuevo gato
+                    placeCat(i, selectedNote);
+                }
+            };
+            board.appendChild(cell);
+        }
+
+        function placeCat(index, note) {
+            const speedIndex = 1; // Por defecto: Negra (1000ms)
+            boardState[index] = { ...note, speedIndex };
+            renderCell(index);
+            startLoop(index);
+        }
+
+        function cycleSpeed(index) {
+            const cat = boardState[index];
+            cat.speedIndex = (cat.speedIndex + 1) % speeds.length;
+            renderCell(index);
+            startLoop(index);
+        }
+
+        function renderCell(index) {
+            const cell = board.children[index];
+            const data = boardState[index];
+            
+            if (!data) {
+                cell.innerHTML = '';
+                return;
+            }
+
+            const speed = speeds[data.speedIndex];
+            cell.innerHTML = `
+                <div class="cat-note flex flex-col items-center">
+                    <svg viewBox="0 0 100 100" class="w-16 h-16" style="fill: ${data.color}">
+                        <circle cx="50" cy="55" r="35" />
+                        <path d="M25 35 L15 10 L40 25 Z" />
+                        <path d="M75 35 L85 10 L60 25 Z" />
+                        <circle cx="40" cy="50" r="3" fill="#333" />
+                        <circle cx="60" cy="50" r="3" fill="#333" />
+                        <path d="M45 65 Q50 70 55 65" stroke="#333" fill="transparent" stroke-width="2" />
+                    </svg>
+                    <span class="speed-badge ${speed.color} absolute top-1 right-1">${speed.label}</span>
+                </div>
+            `;
+        }
+
+        function startLoop(index) {
+            if (intervals[index]) clearInterval(intervals[index]);
+            
+            const cat = boardState[index];
+            const speedMs = speeds[cat.speedIndex].ms;
+
+            // Primer maullido inmediato
+            triggerAction(index);
+
+            intervals[index] = setInterval(() => {
+                triggerAction(index);
+            }, speedMs);
+        }
+
+        function triggerAction(index) {
+            const cat = boardState[index];
+            if (!cat) return;
+            
+            playNote(cat.freq);
+            
+            // Efecto visual
+            const cell = board.children[index];
+            const catSvg = cell.querySelector('.cat-note');
+            if (catSvg) {
+                catSvg.classList.add('playing');
+                setTimeout(() => catSvg.classList.remove('playing'), 200);
+            }
+        }
+
+        document.getElementById('start-btn').onclick = initAudio;
+        
+        document.getElementById('clear-board').onclick = () => {
+            intervals.forEach(inv => clearInterval(inv));
+            boardState = Array(16).fill(null);
+            intervals = Array(16).fill(null);
+            for (let i = 0; i < 16; i++) renderCell(i);
+        };
+
+        document.getElementById('stop-audio').onclick = () => {
+            if (audioCtx.state === 'running') {
+                audioCtx.suspend();
+                document.getElementById('stop-audio').innerText = "Reactivar Sonido";
+            } else {
+                audioCtx.resume();
+                document.getElementById('stop-audio').innerText = "Silenciar";
+            }
+        };
+    </script>
+</body>
+</html>
