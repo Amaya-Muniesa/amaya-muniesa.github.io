@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idle Tower Defense</title>
+    <title>Idle Fortress Defense</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { touch-action: manipulation; overflow: hidden; background-color: #0f172a; }
@@ -11,6 +11,7 @@
         .ui-panel { pointer-events: none; }
         .ui-panel * { pointer-events: auto; }
         #boss-ui { transition: opacity 0.5s; }
+        .menu-btn { pointer-events: auto; }
     </style>
 </head>
 <body class="text-white font-sans">
@@ -38,16 +39,28 @@
             </div>
         </div>
 
-        <!-- Centro: Mensajes -->
-        <div id="msg-box" class="flex-grow flex items-center justify-center pointer-events-none">
-            <div id="game-msg" class="bg-black/80 px-8 py-4 rounded-full border border-white/20 scale-0 transition-transform duration-300 font-bold text-center text-lg"></div>
+        <!-- Centro: Mensajes y Menú de Torreta -->
+        <div id="msg-box" class="flex-grow flex items-center justify-center pointer-events-none relative">
+            <div id="game-msg" class="bg-black/80 px-8 py-4 rounded-full border border-white/20 scale-0 transition-transform duration-300 font-bold text-center text-lg z-10"></div>
+            
+            <!-- Menú Flotante de Torreta -->
+            <div id="turret-menu" class="hidden absolute flex flex-col gap-2 p-3 bg-slate-800/95 border border-white/20 rounded-xl shadow-2xl z-20 w-40">
+                <div class="text-[10px] uppercase font-bold text-blue-400 mb-1 text-center">Gestionar Torreta</div>
+                <button onclick="upgradeSelectedTurret()" id="btn-up-turret" class="bg-blue-600 hover:bg-blue-500 py-2 rounded text-xs font-bold transition menu-btn">
+                    Mejorar (<span id="up-cost">40</span> 💰)
+                </button>
+                <button onclick="sellSelectedTurret()" class="bg-red-600/80 hover:bg-red-500 py-2 rounded text-[10px] font-bold transition menu-btn">
+                    Eliminar (+30 💰)
+                </button>
+                <button onclick="closeTurretMenu()" class="text-[10px] opacity-50 py-1 menu-btn">Cerrar</button>
+            </div>
         </div>
 
         <!-- Pie: Mejoras y Torretas -->
         <div class="p-4 bg-slate-900/90 border-t border-white/10 grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-2">
                 <button onclick="buyTurret()" id="btn-turret" class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 py-2 rounded font-bold transition">
-                    🗼 Torreta (50 💰)
+                    🗼 Torreta (75 💰)
                 </button>
                 <div class="text-[10px] text-center opacity-60">Toca el mapa para instalar</div>
             </div>
@@ -77,11 +90,12 @@
             lastSpawn: 0,
             gameActive: true,
             waveTransition: false,
-            bossActive: false
+            bossActive: false,
+            selectedTurret: null
         };
 
         const config = {
-            turretCost: 50,
+            turretCost: 75,
             fortressBaseHP: 100,
             spawnRate: 1500,
         };
@@ -123,6 +137,8 @@
             state.waveTransition = false;
             state.bossActive = false;
             currentBoss = null;
+            state.selectedTurret = null;
+            closeTurretMenu();
             
             enemies = [];
             turrets = [];
@@ -141,7 +157,6 @@
         }
 
         function spawnBoss() {
-            // Verificación extra: si ya hay un boss o estamos en transición, no hacer nada
             if (state.bossActive || state.waveTransition) return;
 
             state.bossActive = true;
@@ -152,7 +167,7 @@
                 y: Math.random() * canvas.height,
                 hp: 500 * diffFactor,
                 maxHp: 500 * diffFactor,
-                speed: 0.35 + (state.wave * 0.02), // Un poco más lento para que sea justo
+                speed: 0.35 + (state.wave * 0.02),
                 r: 50,
                 isBoss: true,
                 color: '#ef4444'
@@ -164,7 +179,7 @@
         }
 
         function nextWave() {
-            if (state.waveTransition) return; // Evitar disparar múltiples veces si el boss muere "varias veces"
+            if (state.waveTransition) return;
 
             state.waveTransition = true;
             state.bossActive = false;
@@ -177,7 +192,6 @@
             saveProgress();
             
             projectiles = [];
-            // Limpiar enemigos residuales
             enemies = [];
 
             showMessage(`¡OLEADA COMPLETADA!\n+1 💎 conseguida.\nPreparando Oleada ${state.wave}...`, 3000);
@@ -189,7 +203,6 @@
         }
 
         function spawnEnemy() {
-            // Regla de oro: si hay boss o transición, NO hay enemigos normales
             if (state.waveTransition || state.bossActive || state.killsInWave >= state.killsToBoss) return;
 
             const side = Math.floor(Math.random() * 4);
@@ -216,7 +229,6 @@
         function update() {
             if (!state.gameActive || state.waveTransition) return;
 
-            // Spawn normal: Solo si no hemos llegado al límite de bajas para el boss
             if (!state.bossActive && state.killsInWave < state.killsToBoss) {
                 const currentSpawnRate = Math.max(400, config.spawnRate - (state.wave * 100));
                 if (Date.now() - state.lastSpawn > currentSpawnRate) {
@@ -225,7 +237,6 @@
                 }
             }
 
-            // Mover enemigos
             enemies.forEach((en) => {
                 const dx = fortress.x - en.x;
                 const dy = fortress.y - en.y;
@@ -243,7 +254,6 @@
 
             // Ataque Fortaleza
             if (fortress.cooldown <= 0) {
-                // Prioridad absoluta al boss si está en rango
                 let target = enemies.find(en => en.isBoss && Math.sqrt((en.x-fortress.x)**2 + (en.y-fortress.y)**2) < fortress.atkRange);
                 if (!target) {
                     target = enemies.find(en => Math.sqrt((en.x-fortress.x)**2 + (en.y-fortress.y)**2) < fortress.atkRange);
@@ -264,8 +274,8 @@
                     }
                     
                     if (target) {
-                        fireProjectile(t.x, t.y, target, 12, '#60a5fa');
-                        t.cooldown = 30;
+                        fireProjectile(t.x, t.y, target, t.damage, t.level > 1 ? '#a78bfa' : '#60a5fa');
+                        t.cooldown = t.baseCooldown;
                     }
                 } else { t.cooldown--; }
             });
@@ -349,11 +359,6 @@
                     ctx.strokeStyle = 'white';
                     ctx.lineWidth = 4;
                     ctx.stroke();
-                    // Detalle visual para el jefe
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                    ctx.beginPath();
-                    ctx.arc(en.x, en.y, en.r * 0.7, 0, Math.PI*2);
-                    ctx.fill();
                 } else {
                     const enHpPerc = Math.max(0, en.hp / en.maxHp);
                     ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -364,11 +369,34 @@
             });
 
             turrets.forEach(t => {
-                ctx.fillStyle = '#2563eb';
-                ctx.fillRect(t.x - 12, t.y - 12, 24, 24);
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(t.x - 12, t.y - 12, 24, 24);
+                const isSelected = state.selectedTurret === t;
+                ctx.fillStyle = t.level > 1 ? '#7c3aed' : '#2563eb';
+                
+                // Dibujar base torreta
+                ctx.fillRect(t.x - 14, t.y - 14, 28, 28);
+                
+                // Indicador de nivel
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`L${t.level}`, t.x, t.y + 4);
+
+                if (isSelected) {
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(t.x - 16, t.y - 16, 32, 32);
+                    
+                    // Dibujar rango al estar seleccionada
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, t.range, 0, Math.PI*2);
+                    ctx.strokeStyle = 'rgba(250, 204, 21, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(t.x - 14, t.y - 14, 28, 28);
+                }
             });
 
             projectiles.forEach(p => {
@@ -422,6 +450,12 @@
             
             document.getElementById('btn-turret').disabled = state.coins < config.turretCost || state.waveTransition || state.isPlacing;
             document.getElementById('btn-upgrade').disabled = state.gems < 1;
+
+            if (state.selectedTurret) {
+                const upgradeCost = state.selectedTurret.level * 40 + 20;
+                document.getElementById('up-cost').innerText = upgradeCost;
+                document.getElementById('btn-up-turret').disabled = state.coins < upgradeCost;
+            }
             
             if (state.bossActive) {
                 document.getElementById('kill-info').classList.add('hidden');
@@ -451,15 +485,47 @@
         function buyTurret() {
             if (state.coins >= config.turretCost && !state.isPlacing) {
                 state.isPlacing = true;
+                closeTurretMenu();
                 showMessage("Selecciona ubicación", 2000);
             }
+        }
+
+        function upgradeSelectedTurret() {
+            if (!state.selectedTurret) return;
+            const cost = state.selectedTurret.level * 40 + 20;
+            if (state.coins >= cost) {
+                state.coins -= cost;
+                state.selectedTurret.level++;
+                state.selectedTurret.damage += 8;
+                state.selectedTurret.range += 15;
+                state.selectedTurret.baseCooldown = Math.max(10, state.selectedTurret.baseCooldown - 2);
+                updateUI();
+                showMessage("¡Torreta Nivel " + state.selectedTurret.level + "!", 1000);
+            }
+        }
+
+        function sellSelectedTurret() {
+            if (!state.selectedTurret) return;
+            const idx = turrets.indexOf(state.selectedTurret);
+            if (idx > -1) {
+                state.coins += 30 + (state.selectedTurret.level * 10);
+                turrets.splice(idx, 1);
+                closeTurretMenu();
+                updateUI();
+                showMessage("Torreta Eliminada", 1000);
+            }
+        }
+
+        function closeTurretMenu() {
+            state.selectedTurret = null;
+            document.getElementById('turret-menu').classList.add('hidden');
         }
 
         function upgradeFortress() {
             if (state.gems >= 1) {
                 state.gems -= 1;
                 state.fortressLevel++;
-                fortress.maxHp += 40; // Un poco más generoso
+                fortress.maxHp += 40;
                 fortress.hp = fortress.maxHp;
                 updateUI();
                 saveProgress();
@@ -481,9 +547,43 @@
                     return;
                 }
                 state.coins -= config.turretCost;
-                turrets.push({ x: e.clientX, y: e.clientY, range: 160, cooldown: 0 });
+                turrets.push({ 
+                    x: e.clientX, 
+                    y: e.clientY, 
+                    range: 160, 
+                    cooldown: 0, 
+                    baseCooldown: 30,
+                    damage: 12,
+                    level: 1 
+                });
                 state.isPlacing = false;
                 updateUI();
+            } else {
+                // Lógica de selección de torreta
+                const clickedTurret = turrets.find(t => 
+                    Math.abs(t.x - e.clientX) < 20 && Math.abs(t.y - e.clientY) < 20
+                );
+
+                if (clickedTurret) {
+                    state.selectedTurret = clickedTurret;
+                    const menu = document.getElementById('turret-menu');
+                    menu.classList.remove('hidden');
+                    
+                    // Posicionar menú cerca del clic pero dentro de pantalla
+                    let menuX = e.clientX + 20;
+                    let menuY = e.clientY - 50;
+                    if (menuX + 160 > canvas.width) menuX = e.clientX - 180;
+                    if (menuY < 50) menuY = 50;
+                    
+                    menu.style.left = menuX + 'px';
+                    menu.style.top = menuY + 'px';
+                    updateUI();
+                } else {
+                    // Si se hace clic fuera del menú y de cualquier torreta
+                    if (!e.target.closest('#turret-menu')) {
+                        closeTurretMenu();
+                    }
+                }
             }
         });
 
