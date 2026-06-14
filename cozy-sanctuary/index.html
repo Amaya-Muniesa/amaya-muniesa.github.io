@@ -144,7 +144,7 @@
                 <!-- Ventanita Interactiva -->
                 <div
                     class="w-20 h-20 border-2 border-indigo-950 rounded-xl bg-slate-950/80 flex items-center justify-center overflow-hidden relative shadow-inner">
-                    <span id="window-scenery" class="text-4xl transition-all duration-1000 float-slow">🌌</span>
+                    <span id="window-scenery" class="text-4xl transition-all duration-1000 float-slow">🌙</span>
                     <!-- Efecto de lluvia visual si está activa -->
                     <div id="window-rain"
                         class="absolute inset-0 flex justify-around pointer-events-none opacity-0 transition-opacity duration-1000">
@@ -381,6 +381,9 @@
                 </div>
 
                 <div class="grid grid-cols-4 gap-2.5 max-w-md mx-auto w-full">
+                    <button onclick="setSleepTimer(5)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">5
+                        Min</button>
                     <button onclick="setSleepTimer(10)"
                         class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">10
                         Min</button>
@@ -389,9 +392,6 @@
                         Min</button>
                     <button onclick="setSleepTimer(30)"
                         class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">30
-                        Min</button>
-                    <button onclick="setSleepTimer(60)"
-                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">60
                         Min</button>
                 </div>
 
@@ -427,9 +427,9 @@
             sps: 0, // Stardust Per Second
             upgrades: {
                 tea: { id: 'tea', name: 'Té de Manzanilla', desc: 'Una taza de infusión tibia que calma los nervios.', cost: 15, sps: 0.5, level: 0, icon: '🍵', elementId: 'cozy-tea' },
-                candle: { id: 'candle', name: 'Vela de Lavanda', desc: 'Aroma reconfortante que relaja tu respiración.', cost: 60, sps: 2, level: 0, icon: '🕯️', elementId: 'cozy-candle' },
-                plush: { id: 'plush', name: 'Teddy Guardián', desc: 'Un peluche suave que ahuyenta las pesadillas.', cost: 250, sps: 8, level: 0, icon: '🧸', elementId: 'cozy-plush' },
-                lights: { id: 'lights', name: 'Guirnalda Estelar', desc: 'Luces cálidas para inundar el cuarto de magia.', cost: 1000, sps: 30, level: 0, icon: '💡', elementId: 'visual-lights' }
+                candle: { id: 'candle', name: 'Vela de Lavanda', desc: 'Aroma reconfortante que relaja tu respiración.', cost: 60, sps: 1, level: 0, icon: '🕯️', elementId: 'cozy-candle' },
+                plush: { id: 'plush', name: 'Teddy Guardián', desc: 'Un peluche suave que ahuyenta las pesadillas.', cost: 250, sps: 4, level: 0, icon: '🧸', elementId: 'cozy-plush' },
+                lights: { id: 'lights', name: 'Guirnalda Estelar', desc: 'Luces cálidas para inundar el cuarto de magia.', cost: 1000, sps: 15, level: 0, icon: '💡', elementId: 'visual-lights' }
             },
             clicks: 0
         };
@@ -843,7 +843,7 @@
                     rainVisual.classList.replace('opacity-100', 'opacity-0');
                     document.getElementById('clima-icon').textContent = '🌙';
                     document.getElementById('clima-desc').textContent = 'Cielo despejado';
-                    document.getElementById('window-scenery').textContent = '🌌';
+                    document.getElementById('window-scenery').textContent = '🌙';
                 }
             } else if (type === 'viento' && windGain) {
                 windGain.gain.setTargetAtTime(volumes.viento * 0.5, targetGain, 1.0);
