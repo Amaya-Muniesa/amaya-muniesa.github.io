@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santuario de Sueño Cozy</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Quicksand para un toque tierno y redondeado -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #090B11;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        /* Animaciones suaves */
+        .glow-star {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(0.95);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        .float-slow {
+            animation: floating 6s infinite ease-in-out;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Estilo para simular dimmer total */
+        #screen-dimmer {
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Personalizar scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1319;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3748;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen justify-between select-none">
+
+    <!-- Dimmer de pantalla para cuando se activa el temporizador de sueño -->
+    <div id="screen-dimmer" class="fixed inset-0 bg-black opacity-0 z-50"></div>
+
+    <!-- Cabecera -->
+    <header
+        class="p-4 flex justify-between items-center border-b border-gray-800 bg-[#0e121b] bg-opacity-70 backdrop-blur-md sticky top-0 z-40">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🌙</span>
+            <div>
+                <h1 class="font-bold text-lg text-indigo-200">Santuario Cozy</h1>
+                <p class="text-xs text-indigo-400">Idle & Relax para dormir</p>
+            </div>
+        </div>
+
+        <!-- Marcador de Polvo de Estrellas -->
+        <div
+            class="bg-[#171d29] px-4 py-2 rounded-full border border-indigo-900/50 flex items-center space-x-2 shadow-inner">
+            <span class="text-yellow-300 text-lg animate-pulse">✨</span>
+            <span id="stardust-count" class="font-bold text-yellow-100 tracking-wide text-lg">0</span>
+            <span class="text-xs text-indigo-300">(+<span id="sps-rate">0</span>/s)</span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 flex flex-col space-y-6">
+
+        <!-- Área Visual del Cuarto (Santuario) -->
+        <div
+            class="relative bg-gradient-to-b from-[#111625] to-[#0d111c] rounded-3xl p-6 border border-indigo-950/40 h-80 flex flex-col justify-between overflow-hidden shadow-2xl">
+            <!-- Cielo estrellado e hilos de luz de fondo -->
+            <div class="absolute inset-0 opacity-40 pointer-events-none">
+                <div class="absolute top-8 left-12 w-1.5 h-1.5 bg-yellow-100 rounded-full glow-star"></div>
+                <div class="absolute top-16 right-24 w-2 h-2 bg-yellow-200 rounded-full glow-star"
+                    style="animation-delay: 1.5s;"></div>
+                <div class="absolute top-36 left-1/3 w-1 h-1 bg-white rounded-full glow-star"
+                    style="animation-delay: 0.7s;"></div>
+                <div class="absolute top-48 right-16 w-1.5 h-1.5 bg-indigo-200 rounded-full glow-star"
+                    style="animation-delay: 2.2s;"></div>
+
+                <!-- Guirnalda de luces (Se desbloquea con idle) -->
+                <div id="visual-lights"
+                    class="absolute top-0 inset-x-0 h-10 flex justify-around px-8 opacity-20 transition-opacity duration-1000">
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                </div>
+            </div>
+
+            <!-- Cabecera de la ventana / Clima actual -->
+            <div class="flex justify-between items-start z-10">
+                <div
+                    class="bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/5 text-xs text-indigo-300 flex items-center space-x-2">
+                    <span id="clima-icon">🌙</span>
+                    <span id="clima-desc">Cielo despejado</span>
+                </div>
+
+                <!-- Ventanita Interactiva -->
+                <div
+                    class="w-20 h-20 border-2 border-indigo-950 rounded-xl bg-slate-950/80 flex items-center justify-center overflow-hidden relative shadow-inner">
+                    <span id="window-scenery" class="text-4xl transition-all duration-1000 float-slow">🌌</span>
+                    <!-- Efecto de lluvia visual si está activa -->
+                    <div id="window-rain"
+                        class="absolute inset-0 flex justify-around pointer-events-none opacity-0 transition-opacity duration-1000">
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_1s_infinite]"></div>
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_1.2s_infinite_0.2s]"></div>
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_0.8s_infinite_0.4s]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Centro del Santuario: El compañero que duerme -->
+            <div class="flex justify-center items-center z-10 my-auto">
+                <button onclick="petCompanion()"
+                    class="focus:outline-none transform active:scale-95 transition-all relative group">
+                    <!-- Efecto aura acogedora -->
+                    <div
+                        class="absolute -inset-4 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition duration-1000">
+                    </div>
+
+                    <!-- SVG de un gatito gordo y tierno durmiendo plácidamente -->
+                    <svg class="w-36 h-24 text-indigo-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] float-slow"
+                        viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cuerpo -->
+                        <path d="M20 70C20 40 60 30 100 40C120 45 130 55 130 70C130 85 110 90 75 90C40 90 20 85 20 70Z"
+                            fill="#312E81" />
+                        <path d="M30 70C30 48 65 38 95 48C110 52 118 60 118 70C118 80 100 83 74 83C44 83 30 80 30 70Z"
+                            fill="#3730A3" />
+                        <!-- Cabeza -->
+                        <circle cx="110" cy="50" r="22" fill="#312E81" />
+                        <circle cx="110" cy="50" r="19" fill="#3730A3" />
+                        <!-- Orejas -->
+                        <polygon points="95,38 90,20 105,32" fill="#312E81" />
+                        <polygon points="120,38 130,20 125,32" fill="#312E81" />
+                        <polygon points="97,36 94,24 103,32" fill="#4338CA" />
+                        <polygon points="118,36 126,24 122,32" fill="#4338CA" />
+                        <!-- Ojos cerrados (dormido) -->
+                        <path d="M96 52C98 55 102 55 104 52" stroke="#818CF8" stroke-width="2.5"
+                            stroke-linecap="round" />
+                        <path d="M112 52C114 55 118 55 120 52" stroke="#818CF8" stroke-width="2.5"
+                            stroke-linecap="round" />
+                        <!-- Hocico/Boca contenta durmiendo -->
+                        <path d="M106 58C107 59 108 59 109 58C110 59 111 59 112 58" stroke="#818CF8" stroke-width="1.5"
+                            stroke-linecap="round" />
+                        <!-- Cola enroscada -->
+                        <path d="M25 75C15 75 10 65 15 58C20 52 30 58 28 66" stroke="#312E81" stroke-width="10"
+                            stroke-linecap="round" />
+                        <path d="M24 74C17 74 13 67 17 61C20 57 27 61 26 66" stroke="#3730A3" stroke-width="6"
+                            stroke-linecap="round" />
+                        <!-- Detalles de rubor en mejillas -->
+                        <circle cx="94" cy="57" r="2" fill="#F43F5E" opacity="0.6" />
+                        <circle cx="122" cy="57" r="2" fill="#F43F5E" opacity="0.6" />
+                    </svg>
+
+                    <!-- Diálogo o ronroneo flotante -->
+                    <span id="purr-text"
+                        class="absolute -top-4 right-2 text-xs text-indigo-300 font-medium bg-[#1e1b4b] border border-indigo-800 px-2 py-1 rounded-lg opacity-0 transition-opacity duration-300">Zzz...
+                        Purr~</span>
+                </button>
+            </div>
+
+            <!-- Barra inferior de elementos activos en el cuarto -->
+            <div class="flex justify-between items-end z-10 text-xs text-indigo-400">
+                <div class="flex space-x-3">
+                    <span id="cozy-tea" class="opacity-30 transition-opacity duration-1000">🍵 Té tibio</span>
+                    <span id="cozy-candle" class="opacity-30 transition-opacity duration-1000">🕯️ Vela aromática</span>
+                </div>
+                <div id="cozy-plush" class="opacity-30 transition-opacity duration-1000">
+                    🧸 Peluche guardián
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Pestañas Interactivas -->
+        <div class="bg-[#0e121b] border border-indigo-950/40 rounded-3xl p-4 flex-grow flex flex-col">
+            <!-- Botones de pestaña -->
+            <div class="grid grid-cols-4 gap-2 mb-6 bg-[#090b11] p-1.5 rounded-2xl border border-indigo-950/20">
+                <button onclick="switchTab('tab-sounds')" id="btn-tab-sounds"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-200 bg-[#161c2a] shadow-md">
+                    🎵 Sonidos
+                </button>
+                <button onclick="switchTab('tab-shop')" id="btn-tab-shop"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    🛍️ Mejoras
+                </button>
+                <button onclick="switchTab('tab-breathing')" id="btn-tab-breathing"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    🌬️ Respirar
+                </button>
+                <button onclick="switchTab('tab-timer')" id="btn-tab-timer"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    ⏱️ Alarma
+                </button>
+            </div>
+
+            <!-- CONTENIDO DE PESTAÑAS -->
+
+            <!-- Pestaña 1: Mezclador de Sonidos Ambientales Sintéticos -->
+            <div id="tab-sounds" class="tab-content flex flex-col space-y-4">
+                <div class="text-xs text-indigo-400 mb-2 flex justify-between items-center">
+                    <span>Crea tu atmósfera ideal para inducir ondas delta</span>
+                    <button onclick="toggleAudioEngine()" id="audio-master-btn"
+                        class="bg-indigo-900/40 border border-indigo-500/30 hover:bg-indigo-900/60 px-3 py-1 rounded-full text-indigo-200 font-medium transition-colors">
+                        Iniciar Audio
+                    </button>
+                </div>
+
+                <!-- Lista de controles de sonido -->
+                <div class="space-y-4">
+                    <!-- Sonido 1: Melodía de ensueño -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🎹</span>
+                            <div>
+                                <h3 class="font-semibold text-sm text-indigo-200">Melodía Cósmica</h3>
+                                <p class="text-xs text-indigo-400">Arpegios suaves generados por sintetizador</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-melodia" min="0" max="1" step="0.05" value="0.3"
+                                oninput="adjustVolume('melodia', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right"
+                                id="lbl-vol-melodia">30%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 2: Lluvia acogedora -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🌧️</span>
+                            <div>
+                                <h3 class="font-semibold text-sm text-indigo-200">Lluvia en la Ventana</h3>
+                                <p class="text-xs text-indigo-400">Ruido rosa filtrado que relaja el sistema nervioso
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-lluvia" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('lluvia', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-lluvia">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 3: Viento de Otoño -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🍃</span>
+                            <div>
+                                <h3 class="font-semibold text-sm text-indigo-200">Susurro de Viento</h3>
+                                <p class="text-xs text-indigo-400">Modulaciones de aire que calman la ansiedad</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-viento" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('viento', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-viento">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 4: Ronroneo del gatito -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🐈</span>
+                            <div>
+                                <h3 class="font-semibold text-sm text-indigo-200">Ronroneo Terapéutico</h3>
+                                <p class="text-xs text-indigo-400">Frecuencia baja constante de 25 Hz</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-purr" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('purr', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-purr">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Tienda de Mejoras (Idle Elements) -->
+            <div id="tab-shop" class="tab-content hidden flex flex-col space-y-3">
+                <div class="text-xs text-indigo-400 mb-1">
+                    Usa tu Polvo de Estrellas para añadir confort al cuarto e incrementar tu generación pasiva.
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="upgrades-list">
+                    <!-- Las mejoras se cargarán dinámicamente mediante JS para un control estricto de estados -->
+                </div>
+            </div>
+
+            <!-- Pestaña 3: Guía de Respiración (4-7-8 o Caja) -->
+            <div id="tab-breathing" class="tab-content hidden flex flex-col items-center justify-center py-4 space-y-6">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-indigo-200" id="breathing-state-text">Respira con el ritmo
+                    </h3>
+                    <p class="text-xs text-indigo-400 max-w-sm mx-auto mt-1">El método 4-4-4-4 calma el sistema nervioso
+                        autónomo en minutos reduciendo pulsaciones.</p>
+                </div>
+
+                <!-- Burbuja de Respiración Interactiva -->
+                <div class="relative flex items-center justify-center w-48 h-48">
+                    <!-- Círculo que cambia de escala y color -->
+                    <div id="breathing-circle"
+                        class="w-32 h-32 bg-indigo-500/10 border border-indigo-400/30 rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out shadow-[0_0_30px_rgba(129,140,248,0.2)]">
+                        <span id="breathing-timer-lbl" class="text-2xl font-bold text-indigo-200">4</span>
+                    </div>
+                    <!-- Aro exterior decorativo -->
+                    <div class="absolute inset-0 border border-indigo-900/40 rounded-full scale-95"></div>
+                </div>
+
+                <div class="flex space-x-2">
+                    <button onclick="startBreathing()" id="btn-breath-toggle"
+                        class="bg-indigo-900/60 hover:bg-indigo-900/80 border border-indigo-500/20 text-indigo-200 px-6 py-2 rounded-xl text-sm font-medium transition-colors">
+                        Iniciar Ejercicio
+                    </button>
+                    <button onclick="stopBreathing()"
+                        class="bg-slate-950 border border-indigo-950 text-indigo-400 px-4 py-2 rounded-xl text-sm font-medium hover:text-indigo-200 transition-colors">
+                        Detener
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 4: Temporizador de apagado progresivo -->
+            <div id="tab-timer" class="tab-content hidden flex flex-col space-y-5 py-4">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-indigo-200">Temporizador de Sueño</h3>
+                    <p class="text-xs text-indigo-400 max-w-sm mx-auto mt-1">Una vez terminado el tiempo, el volumen se
+                        desvanecerá lentamente a cero y la pantalla se oscurecerá por completo.</p>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2.5 max-w-md mx-auto w-full">
+                    <button onclick="setSleepTimer(10)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">10
+                        Min</button>
+                    <button onclick="setSleepTimer(20)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">20
+                        Min</button>
+                    <button onclick="setSleepTimer(30)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">30
+                        Min</button>
+                    <button onclick="setSleepTimer(60)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">60
+                        Min</button>
+                </div>
+
+                <!-- Temporizador de cuenta atrás dinámico -->
+                <div id="timer-display-container" class="hidden text-center space-y-2">
+                    <p class="text-xs text-indigo-400">Apagado progresivo en:</p>
+                    <div id="timer-countdown" class="text-3xl font-mono font-bold text-yellow-100">00:00</div>
+                    <button onclick="cancelSleepTimer()"
+                        class="text-xs text-red-400 hover:text-red-300 underline font-medium">Cancelar
+                        Temporizador</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página suave / Mensaje tierno -->
+    <footer class="p-4 text-center text-xs text-indigo-500/60 border-t border-indigo-950/20 bg-[#090b11]">
+        "Un día más ha terminado, has hecho suficiente. Permítete descansar." 🌸
+    </footer>
+
+    <!-- NOTIFICACIONES CUSTOM (Evitando alerts) -->
+    <div id="custom-toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-indigo-950/90 border border-indigo-500/30 text-indigo-200 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs opacity-0 pointer-events-none transition-all duration-300 z-50">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg">Mensaje informativo</span>
+    </div>
+
+    <!-- CÓDIGO DEL JUEGO / AUDIO SINTETIZADO -->
+    <script>
+        // --- 1. ESTADO DEL JUEGO (IDLE) ---
+        let state = {
+            stardust: 0,
+            sps: 0, // Stardust Per Second
+            upgrades: {
+                tea: { id: 'tea', name: 'Té de Manzanilla', desc: 'Una taza de infusión tibia que calma los nervios.', cost: 15, sps: 0.5, level: 0, icon: '🍵', elementId: 'cozy-tea' },
+                candle: { id: 'candle', name: 'Vela de Lavanda', desc: 'Aroma reconfortante que relaja tu respiración.', cost: 60, sps: 2, level: 0, icon: '🕯️', elementId: 'cozy-candle' },
+                plush: { id: 'plush', name: 'Teddy Guardián', desc: 'Un peluche suave que ahuyenta las pesadillas.', cost: 250, sps: 8, level: 0, icon: '🧸', elementId: 'cozy-plush' },
+                lights: { id: 'lights', name: 'Guirnalda Estelar', desc: 'Luces cálidas para inundar el cuarto de magia.', cost: 1000, sps: 30, level: 0, icon: '💡', elementId: 'visual-lights' }
+            },
+            clicks: 0
+        };
+
+        // --- 2. SISTEMA DE AUDIO SINTÉTICO (Web Audio API) ---
+        // Generador robusto en tiempo real para evitar fallos de carga o buffering molesto antes de dormir.
+        let audioCtx = null;
+        let masterGain = null;
+
+        // Nodos del sintetizador de melodia
+        let synthOscs = [];
+        let synthGain = null;
+        let synthInterval = null;
+
+        // Nodos para generador de Lluvia (Ruido Rosa Filtrado)
+        let rainBufferNode = null;
+        let rainFilter = null;
+        let rainGain = null;
+
+        // Nodos para generador de Viento
+        let windNoiseNode = null;
+        let windFilter = null;
+        let windGain = null;
+        let windLFO = null;
+
+        // Nodos para el Ronroneo del gato
+        let purrOsc = null;
+        let purrModulator = null;
+        let purrGain = null;
+
+        // Volúmenes base actuales
+        let volumes = {
+            melodia: 0.3,
+            lluvia: 0.0,
+            viento: 0.0,
+            purr: 0.0
+        };
+
+        function initAudio() {
+            if (audioCtx) return;
+
+            try {
+                // Instanciar el contexto de audio
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Nodo master para control general de volumen / fadeout
+                masterGain = audioCtx.createGain();
+                masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                masterGain.connect(audioCtx.destination);
+
+                // --- INICIALIZAR MELODÍA ---
+                synthGain = audioCtx.createGain();
+                synthGain.gain.setValueAtTime(volumes.melodia * 0.4, audioCtx.currentTime);
+                synthGain.connect(masterGain);
+                startAmbientMelody();
+
+                // --- INICIALIZAR LLUVIA (Ruido rosa) ---
+                rainGain = audioCtx.createGain();
+                rainGain.gain.setValueAtTime(volumes.lluvia, audioCtx.currentTime);
+                rainGain.connect(masterGain);
+                createRainSynth();
+
+                // --- INICIALIZAR VIENTO (Ruido blanco con LFO para vaivén) ---
+                windGain = audioCtx.createGain();
+                windGain.gain.setValueAtTime(volumes.viento, audioCtx.currentTime);
+                windGain.connect(masterGain);
+                createWindSynth();
+
+                // --- INICIALIZAR RONRONEO ---
+                purrGain = audioCtx.createGain();
+                purrGain.gain.setValueAtTime(volumes.purr, audioCtx.currentTime);
+                purrGain.connect(masterGain);
+                createPurrSynth();
+
+                showToast("🎵", "Audio iniciado correctamente. ¡Relájate!");
+                document.getElementById('audio-master-btn').textContent = "Audio Activo";
+                document.getElementById('audio-master-btn').classList.replace('bg-indigo-900/40', 'bg-green-950/60');
+            } catch (e) {
+                console.error("No se pudo iniciar el audio context:", e);
+                showToast("⚠️", "No se admite audio sintetizado en este navegador.");
+            }
+        }
+
+        function toggleAudioEngine() {
+            if (!audioCtx) {
+                initAudio();
+            } else {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                    showToast("🎵", "Audio reanudado.");
+                    document.getElementById('audio-master-btn').textContent = "Audio Activo";
+                } else {
+                    audioCtx.suspend();
+                    showToast("🔇", "Audio pausado temporalmente.");
+                    document.getElementById('audio-master-btn').textContent = "Reanudar Audio";
+                }
+            }
+        }
+
+        // --- GENERACIÓN DE RUIDOS (LLUVIA Y VIENTO) ---
+        function createRainSynth() {
+            // Generar buffer de ruido rosa para una lluvia suave
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            let b0, b1, b2, b3, b4, b5, b6;
+            b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                output[i] *= 0.11; // normalizar aproximado
+                b6 = white * 0.115926;
+            }
+
+            rainBufferNode = audioCtx.createBufferSource();
+            rainBufferNode.buffer = noiseBuffer;
+            rainBufferNode.loop = true;
+
+            // Filtro de paso bajo para simular el cristal de la ventana
+            rainFilter = audioCtx.createBiquadFilter();
+            rainFilter.type = 'lowpass';
+            rainFilter.frequency.setValueAtTime(600, audioCtx.currentTime);
+
+            rainBufferNode.connect(rainFilter);
+            rainFilter.connect(rainGain);
+            rainBufferNode.start();
+        }
+
+        function createWindSynth() {
+            // Ruido blanco básico
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+
+            windNoiseNode = audioCtx.createBufferSource();
+            windNoiseNode.buffer = noiseBuffer;
+            windNoiseNode.loop = true;
+
+            // Filtro paso banda para dar la sensación de soplido
+            windFilter = audioCtx.createBiquadFilter();
+            windFilter.type = 'bandpass';
+            windFilter.frequency.setValueAtTime(300, audioCtx.currentTime);
+            windFilter.Q.setValueAtTime(3.0, audioCtx.currentTime);
+
+            // Oscilador de baja frecuencia (LFO) para modular la fuerza del viento de forma natural
+            windLFO = audioCtx.createOscillator();
+            windLFO.frequency.setValueAtTime(0.08, audioCtx.currentTime); // vaivén ultra lento
+
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.setValueAtTime(150, audioCtx.currentTime); // amplitud de la variación de freq
+
+            windLFO.connect(lfoGain);
+            lfoGain.connect(windFilter.frequency);
+
+            windNoiseNode.connect(windFilter);
+            windFilter.connect(windGain);
+
+            windLFO.start();
+            windNoiseNode.start();
+        }
+
+        // --- SINTETIZADOR DE RONRONEO (Cat Purr) ---
+        function createPurrSynth() {
+            // Dos osciladores de baja frecuencia desfasados para la textura de ronroneo
+            purrOsc = audioCtx.createOscillator();
+            purrOsc.type = 'sawtooth';
+            purrOsc.frequency.setValueAtTime(28, audioCtx.currentTime); // 28Hz es perfecto para vibración relajante
+
+            // Filtro paso bajo severo para eliminar armónicos irritantes
+            const purrFilter = audioCtx.createBiquadFilter();
+            purrFilter.type = 'lowpass';
+            purrFilter.frequency.setValueAtTime(70, audioCtx.currentTime);
+
+            // Modulación de volumen rítmica para emular el respirar del felino
+            purrModulator = audioCtx.createOscillator();
+            purrModulator.type = 'sine';
+            purrModulator.frequency.setValueAtTime(3.5, audioCtx.currentTime); // Pulso de ronroneo
+
+            const modGain = audioCtx.createGain();
+            modGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+
+            const carrierGain = audioCtx.createGain();
+            carrierGain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+
+            purrModulator.connect(modGain);
+            // Modular volumen
+            modGain.connect(carrierGain.gain);
+
+            purrOsc.connect(purrFilter);
+            purrFilter.connect(carrierGain);
+            carrierGain.connect(purrGain);
+
+            purrOsc.start();
+            purrModulator.start();
+        }
+
+        // --- SINTETIZADOR DE MELODÍA GENERATIVA (Afinación terapéutica 432Hz) ---
+        // Progresión de acordes extremadamente lenta y calmada: Do Mayor 7 -> Fa Mayor 7 -> La menor -> Sol Mayor
+        const CHORDS_432 = [
+            [257.43, 324.32, 385.70, 485.91], // Cmaj7 (C3, E3, G3, B3 ajustado a base 432Hz)
+            [171.62, 216.22, 257.43, 324.32], // Fmaj7 (F3, A3, C4, E4)
+            [216.22, 257.43, 324.32, 432.00], // Am (A3, C4, E4, A4)
+            [192.43, 242.45, 288.33, 385.70]  // G (G3, B3, D4, G4)
+        ];
+
+        let currentChordIndex = 0;
+
+        function playSoftNote(freq, delay, duration) {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = 'triangle'; // Tono muy cálido y redondo
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+
+            // Filtro suave para sonar aún más lejano
+            const noteFilter = audioCtx.createBiquadFilter();
+            noteFilter.type = 'lowpass';
+            noteFilter.frequency.setValueAtTime(500, audioCtx.currentTime + delay);
+
+            // ADSR adaptado a sueño (Ataque y decaimiento super suave)
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + delay + 1.5); // Ataque de 1.5s
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + delay + duration - 2);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration); // Caída muy larga
+
+            osc.connect(noteFilter);
+            noteFilter.connect(gainNode);
+            gainNode.connect(synthGain);
+
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function startAmbientMelody() {
+            if (synthInterval) clearInterval(synthInterval);
+
+            // Ejecutar un ciclo armónico cada 8 segundos
+            synthInterval = setInterval(() => {
+                if (!audioCtx || audioCtx.state === 'suspended') return;
+
+                const chord = CHORDS_432[currentChordIndex];
+
+                // Tocar notas del acorde de forma espaciada (Arpegio celestial)
+                playSoftNote(chord[0], 0, 7.5); // Tónica baja
+                playSoftNote(chord[1], 1.2, 6);
+                playSoftNote(chord[2], 2.8, 4.5);
+                playSoftNote(chord[3], 4.2, 3);
+
+                // Alternar acorde suavemente
+                currentChordIndex = (currentChordIndex + 1) % CHORDS_432.length;
+            }, 8000);
+        }
+
+        function adjustVolume(type, val) {
+            volumes[type] = parseFloat(val);
+            document.getElementById(`lbl-vol-${type}`).textContent = `${Math.round(val * 100)}%`;
+
+            if (!audioCtx) return; // Si no se ha iniciado, guardamos el volumen pero no aplicamos
+
+            const targetGain = audioCtx.currentTime;
+
+            if (type === 'melodia' && synthGain) {
+                // Mantener melodia siempre moderadamente más baja y celestial
+                synthGain.gain.setTargetAtTime(volumes.melodia * 0.4, targetGain, 0.5);
+            } else if (type === 'lluvia' && rainGain) {
+                rainGain.gain.setTargetAtTime(volumes.lluvia * 0.6, targetGain, 0.5);
+                // Si la lluvia suena, actualizamos la ventana visualmente
+                const rainVisual = document.getElementById('window-rain');
+                if (volumes.lluvia > 0.1) {
+                    rainVisual.classList.replace('opacity-0', 'opacity-100');
+                    document.getElementById('clima-icon').textContent = '🌧️';
+                    document.getElementById('clima-desc').textContent = 'Lluvia rítmica';
+                    document.getElementById('window-scenery').textContent = '⛈️';
+                } else {
+                    rainVisual.classList.replace('opacity-100', 'opacity-0');
+                    document.getElementById('clima-icon').textContent = '🌙';
+                    document.getElementById('clima-desc').textContent = 'Cielo despejado';
+                    document.getElementById('window-scenery').textContent = '🌌';
+                }
+            } else if (type === 'viento' && windGain) {
+                windGain.gain.setTargetAtTime(volumes.viento * 0.5, targetGain, 1.0);
+            } else if (type === 'purr' && purrGain) {
+                purrGain.gain.setTargetAtTime(volumes.purr * 0.8, targetGain, 0.3);
+            }
+        }
+
+
+        // --- 3. JUGABILIDAD IDLE (SANTUARIO Y MEJORAS) ---
+
+        function renderUpgrades() {
+            const container = document.getElementById('upgrades-list');
+            container.innerHTML = '';
+
+            Object.values(state.upgrades).forEach(up => {
+                const canAfford = state.stardust >= up.cost;
+                const isMax = up.level >= 20; // Límite amigable
+
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border transition-all flex justify-between items-center ${canAfford ? 'border-indigo-800 bg-[#121724]' : 'border-indigo-950/40 bg-[#0c101a] opacity-60'
+                    }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl bg-slate-950/50 p-2 rounded-xl border border-indigo-950">${up.icon}</span>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-semibold text-sm text-indigo-100">${up.name}</h4>
+                                <span class="bg-indigo-950 text-indigo-400 border border-indigo-900 px-1.5 py-0.5 rounded-md text-[10px]">Nivel ${up.level}</span>
+                            </div>
+                            <p class="text-[11px] text-indigo-400 max-w-[180px] md:max-w-xs mt-0.5">${up.desc}</p>
+                            <span class="text-[11px] text-yellow-300/80 font-medium">+${up.sps} Polvo/s por nivel</span>
+                        </div>
+                    </div>
+                    <button onclick="buyUpgrade('${up.id}')" ${!canAfford || isMax ? 'disabled' : ''} class="px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] ${canAfford && !isMax
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md active:scale-95'
+                        : 'bg-slate-900 text-indigo-600 border border-indigo-950 cursor-not-allowed'
+                    }">
+                        <span>${isMax ? 'MAX' : 'Añadir'}</span>
+                        <span class="text-[10px] text-yellow-400 font-mono mt-0.5">${isMax ? '---' : '✨ ' + Math.round(up.cost)}</span>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyUpgrade(id) {
+            const up = state.upgrades[id];
+            if (state.stardust >= up.cost && up.level < 20) {
+                state.stardust -= up.cost;
+                up.level++;
+                up.cost = up.cost * 1.5; // Curva de coste suave
+
+                // Recalcular SPS
+                recalculateSPS();
+                renderUpgrades();
+                updateUI();
+
+                // Reflejar visualmente la mejora en el dormitorio
+                const visualEl = document.getElementById(up.elementId);
+                if (visualEl) {
+                    if (up.id === 'lights') {
+                        // Las luces aumentan su opacidad paulatinamente
+                        visualEl.style.opacity = Math.min(0.2 + (up.level * 0.15), 1.0);
+                    } else {
+                        visualEl.style.opacity = "1.0";
+                    }
+                }
+
+                // Disparar audio relajante leve si está activo
+                if (audioCtx && audioCtx.state !== 'suspended') {
+                    playSoftNote(544.37, 0, 0.5); // Nota mágica suave aguda
+                }
+
+                showToast(up.icon, `¡Has mejorado tu ${up.name}!`);
+            }
+        }
+
+        function recalculateSPS() {
+            let total = 0;
+            Object.values(state.upgrades).forEach(up => {
+                total += up.level * up.sps;
+            });
+            state.sps = total;
+            document.getElementById('sps-rate').textContent = state.sps.toFixed(1);
+        }
+
+        // --- INTERACCIONES TIERNA CON EL GATITO ---
+        let petTimeout = null;
+        function petCompanion() {
+            // Asegurarse de arrancar el Audio Context de manera sutil si no lo ha hecho aún
+            if (!audioCtx) {
+                initAudio();
+            }
+
+            state.stardust += 1 + (state.sps * 0.1); // El click da valor acorde al SPS
+            state.clicks++;
+            updateUI();
+
+            // Animación del texto de ronroneo
+            const purrLbl = document.getElementById('purr-text');
+            purrLbl.classList.replace('opacity-0', 'opacity-100');
+
+            // Subir volumen del ronroneo brevemente
+            if (purrGain && volumes.purr < 0.2) {
+                purrGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                purrGain.gain.exponentialRampToValueAtTime(volumes.purr || 0.01, audioCtx.currentTime + 3.0);
+            }
+
+            if (petTimeout) clearTimeout(petTimeout);
+            petTimeout = setTimeout(() => {
+                purrLbl.classList.replace('opacity-100', 'opacity-0');
+            }, 2000);
+
+            // Crear partículas flotantes de estrella sobre el gato
+            createStarParticle();
+        }
+
+        function createStarParticle() {
+            const container = document.getElementById('visual-lights').parentElement;
+            const star = document.createElement('div');
+            star.className = 'absolute text-xs pointer-events-none text-yellow-300 animate-[ping_1.5s_infinite]';
+            star.textContent = '✨';
+            star.style.left = `${30 + Math.random() * 40}%`;
+            star.style.top = `${40 + Math.random() * 30}%`;
+            container.appendChild(star);
+            setTimeout(() => star.remove(), 1200);
+        }
+
+        // Loop de acumulación pasiva (Idle Loop)
+        let lastTick = Date.now();
+        setInterval(() => {
+            const now = Date.now();
+            const delta = (now - lastTick) / 1000;
+            lastTick = now;
+
+            if (state.sps > 0) {
+                state.stardust += state.sps * delta;
+                updateUI();
+            }
+        }, 100);
+
+        function updateUI() {
+            document.getElementById('stardust-count').textContent = Math.floor(state.stardust);
+            // Renderizar de forma pasiva los estados deshabilitados de la tienda
+            // Solo redibujamos la tienda si está visible para optimizar rendimiento de renderizado en móvil
+            const shopTab = document.getElementById('tab-shop');
+            if (!shopTab.classList.contains('hidden')) {
+                // Para evitar un re-render constante que rompa el foco de botones,
+                // actualizamos solo las clases de los botones de la tienda
+                const buttons = shopTab.querySelectorAll('button');
+                let idx = 0;
+                Object.values(state.upgrades).forEach(up => {
+                    const btn = buttons[idx];
+                    if (btn) {
+                        const canAfford = state.stardust >= up.cost;
+                        const isMax = up.level >= 20;
+                        if (canAfford && !isMax) {
+                            btn.removeAttribute('disabled');
+                            btn.className = "px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md active:scale-95";
+                        } else {
+                            btn.setAttribute('disabled', 'true');
+                            btn.className = "px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] bg-slate-900 text-indigo-600 border border-indigo-950 cursor-not-allowed";
+                        }
+                    }
+                    idx++;
+                });
+            }
+        }
+
+
+        // --- 4. GUÍA DE RESPIRACIÓN (MÉTODO CAJA 4-4-4-4) ---
+        let breathingInterval = null;
+        let breathingStep = 0; // 0: Inhala, 1: Mantén, 2: Exhala, 3: Mantén vacío
+        let breathSeconds = 4;
+
+        function startBreathing() {
+            if (breathingInterval) clearInterval(breathingInterval);
+
+            breathingStep = 0;
+            breathSeconds = 4;
+            updateBreathingUI();
+
+            breathingInterval = setInterval(() => {
+                breathSeconds--;
+                if (breathSeconds <= 0) {
+                    breathingStep = (breathingStep + 1) % 4;
+                    breathSeconds = 4;
+                }
+                updateBreathingUI();
+            }, 1000);
+
+            document.getElementById('btn-breath-toggle').textContent = "Reiniciar";
+        }
+
+        function stopBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+            }
+            const circle = document.getElementById('breathing-circle');
+            circle.style.transform = "scale(1)";
+            circle.style.backgroundColor = "rgba(129, 140, 248, 0.1)";
+            document.getElementById('breathing-state-text').textContent = "Ejercicio pausado";
+            document.getElementById('breathing-timer-lbl').textContent = "🧘";
+            document.getElementById('btn-breath-toggle').textContent = "Iniciar Ejercicio";
+        }
+
+        function updateBreathingUI() {
+            const circle = document.getElementById('breathing-circle');
+            const lbl = document.getElementById('breathing-timer-lbl');
+            const stateText = document.getElementById('breathing-state-text');
+
+            lbl.textContent = breathSeconds;
+
+            switch (breathingStep) {
+                case 0: // Inhalar
+                    stateText.textContent = "✨ Inhala suavemente...";
+                    stateText.className = "text-lg font-semibold text-green-300 transition-all";
+                    // Crecer suavemente
+                    circle.style.transform = `scale(${1.4 - (breathSeconds * 0.1)})`;
+                    circle.style.backgroundColor = "rgba(52, 211, 153, 0.2)";
+                    break;
+                case 1: // Mantener con aire
+                    stateText.textContent = "🌸 Retén el aire...";
+                    stateText.className = "text-lg font-semibold text-yellow-300 transition-all";
+                    circle.style.transform = "scale(1.4)";
+                    circle.style.backgroundColor = "rgba(253, 224, 71, 0.2)";
+                    break;
+                case 2: // Exhalar
+                    stateText.textContent = "💨 Exhala despacio...";
+                    stateText.className = "text-lg font-semibold text-indigo-300 transition-all";
+                    // Encogerse suavemente
+                    circle.style.transform = `scale(${1.0 + (breathSeconds * 0.1)})`;
+                    circle.style.backgroundColor = "rgba(129, 140, 248, 0.2)";
+                    break;
+                case 3: // Mantener vacío
+                    stateText.textContent = "🌙 Mantén en calma...";
+                    stateText.className = "text-lg font-semibold text-slate-400 transition-all";
+                    circle.style.transform = "scale(1.0)";
+                    circle.style.backgroundColor = "rgba(148, 163, 184, 0.1)";
+                    break;
+            }
+        }
+
+
+        // --- 5. TEMPORIZADOR DE APAGADO PROGRESIVO (SLEEP TIMER) ---
+        let sleepTimerInterval = null;
+        let sleepSecondsLeft = 0;
+
+        function setSleepTimer(minutes) {
+            initAudio(); // Asegurar inicialización de audio
+
+            sleepSecondsLeft = minutes * 60;
+            document.getElementById('timer-display-container').classList.remove('hidden');
+            updateTimerDisplay();
+
+            if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+
+            sleepTimerInterval = setInterval(() => {
+                sleepSecondsLeft--;
+                updateTimerDisplay();
+
+                if (sleepSecondsLeft <= 0) {
+                    triggerSleepFade();
+                }
+            }, 1000);
+
+            showToast("⏱️", `Temporizador configurado en ${minutes} minutos.`);
+        }
+
+        function cancelSleepTimer() {
+            if (sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+            }
+            document.getElementById('timer-display-container').classList.add('hidden');
+            document.getElementById('screen-dimmer').style.opacity = "0";
+
+            // Reinstaurar volumen master
+            if (masterGain) {
+                masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            }
+            showToast("⏱️", "Temporizador de apagado cancelado.");
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(sleepSecondsLeft / 60).toString().padStart(2, '0');
+            const s = (sleepSecondsLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-countdown').textContent = `${m}:${s}`;
+
+            // Si falta menos de un minuto, empezar un fundido sutil de luz
+            if (sleepSecondsLeft < 60) {
+                const ratio = 1 - (sleepSecondsLeft / 60);
+                document.getElementById('screen-dimmer').style.opacity = (ratio * 0.95).toString();
+            }
+        }
+
+        function triggerSleepFade() {
+            clearInterval(sleepTimerInterval);
+            sleepTimerInterval = null;
+
+            document.getElementById('screen-dimmer').style.opacity = "1"; // Negro total
+
+            // Fade-out ultra suave de 15 segundos para no despertar al usuario si está medio dormido
+            if (masterGain && audioCtx) {
+                masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+                masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 15);
+            }
+
+            setTimeout(() => {
+                if (audioCtx) {
+                    audioCtx.suspend();
+                }
+                showToast("💤", "Buenas noches. Que descanses.");
+            }, 15000);
+        }
+
+
+        // --- 6. UTILIDADES COMUNES ---
+
+        function switchTab(tabId) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-200', 'bg-[#161c2a]', 'shadow-md');
+                btn.classList.add('text-indigo-400');
+            });
+
+            // Mostrar pestaña seleccionada
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.replace('text-indigo-400', 'text-indigo-200');
+            activeBtn.classList.add('bg-[#161c2a]', 'shadow-md');
+
+            // Cargar datos dinámicos si se abre la tienda
+            if (tabId === 'tab-shop') {
+                renderUpgrades();
+            }
+        }
+
+        let toastTimeout = null;
+        function showToast(icon, msg) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-icon').textContent = icon;
+            document.getElementById('toast-msg').textContent = msg;
+
+            toast.classList.replace('opacity-0', 'opacity-100');
+            toast.classList.remove('pointer-events-none');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.replace('opacity-100', 'opacity-0');
+                toast.classList.add('pointer-events-none');
+            }, 3000);
+        }
+
+        // Inicializar la interfaz del juego al cargar la página
+        window.onload = function () {
+            recalculateSPS();
+            updateUI();
+        }
+    </script>
+</body>
+
+</html>
