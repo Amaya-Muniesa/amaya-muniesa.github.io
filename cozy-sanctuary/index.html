@@ -76,8 +76,15 @@
 
 <body class="flex flex-col min-h-screen justify-between select-none">
 
-    <!-- Dimmer de pantalla para cuando se activa el temporizador de sueño -->
-    <div id="screen-dimmer" class="fixed inset-0 bg-black opacity-0 z-50"></div>
+    <!-- Dimmer de pantalla para cuando se activa el temporizador de sueño y botón para desactivar -->
+    <div id="screen-dimmer"
+        class="fixed inset-0 bg-black opacity-0 z-50 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-[2000ms] ease-in-out">
+        <button id="btn-cancel-dimmer" onclick="cancelSleepTimer()"
+            class="hidden transform hover:scale-105 active:scale-95 transition-all bg-[#121622]/95 hover:bg-[#1a2032] border border-indigo-500/30 text-indigo-200 font-bold px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.2)] items-center space-x-2 text-sm pointer-events-auto backdrop-blur-md">
+            <span>✨</span>
+            <span>Despertar Santuario</span>
+        </button>
+    </div>
 
     <!-- Cabecera -->
     <header
@@ -426,6 +433,129 @@
             },
             clicks: 0
         };
+
+        // --- 1.5 INTEGRACIÓN DE GUARDADO SEGURO (NUBE) ---
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let firebaseInitialized = false;
+
+        async function initFirebase() {
+            if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                console.log("Almacenamiento en la nube no disponible. Jugando en modo sesión local de memoria.");
+                return;
+            }
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'cozy-sleep-sanctuary';
+
+                // Importación modular dinámica de Firebase SDK v11
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const { getAuth, signInAnonymously, signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // REGLA 3: Autenticación obligatoria antes de realizar cualquier consulta a Firestore
+                let userCredential;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    userCredential = await signInAnonymously(auth);
+                }
+
+                const user = userCredential.user;
+                if (user) {
+                    userId = user.uid;
+                    firebaseInitialized = true;
+                    console.log("Santuario autenticado de forma segura:", userId);
+
+                    // Carga inmediata del progreso guardado
+                    await loadGameProgress(appId);
+                }
+            } catch (error) {
+                console.error("Error en el sistema de guardado seguro:", error);
+            }
+        }
+
+        async function loadGameProgress(appId) {
+            if (!firebaseInitialized || !db || !userId) return;
+            try {
+                const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                // REGLA 1: Ruta estricta de datos de usuario para el entorno sandbox
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'saveData', 'progress');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data && data.state) {
+                        state.stardust = data.state.stardust || 0;
+                        state.clicks = data.state.clicks || 0;
+
+                        if (data.state.upgrades) {
+                            Object.keys(data.state.upgrades).forEach(key => {
+                                if (state.upgrades[key]) {
+                                    state.upgrades[key].level = data.state.upgrades[key].level || 0;
+                                    state.upgrades[key].cost = data.state.upgrades[key].cost || state.upgrades[key].cost;
+                                }
+                            });
+                        }
+
+                        recalculateSPS();
+                        applyUpgradesVisuals();
+                        updateUI();
+                        showToast("✨", "Tu Santuario ha sido restaurado.");
+                    }
+                }
+            } catch (error) {
+                console.error("Error al restaurar tu progreso:", error);
+            }
+        }
+
+        async function saveGameProgress() {
+            if (!firebaseInitialized || !db || !userId) return;
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'cozy-sleep-sanctuary';
+                const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                // REGLA 1: Ruta estricta de guardado de datos privados de usuario
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'saveData', 'progress');
+
+                await setDoc(docRef, {
+                    state: {
+                        stardust: state.stardust,
+                        clicks: state.clicks,
+                        upgrades: {
+                            tea: { level: state.upgrades.tea.level, cost: state.upgrades.tea.cost },
+                            candle: { level: state.upgrades.candle.level, cost: state.upgrades.candle.cost },
+                            plush: { level: state.upgrades.plush.level, cost: state.upgrades.plush.cost },
+                            lights: { level: state.upgrades.lights.level, cost: state.upgrades.lights.cost }
+                        }
+                    },
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (error) {
+                console.error("Error al guardar el progreso automáticamente:", error);
+            }
+        }
+
+        function applyUpgradesVisuals() {
+            Object.values(state.upgrades).forEach(up => {
+                const visualEl = document.getElementById(up.elementId);
+                if (visualEl) {
+                    if (up.level > 0) {
+                        if (up.id === 'lights') {
+                            visualEl.style.opacity = Math.min(0.2 + (up.level * 0.15), 1.0);
+                        } else {
+                            visualEl.style.opacity = "1.0";
+                        }
+                    } else {
+                        visualEl.style.opacity = "0.3";
+                    }
+                }
+            });
+        }
 
         // --- 2. SISTEMA DE AUDIO SINTÉTICO (Web Audio API) ---
         // Generador robusto en tiempo real para evitar fallos de carga o buffering molesto antes de dormir.
@@ -789,6 +919,11 @@
                     playSoftNote(544.37, 0, 0.5); // Nota mágica suave aguda
                 }
 
+                // Guardar progreso automáticamente tras la compra
+                if (firebaseInitialized) {
+                    saveGameProgress();
+                }
+
                 showToast(up.icon, `¡Has mejorado tu ${up.name}!`);
             }
         }
@@ -992,11 +1127,26 @@
                 sleepTimerInterval = null;
             }
             document.getElementById('timer-display-container').classList.add('hidden');
-            document.getElementById('screen-dimmer').style.opacity = "0";
 
-            // Reinstaurar volumen master
-            if (masterGain) {
-                masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            // Ocultar y desactivar el dimmer
+            const dimmer = document.getElementById('screen-dimmer');
+            dimmer.style.opacity = "0";
+            dimmer.classList.remove('pointer-events-auto');
+            dimmer.classList.add('pointer-events-none');
+
+            const cancelBtn = document.getElementById('btn-cancel-dimmer');
+            cancelBtn.classList.remove('flex');
+            cancelBtn.classList.add('hidden');
+
+            // Reinstaurar volumen master con fade suave
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (masterGain) {
+                    masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+                    masterGain.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 3);
+                }
             }
             showToast("⏱️", "Temporizador de apagado cancelado.");
         }
@@ -1006,10 +1156,17 @@
             const s = (sleepSecondsLeft % 60).toString().padStart(2, '0');
             document.getElementById('timer-countdown').textContent = `${m}:${s}`;
 
-            // Si falta menos de un minuto, empezar un fundido sutil de luz
+            // Si falta menos de un minuto, empezar un fundido sutil de luz y habilitar botón de despertar
             if (sleepSecondsLeft < 60) {
                 const ratio = 1 - (sleepSecondsLeft / 60);
-                document.getElementById('screen-dimmer').style.opacity = (ratio * 0.95).toString();
+                const dimmer = document.getElementById('screen-dimmer');
+                dimmer.style.opacity = (ratio * 0.95).toString();
+                dimmer.classList.remove('pointer-events-none');
+                dimmer.classList.add('pointer-events-auto');
+
+                const cancelBtn = document.getElementById('btn-cancel-dimmer');
+                cancelBtn.classList.remove('hidden');
+                cancelBtn.classList.add('flex');
             }
         }
 
@@ -1017,7 +1174,14 @@
             clearInterval(sleepTimerInterval);
             sleepTimerInterval = null;
 
-            document.getElementById('screen-dimmer').style.opacity = "1"; // Negro total
+            const dimmer = document.getElementById('screen-dimmer');
+            dimmer.style.opacity = "1"; // Negro total
+            dimmer.classList.remove('pointer-events-none');
+            dimmer.classList.add('pointer-events-auto');
+
+            const cancelBtn = document.getElementById('btn-cancel-dimmer');
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.classList.add('flex');
 
             // Fade-out ultra suave de 15 segundos para no despertar al usuario si está medio dormido
             if (masterGain && audioCtx) {
@@ -1026,13 +1190,13 @@
             }
 
             setTimeout(() => {
-                if (audioCtx) {
+                // Evitar que se suspenda el audio si el usuario ya canceló el dimmer durante la espera
+                if (dimmer.style.opacity === "1" && audioCtx) {
                     audioCtx.suspend();
+                    showToast("💤", "Buenas noches. Que descanses.");
                 }
-                showToast("💤", "Buenas noches. Que descanses.");
             }, 15000);
         }
-
 
         // --- 6. UTILIDADES COMUNES ---
 
@@ -1076,6 +1240,16 @@
         window.onload = function () {
             recalculateSPS();
             updateUI();
+
+            // Inicializar Firebase para guardado persistente seguro
+            initFirebase();
+
+            // Guardado periódico automático cada 10 segundos
+            setInterval(() => {
+                if (firebaseInitialized) {
+                    saveGameProgress();
+                }
+            }, 10000);
         }
     </script>
 </body>
