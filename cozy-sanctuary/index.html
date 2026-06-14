@@ -265,7 +265,7 @@
             <!-- Pestaña 1: Mezclador de Sonidos Ambientales Sintéticos -->
             <div id="tab-sounds" class="tab-content flex flex-col space-y-4">
                 <div class="text-xs text-indigo-400 mb-2 flex justify-between items-center">
-                    <span>Crea tu atmósfera ideal para inducir ondas delta</span>
+                    <span id="tab-sounds-text">Crea tu atmósfera ideal para inducir ondas delta</span>
                     <button onclick="toggleAudioEngine()" id="audio-master-btn"
                         class="bg-indigo-900/40 border border-indigo-500/30 hover:bg-indigo-900/60 px-3 py-1 rounded-full text-indigo-200 font-medium transition-colors">
                         Iniciar Audio
@@ -900,9 +900,7 @@
 
             // Sonidos ambientadores individuales
             const soundHeader = document.querySelector('#tab-sounds .text-xs.text-indigo-400');
-            if (soundHeader) {
-                soundHeader.childNodes[0].textContent = dict.soundDesc;
-            }
+            document.getElementById('tab-sounds-text').textContent = dict.soundDesc;
             document.getElementById('snd-title-melodia').textContent = dict.melodiaTitle;
             document.getElementById('snd-desc-melodia').textContent = dict.melodiaDesc;
             document.getElementById('snd-title-lluvia').textContent = dict.lluviaTitle;
