@@ -71,6 +71,16 @@
             background: #2d3748;
             border-radius: 3px;
         }
+
+        .icon-object {
+            font-size: 2rem;
+            display: block;
+            margin: 0.7rem;
+        }
+
+        .text-object {
+            display: block;
+        }
     </style>
 </head>
 
@@ -216,11 +226,14 @@
             <!-- Barra inferior de elementos activos en el cuarto -->
             <div class="flex justify-between items-end z-10 text-xs text-indigo-400">
                 <div class="flex space-x-3">
-                    <span id="cozy-tea" class="opacity-30 transition-opacity duration-1000">🍵 Té tibio</span>
-                    <span id="cozy-candle" class="opacity-30 transition-opacity duration-1000">🕯️ Vela aromática</span>
+                    <span id="cozy-tea" class="opacity-30 transition-opacity duration-1000">
+                        <span class="icon-object">🍵</span></span>
+                    <span id="cozy-candle" class="opacity-30 transition-opacity duration-1000">
+                        <span class="icon-object">🕯️</span>
+                    </span>
                 </div>
                 <div id="cozy-plush" class="opacity-30 transition-opacity duration-1000">
-                    🧸 Peluche guardián
+                    <span class="icon-object">🧸</span>
                 </div>
             </div>
         </div>
