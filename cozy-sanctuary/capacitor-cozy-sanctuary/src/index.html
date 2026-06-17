@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santuario de Sueño Cozy</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Quicksand para un toque tierno y redondeado -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #090B11;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        /* Animaciones suaves */
+        .glow-star {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(0.95);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        .float-slow {
+            animation: floating 6s infinite ease-in-out;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Estilo para simular dimmer total */
+        #screen-dimmer {
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Personalizar scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1319;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3748;
+            border-radius: 3px;
+        }
+
+        .icon-object {
+            font-size: 2rem;
+            display: block;
+            margin: 0.7rem;
+        }
+
+        .text-object {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen justify-between select-none">
+
+    <!-- Dimmer de pantalla para cuando se activa el temporizador de sueño y botón para desactivar -->
+    <div id="screen-dimmer"
+        class="fixed inset-0 bg-black opacity-0 z-50 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-[2000ms] ease-in-out">
+        <button id="btn-cancel-dimmer" onclick="cancelSleepTimer()"
+            class="hidden transform hover:scale-105 active:scale-95 transition-all bg-[#121622]/95 hover:bg-[#1a2032] border border-indigo-500/30 text-indigo-200 font-bold px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.2)] items-center space-x-2 text-sm pointer-events-auto backdrop-blur-md">
+            <span>✨</span>
+            <span>Despertar Santuario</span>
+        </button>
+    </div>
+
+    <!-- Cabecera -->
+    <header
+        class="p-4 flex justify-between items-center border-b border-gray-800 bg-[#0e121b] bg-opacity-70 backdrop-blur-md sticky top-0 z-40">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🌙</span>
+            <div>
+                <h1 class="font-bold text-lg text-indigo-200">Santuario Cozy</h1>
+                <p class="text-xs text-indigo-400">Idle & Relax para dormir</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <!-- Marcador de Polvo de Estrellas -->
+            <div
+                class="bg-[#171d29] px-4 py-2 rounded-full border border-indigo-900/50 flex items-center space-x-2 shadow-inner">
+                <span class="text-yellow-300 text-lg animate-pulse">✨</span>
+                <span id="stardust-count" class="font-bold text-yellow-100 tracking-wide text-lg">0</span>
+                <span class="text-xs text-indigo-300">(+<span id="sps-rate">0</span>/s)</span>
+            </div>
+            <!-- Botón de Menú/Ajustes -->
+            <button onclick="toggleSettingsModal(true)"
+                class="p-2 bg-[#171d29] border border-indigo-900/50 rounded-full hover:bg-[#20293a] transition-all text-indigo-300 hover:text-indigo-100"
+                title="Menú de Ajustes">
+                ⚙️
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 flex flex-col space-y-6">
+
+        <!-- Área Visual del Cuarto (Santuario) -->
+        <div
+            class="relative bg-gradient-to-b from-[#111625] to-[#0d111c] rounded-3xl p-6 border border-indigo-950/40 h-80 flex flex-col justify-between overflow-hidden shadow-2xl">
+            <!-- Cielo estrellado e hilos de luz de fondo -->
+            <div class="absolute inset-0 opacity-40 pointer-events-none">
+                <div class="absolute top-8 left-12 w-1.5 h-1.5 bg-yellow-100 rounded-full glow-star"></div>
+                <div class="absolute top-16 right-24 w-2 h-2 bg-yellow-200 rounded-full glow-star"
+                    style="animation-delay: 1.5s;"></div>
+                <div class="absolute top-36 left-1/3 w-1 h-1 bg-white rounded-full glow-star"
+                    style="animation-delay: 0.7s;"></div>
+                <div class="absolute top-48 right-16 w-1.5 h-1.5 bg-indigo-200 rounded-full glow-star"
+                    style="animation-delay: 2.2s;"></div>
+
+                <!-- Guirnalda de luces (Se desbloquea con idle) -->
+                <div id="visual-lights"
+                    class="absolute top-0 inset-x-0 h-10 flex justify-around px-8 opacity-20 transition-opacity duration-1000">
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                    <span class="text-xs text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">💡</span>
+                </div>
+            </div>
+
+            <!-- Cabecera de la ventana / Clima actual -->
+            <div class="flex justify-between items-start z-10">
+                <div
+                    class="bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/5 text-xs text-indigo-300 flex items-center space-x-2">
+                    <span id="clima-icon">🌙</span>
+                    <span id="clima-desc">Cielo despejado</span>
+                </div>
+
+                <!-- Ventanita Interactiva -->
+                <div
+                    class="w-20 h-20 border-2 border-indigo-950 rounded-xl bg-slate-950/80 flex items-center justify-center overflow-hidden relative shadow-inner">
+                    <span id="window-scenery" class="text-4xl transition-all duration-1000 float-slow">🌙</span>
+                    <!-- Efecto de lluvia visual si está activa -->
+                    <div id="window-rain"
+                        class="absolute inset-0 flex justify-around pointer-events-none opacity-0 transition-opacity duration-1000">
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_1s_infinite]"></div>
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_1.2s_infinite_0.2s]"></div>
+                        <div class="w-0.5 h-full bg-blue-400/30 animate-[bounce_0.8s_infinite_0.4s]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Centro del Santuario: El compañero que duerme -->
+            <div class="flex justify-center items-center z-10 my-auto">
+                <button onclick="petCompanion()"
+                    class="focus:outline-none transform active:scale-95 transition-all relative group">
+                    <!-- Efecto aura acogedora -->
+                    <div
+                        class="absolute -inset-4 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition duration-1000">
+                    </div>
+
+                    <!-- SVG de un gatito gordo y tierno durmiendo plácidamente -->
+                    <svg class="w-36 h-24 text-indigo-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] float-slow"
+                        viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cuerpo -->
+                        <path d="M20 70C20 40 60 30 100 40C120 45 130 55 130 70C130 85 110 90 75 90C40 90 20 85 20 70Z"
+                            fill="#312E81" />
+                        <path d="M30 70C30 48 65 38 95 48C110 52 118 60 118 70C118 80 100 83 74 83C44 83 30 80 30 70Z"
+                            fill="#3730A3" />
+                        <!-- Cabeza -->
+                        <circle cx="110" cy="50" r="22" fill="#312E81" />
+                        <circle cx="110" cy="50" r="19" fill="#3730A3" />
+                        <!-- Orejas -->
+                        <polygon points="95,38 90,20 105,32" fill="#312E81" />
+                        <polygon points="120,38 130,20 125,32" fill="#312E81" />
+                        <polygon points="97,36 94,24 103,32" fill="#4338CA" />
+                        <polygon points="118,36 126,24 122,32" fill="#4338CA" />
+                        <!-- Ojos cerrados (dormido) -->
+                        <path d="M96 52C98 55 102 55 104 52" stroke="#818CF8" stroke-width="2.5"
+                            stroke-linecap="round" />
+                        <path d="M112 52C114 55 118 55 120 52" stroke="#818CF8" stroke-width="2.5"
+                            stroke-linecap="round" />
+                        <!-- Hocico/Boca contenta durmiendo -->
+                        <path d="M106 58C107 59 108 59 109 58C110 59 111 59 112 58" stroke="#818CF8" stroke-width="1.5"
+                            stroke-linecap="round" />
+                        <!-- Cola enroscada -->
+                        <path d="M25 75C15 75 10 65 15 58C20 52 30 58 28 66" stroke="#312E81" stroke-width="10"
+                            stroke-linecap="round" />
+                        <path d="M24 74C17 74 13 67 17 61C20 57 27 61 26 66" stroke="#3730A3" stroke-width="6"
+                            stroke-linecap="round" />
+                        <!-- Detalles de rubor en mejillas -->
+                        <circle cx="94" cy="57" r="2" fill="#F43F5E" opacity="0.6" />
+                        <circle cx="122" cy="57" r="2" fill="#F43F5E" opacity="0.6" />
+                    </svg>
+
+                    <!-- Diálogo o ronroneo flotante -->
+                    <span id="purr-text"
+                        class="absolute -top-4 right-2 text-xs text-indigo-300 font-medium bg-[#1e1b4b] border border-indigo-800 px-2 py-1 rounded-lg opacity-0 transition-opacity duration-300">Zzz...
+                        Purr~</span>
+                </button>
+            </div>
+
+            <!-- Barra inferior de elementos activos en el cuarto -->
+            <div class="flex justify-between items-end z-10 text-xs text-indigo-400">
+                <div class="flex space-x-3">
+                    <span id="cozy-tea" class="opacity-30 transition-opacity duration-1000">
+                        <span class="icon-object">🍵</span></span>
+                    <span id="cozy-candle" class="opacity-30 transition-opacity duration-1000">
+                        <span class="icon-object">🕯️</span>
+                    </span>
+                </div>
+                <div id="cozy-plush" class="opacity-30 transition-opacity duration-1000">
+                    <span class="icon-object">🧸</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Pestañas Interactivas -->
+        <div class="bg-[#0e121b] border border-indigo-950/40 rounded-3xl p-4 flex-grow flex flex-col">
+            <!-- Botones de pestaña -->
+            <div class="grid grid-cols-4 gap-2 mb-6 bg-[#090b11] p-1.5 rounded-2xl border border-indigo-950/20">
+                <button onclick="switchTab('tab-sounds')" id="btn-tab-sounds"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-200 bg-[#161c2a] shadow-md">
+                    🎵 Sonidos
+                </button>
+                <button onclick="switchTab('tab-shop')" id="btn-tab-shop"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    🛍️ Mejoras
+                </button>
+                <button onclick="switchTab('tab-breathing')" id="btn-tab-breathing"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    🌬️ Respirar
+                </button>
+                <button onclick="switchTab('tab-timer')" id="btn-tab-timer"
+                    class="tab-btn py-2.5 px-2 text-sm rounded-xl font-medium transition-all text-indigo-400 hover:text-indigo-200">
+                    ⏱️ Alarma
+                </button>
+            </div>
+
+            <!-- CONTENIDO DE PESTAÑAS -->
+
+            <!-- Pestaña 1: Mezclador de Sonidos Ambientales Sintéticos -->
+            <div id="tab-sounds" class="tab-content flex flex-col space-y-4">
+                <div class="text-xs text-indigo-400 mb-2 flex justify-between items-center">
+                    <span id="tab-sounds-text">Crea tu atmósfera ideal para inducir ondas delta</span>
+                    <button onclick="toggleAudioEngine()" id="audio-master-btn"
+                        class="bg-indigo-900/40 border border-indigo-500/30 hover:bg-indigo-900/60 px-3 py-1 rounded-full text-indigo-200 font-medium transition-colors">
+                        Iniciar Audio
+                    </button>
+                </div>
+
+                <!-- Lista de controles de sonido con identificadores de textos -->
+                <div class="space-y-4">
+                    <!-- Sonido 1: Melodía de ensueño -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🎹</span>
+                            <div>
+                                <h3 id="snd-title-melodia" class="font-semibold text-sm text-indigo-200">Melodía Cósmica
+                                </h3>
+                                <p id="snd-desc-melodia" class="text-xs text-indigo-400">Arpegios suaves generados por
+                                    sintetizador</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-melodia" min="0" max="1" step="0.05" value="0.3"
+                                oninput="adjustVolume('melodia', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right"
+                                id="lbl-vol-melodia">30%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 2: Lluvia acogedora -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🌧️</span>
+                            <div>
+                                <h3 id="snd-title-lluvia" class="font-semibold text-sm text-indigo-200">Lluvia en la
+                                    Ventana</h3>
+                                <p id="snd-desc-lluvia" class="text-xs text-indigo-400">Ruido rosa filtrado que relaja
+                                    el sistema nervioso</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-lluvia" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('lluvia', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-lluvia">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 3: Viento de Otoño -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🍃</span>
+                            <div>
+                                <h3 id="snd-title-viento" class="font-semibold text-sm text-indigo-200">Susurro de
+                                    Viento</h3>
+                                <p id="snd-desc-viento" class="text-xs text-indigo-400">Modulaciones de aire que calman
+                                    la ansiedad</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-viento" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('viento', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-viento">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Sonido 4: Ronroneo del gatito -->
+                    <div
+                        class="bg-[#121724] p-3.5 rounded-2xl border border-indigo-950/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🐈</span>
+                            <div>
+                                <h3 id="snd-title-purr" class="font-semibold text-sm text-indigo-200">Ronroneo
+                                    Terapéutico</h3>
+                                <p id="snd-desc-purr" class="text-xs text-indigo-400">Frecuencia baja constante de 25 Hz
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-1/3">
+                            <input type="range" id="vol-purr" min="0" max="1" step="0.05" value="0"
+                                oninput="adjustVolume('purr', this.value)"
+                                class="w-full accent-indigo-500 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-mono text-indigo-300 w-8 text-right" id="lbl-vol-purr">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Tienda de Mejoras (Idle Elements) -->
+            <div id="tab-shop" class="tab-content hidden flex flex-col space-y-3">
+                <div class="text-xs text-indigo-400 mb-1">
+                    Usa tu Polvo de Estrellas para añadir confort al cuarto e incrementar tu generación pasiva.
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="upgrades-list">
+                    <!-- Las mejoras se cargarán dinámicamente mediante JS para un control estricto de estados -->
+                </div>
+            </div>
+
+            <!-- Pestaña 3: Guía de Respiración (4-7-8 o Caja) -->
+            <div id="tab-breathing" class="tab-content hidden flex flex-col items-center justify-center py-4 space-y-6">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-indigo-200" id="breathing-state-text">Respira con el ritmo
+                    </h3>
+                    <p class="text-xs text-indigo-400 max-w-sm mx-auto mt-1">El método 4-4-4-4 calma el sistema nervioso
+                        autónomo en minutos reduciendo pulsaciones.</p>
+                </div>
+
+                <!-- Burbuja de Respiración Interactiva -->
+                <div class="relative flex items-center justify-center w-48 h-48">
+                    <!-- Círculo que cambia de escala y color -->
+                    <div id="breathing-circle"
+                        class="w-32 h-32 bg-indigo-500/10 border border-indigo-400/30 rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out shadow-[0_0_30px_rgba(129,140,248,0.2)]">
+                        <span id="breathing-timer-lbl" class="text-2xl font-bold text-indigo-200">4</span>
+                    </div>
+                    <!-- Aro exterior decorativo -->
+                    <div class="absolute inset-0 border border-indigo-900/40 rounded-full scale-95"></div>
+                </div>
+
+                <div class="flex space-x-2">
+                    <button onclick="startBreathing()" id="btn-breath-toggle"
+                        class="bg-indigo-900/60 hover:bg-indigo-900/80 border border-indigo-500/20 text-indigo-200 px-6 py-2 rounded-xl text-sm font-medium transition-colors">
+                        Iniciar Ejercicio
+                    </button>
+                    <button onclick="stopBreathing()"
+                        class="bg-slate-950 border border-indigo-950 text-indigo-400 px-4 py-2 rounded-xl text-sm font-medium hover:text-indigo-200 transition-colors">
+                        Detener
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 4: Temporizador de apagado progresivo -->
+            <div id="tab-timer" class="tab-content hidden flex flex-col space-y-5 py-4">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-indigo-200">Temporizador de Sueño</h3>
+                    <p class="text-xs text-indigo-400 max-w-sm mx-auto mt-1">Una vez terminado el tiempo, el volumen se
+                        desvanecerá lentamente a cero y la pantalla se oscurecerá por completo.</p>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2.5 max-w-md mx-auto w-full">
+                    <button onclick="setSleepTimer(5)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">5
+                        Min</button>
+                    <button onclick="setSleepTimer(10)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">10
+                        Min</button>
+                    <button onclick="setSleepTimer(20)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">20
+                        Min</button>
+                    <button onclick="setSleepTimer(30)"
+                        class="bg-[#121724] hover:bg-[#1a2031] border border-indigo-950 py-3 rounded-2xl text-sm font-medium text-indigo-300 transition-colors">30
+                        Min</button>
+                </div>
+
+                <!-- Temporizador de cuenta atrás dinámico -->
+                <div id="timer-display-container" class="hidden text-center space-y-2">
+                    <p class="text-xs text-indigo-400">Apagado progresivo en:</p>
+                    <div id="timer-countdown" class="text-3xl font-mono font-bold text-yellow-100">00:00</div>
+                    <button onclick="cancelSleepTimer()"
+                        class="text-xs text-red-400 hover:text-red-300 underline font-medium">Cancelar
+                        Temporizador</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página suave / Mensaje tierno -->
+    <footer class="p-4 text-center text-xs text-indigo-500/60 border-t border-indigo-950/20 bg-[#090b11]">
+        "Un día más ha terminado, has hecho suficiente. Permítete descansar." 🌸
+    </footer>
+
+    <!-- Modal de Ajustes / Menú -->
+    <div id="settings-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-[#0e121b] border border-indigo-950/80 rounded-3xl p-6 max-w-sm w-full mx-4 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-indigo-950/50 pb-3">
+                <h3 class="text-lg font-bold text-indigo-200 flex items-center space-x-2">
+                    <span>⚙️</span>
+                    <span>Ajustes del Santuario</span>
+                </h3>
+                <button onclick="toggleSettingsModal(false)"
+                    class="text-indigo-400 hover:text-indigo-200 text-lg">✕</button>
+            </div>
+
+            <div class="space-y-3 py-2 text-sm text-indigo-300">
+                <!-- Selector de Idioma -->
+                <div class="p-3 bg-[#121724] rounded-xl border border-indigo-950 flex flex-col space-y-2">
+                    <span class="text-xs font-semibold text-indigo-400" id="lbl-lang-select">Idioma / Language</span>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="changeLanguage('es')" id="btn-lang-es"
+                            class="py-1 px-2 text-xs rounded-lg border border-indigo-500/30 bg-indigo-950/50 text-indigo-200 font-bold">Español</button>
+                        <button onclick="changeLanguage('en')" id="btn-lang-en"
+                            class="py-1 px-2 text-xs rounded-lg border border-indigo-950 bg-transparent text-indigo-400">English</button>
+                        <button onclick="changeLanguage('zh')" id="btn-lang-zh"
+                            class="py-1 px-2 text-xs rounded-lg border border-indigo-950 bg-transparent text-indigo-400">中文</button>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-[#121724] rounded-xl border border-indigo-950 flex flex-col space-y-1">
+                    <span class="text-xs font-semibold text-indigo-400">Estado de guardado</span>
+                    <span id="save-status" class="text-xs text-green-400">✨ Guardado automático activo (Nube
+                        silenciosa)</span>
+                </div>
+                <p class="text-xs text-indigo-400">Si decides borrar tu progreso, reiniciarás tus estrellas y todas tus
+                    mejoras acumuladas al nivel cero de forma permanente.</p>
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <button onclick="showResetConfirm(true)"
+                    class="w-full bg-red-950/50 hover:bg-red-900/40 border border-red-500/30 text-red-200 py-3 rounded-2xl font-bold text-xs transition-all active:scale-95 flex items-center justify-center space-x-2">
+                    <span>🗑️</span>
+                    <span>Borrar progreso y reiniciar</span>
+                </button>
+                <button onclick="toggleSettingsModal(false)"
+                    class="w-full bg-[#171d29] hover:bg-[#20293a] border border-indigo-950 py-3 rounded-2xl text-indigo-300 text-xs font-medium transition-all">
+                    Cerrar Ajustes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Borrado (Reemplazo de confirm()) -->
+    <div id="confirm-reset-modal"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div
+            class="bg-[#120a0f] border border-red-950/80 rounded-3xl p-6 max-w-sm w-full mx-4 shadow-2xl space-y-4 text-center">
+            <span class="text-4xl">⚠️</span>
+            <h3 class="text-lg font-bold text-red-200">¿Borrar todo tu progreso?</h3>
+            <p class="text-xs text-red-400/80 leading-relaxed">Esta acción es irreversible. Perderás tus estrellas
+                acumuladas, tus peluches, luces, té y todo el confort de tu santuario.</p>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="showResetConfirm(false)"
+                    class="bg-[#171d29] hover:bg-[#20293a] border border-indigo-950 py-3 rounded-2xl text-indigo-300 text-xs font-medium transition-all">
+                    No, cancelar
+                </button>
+                <button onclick="resetGameProgress()"
+                    class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-3 rounded-2xl text-xs shadow-md transition-all active:scale-95">
+                    Sí, borrar todo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES CUSTOM (Evitando alerts) -->
+    <div id="custom-toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-indigo-950/90 border border-indigo-500/30 text-indigo-200 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs opacity-0 pointer-events-none transition-all duration-300 z-50">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg">Mensaje informativo</span>
+    </div>
+
+    <!-- CÓDIGO DEL JUEGO / AUDIO SINTETIZADO -->
+    <script>
+        // --- 0. LOCALIZACIÓN E IDIOMAS (i18n) ---
+        let currentLang = 'es';
+
+        const i18n = {
+            es: {
+                title: "Santuario Cozy",
+                subtitle: "Idle & Relax para dormir",
+                clearSky: "Cielo despejado",
+                rhythmicRain: "Lluvia rítmica",
+                btnStartAudio: "Iniciar Audio",
+                btnAudioActive: "Audio Activo",
+                btnResumeAudio: "Reanudar Audio",
+                purrText: "Zzz... Ronroneo~",
+                tabSounds: "🎵 Sonidos",
+                tabShop: "🛍️ Mejoras",
+                tabBreathing: "🌬️ Respirar",
+                tabTimer: "⏱️ Alarma",
+                soundDesc: "Crea tu atmósfera ideal para inducir ondas delta",
+                melodiaTitle: "Melodía Cósmica",
+                melodiaDesc: "Arpegios suaves generados por sintetizador",
+                lluviaTitle: "Lluvia en la Ventana",
+                lluviaDesc: "Ruido rosa filtrado que relaja el sistema nervioso",
+                vientoTitle: "Susurro de Viento",
+                vientoDesc: "Modulaciones de aire que calman la ansiedad",
+                purrTitle: "Ronroneo Terapéutico",
+                purrDesc: "Frecuencia baja constante de 25 Hz",
+                shopDesc: "Usa tu Polvo de Estrellas para añadir confort al cuarto e incrementar tu generación pasiva.",
+                breatheTitle: "Respira con el ritmo",
+                breatheDesc: "El método 4-4-4-4 calma el sistema nervioso autónomo en minutos reduciendo pulsaciones.",
+                btnBreatheStart: "Iniciar Ejercicio",
+                btnBreatheRestart: "Reiniciar",
+                btnBreatheStop: "Detener",
+                breatheIn: "✨ Inhala suavemente...",
+                breatheHold: "🌸 Retén el aire...",
+                breatheOut: "💨 Exhala despacio...",
+                breatheHoldEmpty: "🌙 Mantén en calma...",
+                breathePaused: "Ejercicio pausado",
+                timerTitle: "Temporizador de Sueño",
+                timerDesc: "Una vez terminado el tiempo, el volumen se desvanecerá lentamente a cero y la pantalla se oscurecerá por completo.",
+                timerCountdownLbl: "Apagado progresivo en:",
+                btnCancelTimer: "Cancelar Temporizador",
+                footerMsg: '"Un día más ha terminado, has hecho suficiente. Permítete descansar." 🌸',
+                settingsTitle: "Ajustes del Santuario",
+                saveStatus: "Estado de guardado",
+                saveStatusActive: "✨ Guardado automático activo (Nube silenciosa)",
+                saveStatusLocal: "⚠️ Guardado activo solo en memoria local",
+                resetWarning: "Si decides borrar tu progreso, reiniciarás tus estrellas y todas tus mejoras acumuladas al nivel cero de forma permanente.",
+                btnResetProgress: "Borrar progreso y reiniciar",
+                btnCloseSettings: "Cerrar Ajustes",
+                resetConfirmTitle: "¿Borrar todo tu progreso?",
+                resetConfirmDesc: "Esta acción es irreversible. Perderás tus estrellas acumuladas, tus peluches, luces, té y todo el confort de tu santuario.",
+                btnNoCancel: "No, cancelar",
+                btnYesDelete: "Sí, borrar todo",
+                wakeUpBtn: "Despertar Santuario",
+                toastRestored: "Tu Santuario ha sido restaurado.",
+                toastAudioStarted: "Audio iniciado correctamente. ¡Relájate!",
+                toastAudioResumed: "Audio reanudado.",
+                toastAudioPaused: "Audio pausado temporalmente.",
+                toastNoAudioSupport: "No se admite audio sintetizado en este navegador.",
+                toastUpgraded: "¡Has mejorado tu {name}!",
+                toastTimerSet: "Temporizador configurado en {minutes} minutos.",
+                toastTimerCancelled: "Temporizador de apagado cancelado.",
+                toastGoodNight: "Buenas noches. Que descanses.",
+                toastReset: "Tu santuario ha sido reiniciado por completo.",
+                minText: "Min",
+                spsSuffix: "Polvo/s por nivel",
+                costLbl: "Añadir"
+            },
+            en: {
+                title: "Cozy Sanctuary",
+                subtitle: "Idle & Relax for sleeping",
+                clearSky: "Clear sky",
+                rhythmicRain: "Rhythmic rain",
+                btnStartAudio: "Start Audio",
+                btnAudioActive: "Audio Active",
+                btnResumeAudio: "Resume Audio",
+                purrText: "Zzz... Purr~",
+                tabSounds: "🎵 Sounds",
+                tabShop: "🛍️ Upgrades",
+                tabBreathing: "🌬️ Breathe",
+                tabTimer: "⏱️ Timer",
+                soundDesc: "Create your ideal atmosphere to induce delta waves",
+                melodiaTitle: "Cosmic Melody",
+                melodiaDesc: "Soft arpeggios generated by synthesizer",
+                lluviaTitle: "Rain on the Window",
+                lluviaDesc: "Filtered pink noise that relaxes the nervous system",
+                vientoTitle: "Wind Whisper",
+                vientoDesc: "Air modulations that soothe anxiety",
+                purrTitle: "Therapeutic Purr",
+                purrDesc: "Constant low frequency of 25 Hz",
+                shopDesc: "Use your Stardust to add comfort to the room and increase your passive generation.",
+                breatheTitle: "Breathe with the rhythm",
+                breatheDesc: "The 4-4-4-4 method calms the autonomic nervous system in minutes, reducing pulse rate.",
+                btnBreatheStart: "Start Exercise",
+                btnBreatheRestart: "Restart",
+                btnBreatheStop: "Stop",
+                breatheIn: "✨ Breathe in gently...",
+                breatheHold: "🌸 Hold your breath...",
+                breatheOut: "💨 Breathe out slowly...",
+                breatheHoldEmpty: "🌙 Rest in calm...",
+                breathePaused: "Exercise paused",
+                timerTitle: "Sleep Timer",
+                timerDesc: "Once the time is up, the volume will slowly fade to zero and the screen will darken completely.",
+                timerCountdownLbl: "Progressive shutoff in:",
+                btnCancelTimer: "Cancel Timer",
+                footerMsg: '"Another day is over, you have done enough. Allow yourself to rest." 🌸',
+                settingsTitle: "Sanctuary Settings",
+                saveStatus: "Save Status",
+                saveStatusActive: "✨ Auto-save active (Silent Cloud)",
+                saveStatusLocal: "⚠️ Saving active only in local memory",
+                resetWarning: "If you decide to delete your progress, you will permanently reset your stars and all accumulated upgrades to level zero.",
+                btnResetProgress: "Delete progress and restart",
+                btnCloseSettings: "Close Settings",
+                resetConfirmTitle: "Delete all progress?",
+                resetConfirmDesc: "This action is irreversible. You will lose your accumulated stars, plushies, lights, tea, and all the comfort of your sanctuary.",
+                btnNoCancel: "No, cancel",
+                btnYesDelete: "Yes, delete all",
+                wakeUpBtn: "Wake Up Sanctuary",
+                toastRestored: "Your Sanctuary has been restored.",
+                toastAudioStarted: "Audio started successfully. Relax!",
+                toastAudioResumed: "Audio resumed.",
+                toastAudioPaused: "Audio paused temporarily.",
+                toastNoAudioSupport: "Synthesized audio is not supported in this browser.",
+                toastUpgraded: "You have upgraded your {name}!",
+                toastTimerSet: "Timer set to {minutes} minutes.",
+                toastTimerCancelled: "Sleep timer cancelled.",
+                toastGoodNight: "Good night. Sweet dreams.",
+                toastReset: "Your sanctuary has been completely reset.",
+                minText: "Min",
+                spsSuffix: "Dust/s per level",
+                costLbl: "Add"
+            },
+            zh: {
+                title: "温馨避风港",
+                subtitle: "挂机与放松助眠",
+                clearSky: "晴朗夜空",
+                rhythmicRain: "律动雨声",
+                btnStartAudio: "开启音频",
+                btnAudioActive: "音频已激活",
+                btnResumeAudio: "恢复音频",
+                purrText: "呼噜呼噜~",
+                tabSounds: "🎵 声音",
+                tabShop: "🛍️ 升级",
+                tabBreathing: "🌬️ 呼吸",
+                tabTimer: "⏱️ 定时",
+                soundDesc: "创造理想的氛围以诱导三角脑波",
+                melodiaTitle: "宇宙旋律",
+                melodiaDesc: "合成器生成的柔和琶音",
+                lluviaTitle: "窗外细雨",
+                lluviaDesc: "过滤粉色噪音，放松神经系统",
+                vientoTitle: "风之轻语",
+                vientoDesc: "空气调制音，缓解焦虑",
+                purrTitle: "疗愈猫噜噜声",
+                purrDesc: "25赫兹的恒定低频",
+                shopDesc: "使用星尘为房间增添舒适度，并提高你的被动星尘产出。",
+                breatheTitle: "跟随节奏呼吸",
+                breatheDesc: "4-4-4-4呼吸法能在几分钟内安抚自主神经系统，降低脉搏。",
+                btnBreatheStart: "开始练习",
+                btnBreatheRestart: "重新开始",
+                btnBreatheStop: "停止",
+                breatheIn: "✨ 缓缓吸气...",
+                breatheHold: "🌸 屏气...",
+                breatheOut: "💨 缓缓呼气...",
+                breatheHoldEmpty: "🌙 保持平静...",
+                breathePaused: "练习已暂停",
+                timerTitle: "睡眠定时器",
+                timerDesc: "时间一到，音量将慢慢降为零，屏幕会完全变暗。",
+                timerCountdownLbl: "渐进式关闭剩余时间：",
+                btnCancelTimer: "取消定时器",
+                footerMsg: '“又一天结束了，你已经做得足够好。让自己好好休息吧。” 🌸',
+                settingsTitle: "避风港设置",
+                saveStatus: "存档状态",
+                saveStatusActive: "✨ 自动存档已激活 (静默云端)",
+                saveStatusLocal: "⚠️ 仅在本地内存中激活存档",
+                resetWarning: "如果您决定删除进度，您将永久重置您的星尘和所有已累计的升级至零级。",
+                btnResetProgress: "删除进度并重置",
+                btnCloseSettings: "关闭设置",
+                resetConfirmTitle: "删除所有进度？",
+                resetConfirmDesc: "此操作不可逆。您将失去已累计的星尘、玩偶、灯串、茶以及您避风港的所有舒适配置。",
+                btnNoCancel: "不，取消",
+                btnYesDelete: "是的，全部删除",
+                wakeUpBtn: "唤醒避风港",
+                toastRestored: "您的避风港已恢复。",
+                toastAudioStarted: "音频已成功开启。放松！",
+                toastAudioResumed: "音频已恢复。",
+                toastAudioPaused: "音频已暂停。",
+                toastNoAudioSupport: "此浏览器不支持合成音频。",
+                toastUpgraded: "您已升级您的{name}！",
+                toastTimerSet: "定时器已设置为 {minutes} 分钟。",
+                toastTimerCancelled: "睡眠定时器已取消。",
+                toastGoodNight: "晚安。好梦。",
+                toastReset: "您的避风港已完全重置。",
+                minText: "分钟",
+                spsSuffix: "每级星尘/秒",
+                costLbl: "添加"
+            }
+        };
+
+        const upgradeLocales = {
+            es: {
+                tea: { name: 'Té de Manzanilla', desc: 'Una taza de infusión tibia que calma los nervios.' },
+                candle: { name: 'Vela de Lavanda', desc: 'Aroma reconfortante que relaja tu respiración.' },
+                plush: { name: 'Teddy Guardián', desc: 'Un peluche suave que ahuyenta las pesadillas.' },
+                lights: { name: 'Guirnalda Estelar', desc: 'Luces cálidas para inundar el cuarto de magia.' }
+            },
+            en: {
+                tea: { name: 'Chamomile Tea', desc: 'A warm cup of herbal tea that calms the nerves.' },
+                candle: { name: 'Lavender Candle', desc: 'Comforting aroma that relaxes your breathing.' },
+                plush: { name: 'Guardian Teddy', desc: 'A soft plushie that chases away nightmares.' },
+                lights: { name: 'Stellar Lights', desc: 'Warm lights to flood the room with magic.' }
+            },
+            zh: {
+                tea: { name: '甘菊茶', desc: '一杯温暖的草本茶，抚平紧张情绪。' },
+                candle: { name: '薰衣草蜡烛', desc: '令人安心的香气，让你的呼吸重归平静。' },
+                plush: { name: '守护小熊', desc: '一只柔软的玩偶，驱散所有噩梦。' },
+                lights: { name: '星光灯串', desc: '温暖的灯光，让房间充满魔法气息。' }
+            }
+        };
+
+        // --- 1. ESTADO DEL JUEGO (IDLE) ---
+        let state = {
+            stardust: 0,
+            sps: 0, // Stardust Per Second
+            upgrades: {
+                tea: { id: 'tea', cost: 15, sps: 0.5, level: 0, icon: '🍵', elementId: 'cozy-tea' },
+                candle: { id: 'candle', cost: 60, sps: 1, level: 0, icon: '🕯️', elementId: 'cozy-candle' },
+                plush: { id: 'plush', cost: 250, sps: 4, level: 0, icon: '🧸', elementId: 'cozy-plush' },
+                lights: { id: 'lights', cost: 1000, sps: 15, level: 0, icon: '💡', elementId: 'visual-lights' }
+            },
+            clicks: 0,
+            lang: 'es'
+        };
+
+        // --- STREAMING_CHUNK: Integrando el sistema de guardado y carga segura en la nube... ---
+        // --- 1.5 INTEGRACIÓN DE GUARDADO SEGURO (NUBE) ---
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let firebaseInitialized = false;
+
+        async function initFirebase() {
+            if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                console.log("Almacenamiento en la nube no disponible. Jugando en modo sesión local de memoria.");
+                return;
+            }
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'cozy-sleep-sanctuary';
+
+                // Importación modular dinámica de Firebase SDK v11
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const { getAuth, signInAnonymously, signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                let userCredential;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    userCredential = await signInAnonymously(auth);
+                }
+
+                const user = userCredential.user;
+                if (user) {
+                    userId = user.uid;
+                    firebaseInitialized = true;
+                    console.log("Santuario autenticado de forma segura:", userId);
+
+                    // Carga inmediata del progreso guardado
+                    await loadGameProgress(appId);
+                }
+            } catch (error) {
+                console.error("Error en el sistema de guardado seguro:", error);
+            }
+        }
+
+        async function loadGameProgress(appId) {
+            if (!firebaseInitialized || !db || !userId) return;
+            try {
+                const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'saveData', 'progress');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data && data.state) {
+                        state.stardust = data.state.stardust || 0;
+                        state.clicks = data.state.clicks || 0;
+                        state.lang = data.state.lang || 'es';
+                        currentLang = state.lang;
+
+                        if (data.state.upgrades) {
+                            Object.keys(data.state.upgrades).forEach(key => {
+                                if (state.upgrades[key]) {
+                                    state.upgrades[key].level = data.state.upgrades[key].level || 0;
+                                    state.upgrades[key].cost = data.state.upgrades[key].cost || state.upgrades[key].cost;
+                                }
+                            });
+                        }
+
+                        recalculateSPS();
+                        applyUpgradesVisuals();
+                        updateLanguageUI();
+                        updateSaveStatusLabel();
+                        updateAudioButtonLabel();
+                        showToast("✨", i18n[currentLang].toastRestored);
+                    }
+                }
+            } catch (error) {
+                console.error("Error al restaurar tu progreso:", error);
+            }
+        }
+
+        async function saveGameProgress() {
+            if (!firebaseInitialized || !db || !userId) return;
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'cozy-sleep-sanctuary';
+                const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'saveData', 'progress');
+
+                await setDoc(docRef, {
+                    state: {
+                        stardust: state.stardust,
+                        clicks: state.clicks,
+                        lang: currentLang,
+                        upgrades: {
+                            tea: { level: state.upgrades.tea.level, cost: state.upgrades.tea.cost },
+                            candle: { level: state.upgrades.candle.level, cost: state.upgrades.candle.cost },
+                            plush: { level: state.upgrades.plush.level, cost: state.upgrades.plush.cost },
+                            lights: { level: state.upgrades.lights.level, cost: state.upgrades.lights.cost }
+                        }
+                    },
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (error) {
+                console.error("Error al guardar el progreso automáticamente:", error);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Creando el generador de traducción dinámico (Localización)... ---
+        // Cambiar idioma y actualizar la interfaz por completo
+        function changeLanguage(langCode) {
+            if (i18n[langCode]) {
+                currentLang = langCode;
+                state.lang = langCode;
+                updateLanguageUI();
+                updateSaveStatusLabel();
+                updateAudioButtonLabel();
+                if (firebaseInitialized) {
+                    saveGameProgress();
+                }
+            }
+        }
+
+        function updateLanguageUI() {
+            const dict = i18n[currentLang];
+
+            // Cabecera principal
+            document.querySelector('h1').textContent = dict.title;
+            document.querySelector('h1 + p').textContent = dict.subtitle;
+
+            // Clima y ventana
+            updateWeatherDisplay();
+
+            // Texto de ronroneo flotante
+            document.getElementById('purr-text').textContent = dict.purrText;
+
+            // Pestañas
+            document.getElementById('btn-tab-sounds').innerHTML = dict.tabSounds;
+            document.getElementById('btn-tab-shop').innerHTML = dict.tabShop;
+            document.getElementById('btn-tab-breathing').innerHTML = dict.tabBreathing;
+            document.getElementById('btn-tab-timer').innerHTML = dict.tabTimer;
+
+            // Sonidos ambientadores individuales
+            const soundHeader = document.querySelector('#tab-sounds .text-xs.text-indigo-400');
+            document.getElementById('tab-sounds-text').textContent = dict.soundDesc;
+            document.getElementById('snd-title-melodia').textContent = dict.melodiaTitle;
+            document.getElementById('snd-desc-melodia').textContent = dict.melodiaDesc;
+            document.getElementById('snd-title-lluvia').textContent = dict.lluviaTitle;
+            document.getElementById('snd-desc-lluvia').textContent = dict.lluviaDesc;
+            document.getElementById('snd-title-viento').textContent = dict.vientoTitle;
+            document.getElementById('snd-desc-viento').textContent = dict.vientoDesc;
+            document.getElementById('snd-title-purr').textContent = dict.purrTitle;
+            document.getElementById('snd-desc-purr').textContent = dict.purrDesc;
+
+            // Tienda / Mejoras
+            const shopHeader = document.querySelector('#tab-shop .text-xs.text-indigo-400');
+            if (shopHeader) {
+                shopHeader.textContent = dict.shopDesc;
+            }
+
+            // Respirar
+            document.getElementById('breathing-state-text').textContent = dict.breatheTitle;
+            document.querySelector('#tab-breathing p.text-xs').textContent = dict.breatheDesc;
+            if (!breathingInterval) {
+                document.getElementById('btn-breath-toggle').textContent = dict.btnBreatheStart;
+            } else {
+                document.getElementById('btn-breath-toggle').textContent = dict.btnBreatheRestart;
+            }
+            document.querySelector('#tab-breathing button[onclick="stopBreathing()"]').textContent = dict.btnBreatheStop;
+
+            // Alarma / Temporizador
+            document.querySelector('#tab-timer h3').textContent = dict.timerTitle;
+            document.querySelector('#tab-timer p').textContent = dict.timerDesc;
+
+            const timerButtons = document.querySelectorAll('#tab-timer .grid button');
+            if (timerButtons.length >= 4) {
+                timerButtons[0].textContent = `5 ${dict.minText}`;
+                timerButtons[1].textContent = `10 ${dict.minText}`;
+                timerButtons[2].textContent = `20 ${dict.minText}`;
+                timerButtons[3].textContent = `30 ${dict.minText}`;
+            }
+
+            document.querySelector('#timer-display-container p').textContent = dict.timerCountdownLbl;
+            document.querySelector('#timer-display-container button').textContent = dict.btnCancelTimer;
+
+            // Mensaje de pie de página
+            document.querySelector('footer').innerHTML = dict.footerMsg;
+
+            // Ventanas de menú / Ajustes
+            document.querySelector('#settings-modal h3 span:last-child').textContent = dict.settingsTitle;
+            document.querySelector('#settings-modal .text-xs.font-semibold.text-indigo-400').textContent = dict.saveStatus;
+            document.querySelector('#settings-modal p.text-xs').textContent = dict.resetWarning;
+            document.querySelector('#settings-modal button[onclick="showResetConfirm(true)"] span:last-child').textContent = dict.btnResetProgress;
+            document.querySelector('#settings-modal button[onclick="toggleSettingsModal(false)"]').textContent = dict.btnCloseSettings;
+
+            // Confirmar borrado
+            document.querySelector('#confirm-reset-modal h3').textContent = dict.resetConfirmTitle;
+            document.querySelector('#confirm-reset-modal p').textContent = dict.resetConfirmDesc;
+            document.querySelector('#confirm-reset-modal button[onclick="showResetConfirm(false)"]').textContent = dict.btnNoCancel;
+            document.querySelector('#confirm-reset-modal button[onclick="resetGameProgress()"]').textContent = dict.btnYesDelete;
+
+            // Despertar santuario dimmer
+            document.querySelector('#btn-cancel-dimmer span:last-child').textContent = dict.wakeUpBtn;
+
+            // Clases de botones del selector de idioma
+            ['es', 'en', 'zh'].forEach(l => {
+                const btn = document.getElementById(`btn-lang-${l}`);
+                if (btn) {
+                    if (l === currentLang) {
+                        btn.className = "py-1 px-2 text-xs rounded-lg border border-indigo-500/30 bg-indigo-950/50 text-indigo-200 font-bold";
+                    } else {
+                        btn.className = "py-1 px-2 text-xs rounded-lg border border-indigo-950 bg-transparent text-indigo-400";
+                    }
+                }
+            });
+
+            // Re-renderizar upgrades ya traducidos
+            renderUpgrades();
+            updateUI();
+        }
+
+        function updateSaveStatusLabel() {
+            const statusLabel = document.getElementById('save-status');
+            const dict = i18n[currentLang];
+            if (firebaseInitialized) {
+                statusLabel.textContent = dict.saveStatusActive;
+                statusLabel.className = "text-xs text-green-400";
+            } else {
+                statusLabel.textContent = dict.saveStatusLocal;
+                statusLabel.className = "text-xs text-yellow-500";
+            }
+        }
+
+        function updateAudioButtonLabel() {
+            const btn = document.getElementById('audio-master-btn');
+            if (!btn) return;
+            const dict = i18n[currentLang];
+            if (!audioCtx) {
+                btn.textContent = dict.btnStartAudio;
+            } else {
+                if (audioCtx.state === 'suspended') {
+                    btn.textContent = dict.btnResumeAudio;
+                } else {
+                    btn.textContent = dict.btnAudioActive;
+                }
+            }
+        }
+
+        function updateWeatherDisplay() {
+            const dict = i18n[currentLang];
+            const rainVisual = document.getElementById('window-rain');
+            const hasRain = volumes.lluvia > 0.1;
+
+            if (hasRain) {
+                document.getElementById('clima-icon').textContent = '🌧️';
+                document.getElementById('clima-desc').textContent = dict.rhythmicRain;
+                document.getElementById('window-scenery').textContent = '⛈️';
+            } else {
+                document.getElementById('clima-icon').textContent = '🌙';
+                document.getElementById('clima-desc').textContent = dict.clearSky;
+                document.getElementById('window-scenery').textContent = '🌙';
+            }
+        }
+
+        function applyUpgradesVisuals() {
+            Object.values(state.upgrades).forEach(up => {
+                const visualEl = document.getElementById(up.elementId);
+                if (visualEl) {
+                    if (up.level > 0) {
+                        if (up.id === 'lights') {
+                            visualEl.style.opacity = Math.min(0.2 + (up.level * 0.15), 1.0);
+                        } else {
+                            visualEl.style.opacity = "1.0";
+                        }
+                    } else {
+                        visualEl.style.opacity = "0.3";
+                    }
+                }
+            });
+        }
+
+        // --- STREAMING_CHUNK: Inicializando sintetizadores de audio generativo en tiempo real... ---
+        // --- 2. SISTEMA DE AUDIO SINTÉTICO (Web Audio API) ---
+        let audioCtx = null;
+        let masterGain = null;
+
+        // Nodos del sintetizador de melodia
+        let synthOscs = [];
+        let synthGain = null;
+        let synthInterval = null;
+
+        // Nodos para generador de Lluvia (Ruido Rosa Filtrado)
+        let rainBufferNode = null;
+        let rainFilter = null;
+        let rainGain = null;
+
+        // Nodos para generador de Viento
+        let windNoiseNode = null;
+        let windFilter = null;
+        let windGain = null;
+        let windLFO = null;
+
+        // Nodos para el Ronroneo del gato
+        let purrOsc = null;
+        let purrModulator = null;
+        let purrGain = null;
+
+        // Volúmenes base actuales
+        let volumes = {
+            melodia: 0.3,
+            lluvia: 0.0,
+            viento: 0.0,
+            purr: 0.0
+        };
+
+        function initAudio() {
+            if (audioCtx) return;
+
+            try {
+                // Instanciar el contexto de audio
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Nodo master para control general de volumen / fadeout
+                masterGain = audioCtx.createGain();
+                masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                masterGain.connect(audioCtx.destination);
+
+                // --- INICIALIZAR MELODÍA ---
+                synthGain = audioCtx.createGain();
+                synthGain.gain.setValueAtTime(volumes.melodia * 0.4, audioCtx.currentTime);
+                synthGain.connect(masterGain);
+                startAmbientMelody();
+
+                // --- INICIALIZAR LLUVIA ---
+                rainGain = audioCtx.createGain();
+                rainGain.gain.setValueAtTime(volumes.lluvia, audioCtx.currentTime);
+                rainGain.connect(masterGain);
+                createRainSynth();
+
+                // --- INICIALIZAR VIENTO ---
+                windGain = audioCtx.createGain();
+                windGain.gain.setValueAtTime(volumes.viento, audioCtx.currentTime);
+                windGain.connect(masterGain);
+                createWindSynth();
+
+                // --- INICIALIZAR RONRONEO ---
+                purrGain = audioCtx.createGain();
+                purrGain.gain.setValueAtTime(volumes.purr, audioCtx.currentTime);
+                purrGain.connect(masterGain);
+                createPurrSynth();
+
+                showToast("🎵", i18n[currentLang].toastAudioStarted);
+                updateAudioButtonLabel();
+                document.getElementById('audio-master-btn').classList.replace('bg-indigo-900/40', 'bg-green-950/60');
+            } catch (e) {
+                console.error("No se pudo iniciar el audio context:", e);
+                showToast("⚠️", i18n[currentLang].toastNoAudioSupport);
+            }
+        }
+
+        function toggleAudioEngine() {
+            if (!audioCtx) {
+                initAudio();
+            } else {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                    showToast("🎵", i18n[currentLang].toastAudioResumed);
+                    updateAudioButtonLabel();
+                } else {
+                    audioCtx.suspend();
+                    showToast("🔇", i18n[currentLang].toastAudioPaused);
+                    updateAudioButtonLabel();
+                }
+            }
+        }
+
+        // --- GENERACIÓN DE RUIDOS (LLUVIA Y VIENTO) ---
+        function createRainSynth() {
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            let b0, b1, b2, b3, b4, b5, b6;
+            b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                output[i] *= 0.11;
+                b6 = white * 0.115926;
+            }
+
+            rainBufferNode = audioCtx.createBufferSource();
+            rainBufferNode.buffer = noiseBuffer;
+            rainBufferNode.loop = true;
+
+            rainFilter = audioCtx.createBiquadFilter();
+            rainFilter.type = 'lowpass';
+            rainFilter.frequency.setValueAtTime(600, audioCtx.currentTime);
+
+            rainBufferNode.connect(rainFilter);
+            rainFilter.connect(rainGain);
+            rainBufferNode.start();
+        }
+
+        function createWindSynth() {
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+
+            windNoiseNode = audioCtx.createBufferSource();
+            windNoiseNode.buffer = noiseBuffer;
+            windNoiseNode.loop = true;
+
+            windFilter = audioCtx.createBiquadFilter();
+            windFilter.type = 'bandpass';
+            windFilter.frequency.setValueAtTime(300, audioCtx.currentTime);
+            windFilter.Q.setValueAtTime(3.0, audioCtx.currentTime);
+
+            windLFO = audioCtx.createOscillator();
+            windLFO.frequency.setValueAtTime(0.08, audioCtx.currentTime);
+
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.setValueAtTime(150, audioCtx.currentTime);
+
+            windLFO.connect(lfoGain);
+            lfoGain.connect(windFilter.frequency);
+
+            windNoiseNode.connect(windFilter);
+            windFilter.connect(windGain);
+
+            windLFO.start();
+            windNoiseNode.start();
+        }
+
+        function createPurrSynth() {
+            purrOsc = audioCtx.createOscillator();
+            purrOsc.type = 'sawtooth';
+            purrOsc.frequency.setValueAtTime(28, audioCtx.currentTime);
+
+            const purrFilter = audioCtx.createBiquadFilter();
+            purrFilter.type = 'lowpass';
+            purrFilter.frequency.setValueAtTime(70, audioCtx.currentTime);
+
+            purrModulator = audioCtx.createOscillator();
+            purrModulator.type = 'sine';
+            purrModulator.frequency.setValueAtTime(3.5, audioCtx.currentTime);
+
+            const modGain = audioCtx.createGain();
+            modGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+
+            const carrierGain = audioCtx.createGain();
+            carrierGain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+
+            purrModulator.connect(modGain);
+            modGain.connect(carrierGain.gain);
+
+            purrOsc.connect(purrFilter);
+            purrFilter.connect(carrierGain);
+            carrierGain.connect(purrGain);
+
+            purrOsc.start();
+            purrModulator.start();
+        }
+
+        // Progresión de acordes extremadamente lenta y calmada: Do Mayor 7 -> Fa Mayor 7 -> La menor -> Sol Mayor
+        const CHORDS_432 = [
+            [257.43, 324.32, 385.70, 485.91], // Cmaj7 (C3, E3, G3, B3 ajustado a base 432Hz)
+            [171.62, 216.22, 257.43, 324.32], // Fmaj7 (F3, A3, C4, E4)
+            [216.22, 257.43, 324.32, 432.00], // Am (A3, C4, E4, A4)
+            [192.43, 242.45, 288.33, 385.70]  // G (G3, B3, D4, G4)
+        ];
+
+        let currentChordIndex = 0;
+
+        function playSoftNote(freq, delay, duration) {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+
+            const noteFilter = audioCtx.createBiquadFilter();
+            noteFilter.type = 'lowpass';
+            noteFilter.frequency.setValueAtTime(500, audioCtx.currentTime + delay);
+
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + delay + 1.5);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + delay + duration - 2);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+
+            osc.connect(noteFilter);
+            noteFilter.connect(gainNode);
+            gainNode.connect(synthGain);
+
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function startAmbientMelody() {
+            if (synthInterval) clearInterval(synthInterval);
+
+            synthInterval = setInterval(() => {
+                if (!audioCtx || audioCtx.state === 'suspended') return;
+
+                const chord = CHORDS_432[currentChordIndex];
+
+                playSoftNote(chord[0], 0, 7.5);
+                playSoftNote(chord[1], 1.2, 6);
+                playSoftNote(chord[2], 2.8, 4.5);
+                playSoftNote(chord[3], 4.2, 3);
+
+                currentChordIndex = (currentChordIndex + 1) % CHORDS_432.length;
+            }, 8000);
+        }
+
+        function adjustVolume(type, val) {
+            volumes[type] = parseFloat(val);
+            document.getElementById(`lbl-vol-${type}`).textContent = `${Math.round(val * 100)}%`;
+
+            if (!audioCtx) return;
+
+            const targetGain = audioCtx.currentTime;
+
+            if (type === 'melodia' && synthGain) {
+                synthGain.gain.setTargetAtTime(volumes.melodia * 0.4, targetGain, 0.5);
+            } else if (type === 'lluvia' && rainGain) {
+                rainGain.gain.setTargetAtTime(volumes.lluvia * 0.6, targetGain, 0.5);
+
+                const rainVisual = document.getElementById('window-rain');
+                updateWeatherDisplay();
+            } else if (type === 'viento' && windGain) {
+                windGain.gain.setTargetAtTime(volumes.viento * 0.5, targetGain, 1.0);
+            } else if (type === 'purr' && purrGain) {
+                purrGain.gain.setTargetAtTime(volumes.purr * 0.8, targetGain, 0.3);
+            }
+        }
+
+
+        // --- STREAMING_CHUNK: Creando el listado dinámico de compras e incrementos de SPS... ---
+        // --- 3. JUGABILIDAD IDLE (SANTUARIO Y MEJORAS) ---
+
+        function renderUpgrades() {
+            const container = document.getElementById('upgrades-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const dict = i18n[currentLang];
+            const upLocals = upgradeLocales[currentLang];
+
+            Object.values(state.upgrades).forEach(up => {
+                const canAfford = state.stardust >= up.cost;
+                const isMax = up.level >= 20;
+                const localInfo = upLocals[up.id];
+
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border transition-all flex justify-between items-center ${canAfford ? 'border-indigo-800 bg-[#121724]' : 'border-indigo-950/40 bg-[#0c101a] opacity-60'
+                    }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl bg-slate-950/50 p-2 rounded-xl border border-indigo-950">${up.icon}</span>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-semibold text-sm text-indigo-100">${localInfo.name}</h4>
+                                <span class="bg-indigo-950 text-indigo-400 border border-indigo-900 px-1.5 py-0.5 rounded-md text-[10px]">Nivel ${up.level}</span>
+                            </div>
+                            <p class="text-[11px] text-indigo-400 max-w-[180px] md:max-w-xs mt-0.5">${localInfo.desc}</p>
+                            <span class="text-[11px] text-yellow-300/80 font-medium">+${up.sps} ${dict.spsSuffix}</span>
+                        </div>
+                    </div>
+                    <button onclick="buyUpgrade('${up.id}')" ${!canAfford || isMax ? 'disabled' : ''} class="px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] ${canAfford && !isMax
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md active:scale-95'
+                        : 'bg-slate-900 text-indigo-600 border border-indigo-950 cursor-not-allowed'
+                    }">
+                        <span>${isMax ? 'MAX' : dict.costLbl}</span>
+                        <span class="text-[10px] text-yellow-400 font-mono mt-0.5">${isMax ? '---' : '✨ ' + Math.round(up.cost)}</span>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyUpgrade(id) {
+            const up = state.upgrades[id];
+            const dict = i18n[currentLang];
+            const upLocals = upgradeLocales[currentLang];
+            const localInfo = upLocals[up.id];
+
+            if (state.stardust >= up.cost && up.level < 20) {
+                state.stardust -= up.cost;
+                up.level++;
+                up.cost = up.cost * 1.5;
+
+                recalculateSPS();
+                renderUpgrades();
+                updateUI();
+
+                const visualEl = document.getElementById(up.elementId);
+                if (visualEl) {
+                    if (up.id === 'lights') {
+                        visualEl.style.opacity = Math.min(0.2 + (up.level * 0.15), 1.0);
+                    } else {
+                        visualEl.style.opacity = "1.0";
+                    }
+                }
+
+                if (audioCtx && audioCtx.state !== 'suspended') {
+                    playSoftNote(544.37, 0, 0.5);
+                }
+
+                if (firebaseInitialized) {
+                    saveGameProgress();
+                }
+
+                showToast(up.icon, dict.toastUpgraded.replace('{name}', localInfo.name));
+            }
+        }
+
+        function recalculateSPS() {
+            let total = 0;
+            Object.values(state.upgrades).forEach(up => {
+                total += up.level * up.sps;
+            });
+            state.sps = total;
+            document.getElementById('sps-rate').textContent = state.sps.toFixed(1);
+        }
+
+        // --- INTERACCIONES TIERNA CON EL GATITO ---
+        let petTimeout = null;
+        function petCompanion() {
+            if (!audioCtx) {
+                initAudio();
+            }
+
+            state.stardust += 1 + (state.sps * 0.1);
+            state.clicks++;
+            updateUI();
+
+            const purrLbl = document.getElementById('purr-text');
+            purrLbl.classList.replace('opacity-0', 'opacity-100');
+
+            if (purrGain && volumes.purr < 0.2) {
+                purrGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                purrGain.gain.exponentialRampToValueAtTime(volumes.purr || 0.01, audioCtx.currentTime + 3.0);
+            }
+
+            if (petTimeout) clearTimeout(petTimeout);
+            petTimeout = setTimeout(() => {
+                purrLbl.classList.replace('opacity-100', 'opacity-0');
+            }, 2000);
+
+            createStarParticle();
+        }
+
+        function createStarParticle() {
+            const container = document.getElementById('visual-lights').parentElement;
+            const star = document.createElement('div');
+            star.className = 'absolute text-xs pointer-events-none text-yellow-300 animate-[ping_1.5s_infinite]';
+            star.textContent = '✨';
+            star.style.left = `${30 + Math.random() * 40}%`;
+            star.style.top = `${40 + Math.random() * 30}%`;
+            container.appendChild(star);
+            setTimeout(() => star.remove(), 1200);
+        }
+
+        // Loop de acumulación pasiva (Idle Loop)
+        let lastTick = Date.now();
+        setInterval(() => {
+            const now = Date.now();
+            const delta = (now - lastTick) / 1000;
+            lastTick = now;
+
+            if (state.sps > 0) {
+                state.stardust += state.sps * delta;
+                updateUI();
+            }
+        }, 100);
+
+        function updateUI() {
+            document.getElementById('stardust-count').textContent = Math.floor(state.stardust);
+            const shopTab = document.getElementById('tab-shop');
+            const dict = i18n[currentLang];
+
+            if (!shopTab.classList.contains('hidden')) {
+                const buttons = shopTab.querySelectorAll('button');
+                let idx = 0;
+                Object.values(state.upgrades).forEach(up => {
+                    const btn = buttons[idx];
+                    if (btn) {
+                        const canAfford = state.stardust >= up.cost;
+                        const isMax = up.level >= 20;
+                        if (canAfford && !isMax) {
+                            btn.removeAttribute('disabled');
+                            btn.className = "px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md active:scale-95";
+                        } else {
+                            btn.setAttribute('disabled', 'true');
+                            btn.className = "px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all flex flex-col items-center justify-center min-w-[70px] bg-slate-900 text-indigo-600 border border-indigo-950 cursor-not-allowed";
+                        }
+                    }
+                    idx++;
+                });
+            }
+        }
+
+
+        // --- STREAMING_CHUNK: Creando el control interactivo de respiración coordinada... ---
+        // --- 4. GUÍA DE RESPIRACIÓN (MÉTODO CAJA 4-4-4-4) ---
+        let breathingInterval = null;
+        let breathingStep = 0; // 0: Inhala, 1: Mantén, 2: Exhala, 3: Mantén vacío
+        let breathSeconds = 4;
+
+        function startBreathing() {
+            if (breathingInterval) clearInterval(breathingInterval);
+
+            breathingStep = 0;
+            breathSeconds = 4;
+            updateBreathingUI();
+
+            const dict = i18n[currentLang];
+
+            breathingInterval = setInterval(() => {
+                breathSeconds--;
+                if (breathSeconds <= 0) {
+                    breathingStep = (breathingStep + 1) % 4;
+                    breathSeconds = 4;
+                }
+                updateBreathingUI();
+            }, 1000);
+
+            document.getElementById('btn-breath-toggle').textContent = dict.btnBreatheRestart;
+        }
+
+        function stopBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+            }
+            const circle = document.getElementById('breathing-circle');
+            const dict = i18n[currentLang];
+
+            circle.style.transform = "scale(1)";
+            circle.style.backgroundColor = "rgba(129, 140, 248, 0.1)";
+            document.getElementById('breathing-state-text').textContent = dict.breathePaused;
+            document.getElementById('breathing-timer-lbl').textContent = "🧘";
+            document.getElementById('btn-breath-toggle').textContent = dict.btnBreatheStart;
+        }
+
+        function updateBreathingUI() {
+            const circle = document.getElementById('breathing-circle');
+            const lbl = document.getElementById('breathing-timer-lbl');
+            const stateText = document.getElementById('breathing-state-text');
+            const dict = i18n[currentLang];
+
+            lbl.textContent = breathSeconds;
+
+            switch (breathingStep) {
+                case 0: // Inhalar
+                    stateText.textContent = dict.breatheIn;
+                    stateText.className = "text-lg font-semibold text-green-300 transition-all";
+                    circle.style.transform = `scale(${1.4 - (breathSeconds * 0.1)})`;
+                    circle.style.backgroundColor = "rgba(52, 211, 153, 0.2)";
+                    break;
+                case 1: // Mantener con aire
+                    stateText.textContent = dict.breatheHold;
+                    stateText.className = "text-lg font-semibold text-yellow-300 transition-all";
+                    circle.style.transform = "scale(1.4)";
+                    circle.style.backgroundColor = "rgba(253, 224, 71, 0.2)";
+                    break;
+                case 2: // Exhalar
+                    stateText.textContent = dict.breatheOut;
+                    stateText.className = "text-lg font-semibold text-indigo-300 transition-all";
+                    circle.style.transform = `scale(${1.0 + (breathSeconds * 0.1)})`;
+                    circle.style.backgroundColor = "rgba(129, 140, 248, 0.2)";
+                    break;
+                case 3: // Mantener vacío
+                    stateText.textContent = dict.breatheHoldEmpty;
+                    stateText.className = "text-lg font-semibold text-slate-400 transition-all";
+                    circle.style.transform = "scale(1.0)";
+                    circle.style.backgroundColor = "rgba(148, 163, 184, 0.1)";
+                    break;
+            }
+        }
+
+
+        // --- STREAMING_CHUNK: Creando el control del temporizador de sueño... ---
+        // --- 5. TEMPORIZADOR DE APAGADO PROGRESIVO (SLEEP TIMER) ---
+        let sleepTimerInterval = null;
+        let sleepSecondsLeft = 0;
+
+        function setSleepTimer(minutes) {
+            initAudio();
+
+            sleepSecondsLeft = minutes * 60;
+            document.getElementById('timer-display-container').classList.remove('hidden');
+            updateTimerDisplay();
+
+            if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+
+            sleepTimerInterval = setInterval(() => {
+                sleepSecondsLeft--;
+                updateTimerDisplay();
+
+                if (sleepSecondsLeft <= 0) {
+                    triggerSleepFade();
+                }
+            }, 1000);
+
+            const dict = i18n[currentLang];
+            showToast("⏱️", dict.toastTimerSet.replace('{minutes}', minutes));
+        }
+
+        function cancelSleepTimer() {
+            if (sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+            }
+            document.getElementById('timer-display-container').classList.add('hidden');
+
+            const dimmer = document.getElementById('screen-dimmer');
+            dimmer.style.opacity = "0";
+            dimmer.classList.remove('pointer-events-auto');
+            dimmer.classList.add('pointer-events-none');
+
+            const cancelBtn = document.getElementById('btn-cancel-dimmer');
+            cancelBtn.classList.remove('flex');
+            cancelBtn.classList.add('hidden');
+
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (masterGain) {
+                    masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+                    masterGain.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 3);
+                }
+            }
+            const dict = i18n[currentLang];
+            showToast("⏱️", dict.toastTimerCancelled);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(sleepSecondsLeft / 60).toString().padStart(2, '0');
+            const s = (sleepSecondsLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-countdown').textContent = `${m}:${s}`;
+
+            if (sleepSecondsLeft < 60) {
+                const ratio = 1 - (sleepSecondsLeft / 60);
+                const dimmer = document.getElementById('screen-dimmer');
+                dimmer.style.opacity = (ratio * 0.95).toString();
+                dimmer.classList.remove('pointer-events-none');
+                dimmer.classList.add('pointer-events-auto');
+
+                const cancelBtn = document.getElementById('btn-cancel-dimmer');
+                cancelBtn.classList.remove('hidden');
+                cancelBtn.classList.add('flex');
+            }
+        }
+
+        function triggerSleepFade() {
+            clearInterval(sleepTimerInterval);
+            sleepTimerInterval = null;
+
+            const dimmer = document.getElementById('screen-dimmer');
+            dimmer.style.opacity = "1";
+            dimmer.classList.remove('pointer-events-none');
+            dimmer.classList.add('pointer-events-auto');
+
+            const cancelBtn = document.getElementById('btn-cancel-dimmer');
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.classList.add('flex');
+
+            if (masterGain && audioCtx) {
+                masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+                masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 15);
+            }
+
+            const dict = i18n[currentLang];
+            setTimeout(() => {
+                if (dimmer.style.opacity === "1" && audioCtx) {
+                    audioCtx.suspend();
+                    showToast("💤", dict.toastGoodNight);
+                }
+            }, 15000);
+        }
+
+        // --- 6. UTILIDADES COMUNES ---
+
+        function toggleSettingsModal(show) {
+            const modal = document.getElementById('settings-modal');
+            updateSaveStatusLabel();
+
+            if (show) {
+                modal.classList.replace('opacity-0', 'opacity-100');
+                modal.classList.remove('pointer-events-none');
+            } else {
+                modal.classList.replace('opacity-100', 'opacity-0');
+                modal.classList.add('pointer-events-none');
+            }
+        }
+
+        function showResetConfirm(show) {
+            const modal = document.getElementById('confirm-reset-modal');
+            if (show) {
+                modal.classList.replace('opacity-0', 'opacity-100');
+                modal.classList.remove('pointer-events-none');
+            } else {
+                modal.classList.replace('opacity-100', 'opacity-0');
+                modal.classList.add('pointer-events-none');
+            }
+        }
+
+        async function resetGameProgress() {
+            state.stardust = 0;
+            state.clicks = 0;
+
+            Object.keys(state.upgrades).forEach(key => {
+                state.upgrades[key].level = 0;
+                if (key === 'tea') state.upgrades[key].cost = 15;
+                if (key === 'candle') state.upgrades[key].cost = 60;
+                if (key === 'plush') state.upgrades[key].cost = 250;
+                if (key === 'lights') state.upgrades[key].cost = 1000;
+            });
+
+            recalculateSPS();
+            applyUpgradesVisuals();
+            renderUpgrades();
+            updateUI();
+
+            if (firebaseInitialized) {
+                await saveGameProgress();
+            }
+
+            showResetConfirm(false);
+            toggleSettingsModal(false);
+
+            const dict = i18n[currentLang];
+            showToast("🗑️", dict.toastReset);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-200', 'bg-[#161c2a]', 'shadow-md');
+                btn.classList.add('text-indigo-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.replace('text-indigo-400', 'text-indigo-200');
+            activeBtn.classList.add('bg-[#161c2a]', 'shadow-md');
+
+            if (tabId === 'tab-shop') {
+                renderUpgrades();
+            }
+        }
+
+        let toastTimeout = null;
+        function showToast(icon, msg) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-icon').textContent = icon;
+            document.getElementById('toast-msg').textContent = msg;
+
+            toast.classList.replace('opacity-0', 'opacity-100');
+            toast.classList.remove('pointer-events-none');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.replace('opacity-100', 'opacity-0');
+                toast.classList.add('pointer-events-none');
+            }, 3000);
+        }
+
+        // Inicializar la interfaz del juego al cargar la página
+        window.onload = function () {
+            // Cargar idioma por defecto al principio
+            updateLanguageUI();
+            recalculateSPS();
+            updateUI();
+
+            // Inicializar Firebase para guardado persistente seguro
+            initFirebase();
+
+            // Guardado periódico automático cada 10 segundos
+            setInterval(() => {
+                if (firebaseInitialized) {
+                    saveGameProgress();
+                }
+            }, 10000);
+        }
+    </script>
+</body>
+
+</html>
