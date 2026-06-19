@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SignLingo - Aprende Lenguaje de Signos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandGreen: '#008137',
+                        brandYellow: '#ffd500',
+                        brandDark: '#1f2937',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts (Fredoka para un aire amigable y redondeado estilo Duolingo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos de alta calidad -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Animaciones personalizadas */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.3s ease-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        /* Estilos de cofre */
+        .chest-bounce {
+            animation: float 2s ease-in-out infinite;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col md:flex-row">
+
+    <!-- SIDEBAR / MENÚ LATERAL (Escritorio) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 p-6 space-y-8 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-2xl bg-brandGreen flex items-center justify-center text-white text-2xl shadow-md">
+                <i class="fa-solid fa-hands-sign animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-brandGreen">SignLingo</h1>
+                <p class="text-xs text-gray-400">Prototipo de Aprendizaje</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium transition text-brandGreen bg-green-50" id="btn-tab-dashboard">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span>Aprender</span>
+            </button>
+            <button onclick="switchTab('dictionary')" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium transition text-gray-500 hover:bg-gray-100" id="btn-tab-dictionary">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span>Vocabulario</span>
+            </button>
+            <button onclick="switchTab('profile')" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl font-medium transition text-gray-500 hover:bg-gray-100" id="btn-tab-profile">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span>Mi Perfil</span>
+            </button>
+        </nav>
+
+        <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 text-center">
+            <p class="text-xs text-yellow-800 font-semibold mb-1">PROTOTIPO LOCAL</p>
+            <p class="text-[11px] text-yellow-700">Diseñado especialmente para el lucimiento de Amaya ante la ONCE.</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 flex flex-col min-h-0 pb-20 md:pb-0">
+        
+        <!-- TOP HEADER (Estadísticas rápidas del perfil) -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+            <div class="flex items-center space-x-3 md:hidden">
+                <div class="w-9 h-9 rounded-xl bg-brandGreen flex items-center justify-center text-white text-lg">
+                    <i class="fa-solid fa-hands-sign"></i>
+                </div>
+                <span class="text-lg font-bold text-brandGreen">SignLingo</span>
+            </div>
+
+            <div class="flex items-center space-x-6 ml-auto">
+                <!-- Racha -->
+                <div class="flex items-center space-x-2 text-orange-500 font-bold" title="Racha Diaria">
+                    <i class="fa-solid fa-fire text-xl animate-bounce"></i>
+                    <span id="header-streak" class="text-lg">0</span>
+                </div>
+                <!-- Gemas -->
+                <div class="flex items-center space-x-2 text-cyan-500 font-bold" title="Gemas ganadas">
+                    <i class="fa-solid fa-gem text-lg"></i>
+                    <span id="header-gems" class="text-lg">0</span>
+                </div>
+                <!-- Nivel & XP -->
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-xs text-gray-400">Nivel <span id="header-level-num">1</span></p>
+                        <p class="text-xs font-bold text-brandGreen"><span id="header-xp-num">0</span> XP</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-brandGreen text-white flex items-center justify-center font-bold text-sm shadow shadow-green-200 border-2 border-white" id="header-level-badge">
+                        1
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECCIONES / VISTAS -->
+        <div id="content-area" class="flex-1 p-4 md:p-8 overflow-y-auto max-w-4xl mx-auto w-full">
+            
+            <!-- VISTA: DASHBOARD (Mapa de lecciones) -->
+            <section id="tab-dashboard" class="space-y-8">
+                <!-- Banner de Motivación -->
+                <div class="bg-gradient-to-r from-brandGreen to-green-700 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 max-w-md">
+                        <span class="bg-brandYellow text-brandDark text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">¡Aprende hoy!</span>
+                        <h2 class="text-2xl md:text-3xl font-bold mt-3">Tu viaje hacia la inclusión comienza aquí</h2>
+                        <p class="text-green-100 text-sm mt-2">Completa lecciones diarias, mantén tu racha y desbloquea cofres mágicos de lenguaje de signos.</p>
+                    </div>
+                    <!-- Decoración visual abstracta de manos en SVG -->
+                    <div class="absolute right-4 bottom-0 opacity-15 transform translate-y-4 hidden sm:block">
+                        <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M10 14V3a1.5 1.5 0 1 1 3 0v11m-3-1l-3-3a1.5 1.5 0 0 0-2.12 2.12l4.5 4.5m3.62-2.62a1.5 1.5 0 1 1 3 0v3a1.5 1.5 0 1 1-3 0m3-3a1.5 1.5 0 1 1 3 0v3a1.5 1.5 0 1 1-3 0" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Lista de Lecciones / Estilo Duolingo -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-2">
+                        <i class="fa-solid fa-map-location-dot text-brandGreen"></i>
+                        <span>Mapa de Aprendizaje de Lengua de Signos</span>
+                    </h3>
+                    
+                    <div id="lessons-list" class="grid gap-4 sm:grid-cols-2">
+                        <!-- Las lecciones se renderizarán dinámicamente aquí -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA: DICCIONARIO / VOCABULARIO -->
+            <section id="tab-dictionary" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Mi Glosario Personal</h2>
+                    <p class="text-sm text-gray-500">Repasa las palabras de tu base de datos cuando lo necesites.</p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3" id="dictionary-grid">
+                    <!-- Las palabras del diccionario se cargarán de forma dinámica aquí -->
+                </div>
+            </section>
+
+            <!-- VISTA: PERFIL -->
+            <section id="tab-profile" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm flex flex-col items-center text-center">
+                    <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center text-brandGreen text-4xl border-4 border-white shadow-md relative">
+                        <i class="fa-solid fa-user-astronaut animate-float"></i>
+                        <span class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-brandYellow text-brandDark border-2 border-white flex items-center justify-center font-bold text-xs" id="profile-badge-lvl">1</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-4">Exploradora LSE</h2>
+                    <p class="text-sm text-gray-400">Estudiante de Lenguaje de Signos</p>
+
+                    <!-- Tarjetas de Estadísticas del Perfil -->
+                    <div class="grid grid-cols-3 gap-4 w-full mt-6">
+                        <div class="bg-orange-50 border border-orange-100 p-3 rounded-2xl">
+                            <p class="text-2xl font-bold text-orange-500" id="stat-streak">0</p>
+                            <p class="text-[11px] text-orange-600 font-medium uppercase">Días Racha</p>
+                        </div>
+                        <div class="bg-cyan-50 border border-cyan-100 p-3 rounded-2xl">
+                            <p class="text-2xl font-bold text-cyan-500" id="stat-gems">0</p>
+                            <p class="text-[11px] text-cyan-600 font-medium uppercase">Gemas</p>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 p-3 rounded-2xl">
+                            <p class="text-2xl font-bold text-brandGreen" id="stat-xp">0</p>
+                            <p class="text-[11px] text-green-600 font-medium uppercase">Total XP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Lecciones Completadas -->
+                <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4">
+                    <h3 class="text-lg font-bold text-gray-800">Progreso de Lecciones</h3>
+                    <div class="space-y-3" id="profile-lessons-progress">
+                        <!-- Progreso dinámico -->
+                    </div>
+                    <button onclick="confirmResetProgress()" class="w-full py-3 bg-red-50 text-red-600 rounded-2xl font-semibold text-sm hover:bg-red-100 transition flex items-center justify-center space-x-2 mt-4">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Borrar progreso y reiniciar</span>
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR (Móvil) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 flex justify-around items-center z-20 shadow-lg">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center space-y-1 text-brandGreen" id="btn-tab-mobile-dashboard">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-[10px] font-medium">Aprender</span>
+        </button>
+        <button onclick="switchTab('dictionary')" class="flex flex-col items-center space-y-1 text-gray-400" id="btn-tab-mobile-dictionary">
+            <i class="fa-solid fa-book-open text-xl"></i>
+            <span class="text-[10px] font-medium">Vocabulario</span>
+        </button>
+        <button onclick="switchTab('profile')" class="flex flex-col items-center space-y-1 text-gray-400" id="btn-tab-mobile-profile">
+            <i class="fa-solid fa-user text-xl"></i>
+            <span class="text-[10px] font-medium">Perfil</span>
+        </button>
+    </nav>
+
+    <!-- PANTALLA COMPLETA: INTERFAZ DE LECCIÓN (APRENDER / PRACTICAR) -->
+    <div id="lesson-screen" class="fixed inset-0 bg-white z-50 flex flex-col hidden overflow-y-auto">
+        <!-- Header de la lección -->
+        <header class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <button onclick="exitLesson()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Barra de progreso de la lección -->
+            <div class="flex-1 mx-6 bg-gray-100 h-4 rounded-full overflow-hidden">
+                <div id="lesson-progress-bar" class="bg-brandGreen h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Vidas/Intentos en práctica -->
+            <div class="flex items-center space-x-2 text-red-500 font-bold" id="lesson-lives-container">
+                <i class="fa-solid fa-heart text-xl"></i>
+                <span id="lesson-lives-count">3</span>
+            </div>
+        </header>
+
+        <!-- Contenido principal de la lección -->
+        <div class="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full">
+            
+            <!-- CONTENEDOR 1: MODO DESCOBRIR (VERSIÓN 1) -->
+            <div id="mode-learn-container" class="w-full space-y-6 hidden">
+                <div class="text-center">
+                    <span class="bg-green-100 text-brandGreen text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">Paso 1: Descubrir</span>
+                    <h2 class="text-3xl font-extrabold text-gray-800 mt-2" id="learn-word-title">Palabra</h2>
+                </div>
+
+                <!-- Reproductor de vídeo de signos -->
+                <div class="bg-brandDark rounded-3xl overflow-hidden aspect-video relative shadow-lg flex items-center justify-center">
+                    <video id="learn-video-player" class="w-full h-full object-cover" autoplay loop muted playsinline onerror="handleVideoError(this)">
+                        <source id="learn-video-source" src="" type="video/mp4">
+                    </video>
+                    <!-- Fallback elegante por si Amaya no tiene los vídeos en local aún -->
+                    <div class="video-placeholder absolute inset-0 bg-gray-900 flex flex-col items-center justify-center text-white p-4 text-center hidden">
+                        <i class="fa-solid fa-hands-sign text-4xl text-brandYellow mb-2 animate-bounce"></i>
+                        <p class="font-bold text-sm">Vídeo de Signo Local</p>
+                        <p class="text-[11px] text-gray-400 mt-1 max-w-xs">Introduce tu vídeo en <code class="bg-gray-800 px-1 rounded text-red-400" id="fallback-path">./videos/</code> para reproducirlo.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-5 rounded-2xl border border-gray-200">
+                    <h4 class="font-bold text-sm text-gray-500 uppercase tracking-wide">Descripción del signo</h4>
+                    <p class="text-gray-700 mt-2 text-base leading-relaxed" id="learn-word-desc">Descripción...</p>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR 2: MODO PRÁCTICA (VERSIÓN 2 CORREGIDA) -->
+            <div id="mode-practice-container" class="w-full space-y-6 hidden">
+                <div class="text-center">
+                    <span class="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">Paso 2: Recordar</span>
+                    <h2 class="text-2xl font-extrabold text-gray-800 mt-2">¿Qué palabra o expresión representa este signo?</h2>
+                </div>
+
+                <!-- Zona del vídeo visible por defecto desde el inicio de la práctica -->
+                <div class="bg-brandDark rounded-3xl overflow-hidden aspect-video relative shadow-lg">
+                    <video id="practice-video-player" class="w-full h-full object-cover" autoplay loop muted playsinline onerror="handleVideoError(this)">
+                        <source id="practice-video-source" src="" type="video/mp4">
+                    </video>
+                    <div class="video-placeholder absolute inset-0 bg-gray-900 flex flex-col items-center justify-center text-white p-4 text-center hidden">
+                        <i class="fa-solid fa-hands-sign text-4xl text-brandYellow mb-2 animate-bounce"></i>
+                        <p class="font-bold text-sm">Vídeo de Signo Local</p>
+                    </div>
+                </div>
+
+                <!-- Opciones de respuesta para el test -->
+                <div class="space-y-3" id="quiz-options-container">
+                    <!-- Opciones generadas por código -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Barra inferior de acciones de la lección -->
+        <footer class="border-t border-gray-200 px-6 py-5 bg-white flex justify-end">
+            <button id="lesson-primary-btn" onclick="handlePrimaryAction()" class="w-full sm:w-auto px-10 py-4 bg-brandGreen text-white font-bold text-lg rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-100 flex items-center justify-center space-x-2">
+                <span>Comenzar</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- MODAL: COFRE RECOMPENSA (AL COMPLETAR LECCIÓN) -->
+    <div id="chest-modal" class="fixed inset-0 bg-brandDark/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-gray-100 transform scale-95 transition-all duration-300 relative overflow-hidden">
+            
+            <!-- Confetis decorativos -->
+            <div class="absolute inset-0 pointer-events-none" id="confetti-container"></div>
+
+            <span class="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">¡Lección superada!</span>
+            
+            <h2 class="text-2xl font-black text-gray-800 mt-4">¡Has desbloqueado un Cofre Mágico!</h2>
+            <p class="text-sm text-gray-500 mt-1">Haz clic sobre el cofre para descubrir tu botín de hoy.</p>
+
+            <!-- Cofre Animado con puro CSS y FontAwesome -->
+            <div class="my-8 flex justify-center items-center h-32 perspective-1000">
+                <div id="coffer-body" onclick="openCoffer()" class="chest-bounce cursor-pointer flex flex-col items-center justify-center text-8xl text-yellow-500 transition-all duration-500 hover:scale-110 active:scale-95">
+                    <!-- Tapa cerrada -->
+                    <i class="fa-solid fa-box-open" id="coffer-icon-open" style="display: none;"></i>
+                    <i class="fa-solid fa-box" id="coffer-icon-closed"></i>
+                </div>
+            </div>
+
+            <!-- Datos de Recompensas -->
+            <div id="coffer-loot" class="hidden space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-200 animate-pop">
+                <p class="font-bold text-gray-700">Tu botín:</p>
+                <div class="flex justify-around items-center">
+                    <div class="flex items-center space-x-2 text-cyan-500 font-bold text-lg">
+                        <i class="fa-solid fa-gem text-xl"></i>
+                        <span>+<span id="loot-gems">0</span> Gemas</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-brandGreen font-bold text-lg">
+                        <i class="fa-solid fa-bolt text-xl"></i>
+                        <span>+<span id="loot-xp">0</span> XP</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="chest-close-btn" onclick="closeChestModal()" class="w-full py-4 mt-6 bg-brandGreen text-white font-bold text-base rounded-2xl hover:bg-green-700 transition disabled:opacity-50" disabled>
+                ¡Reclamar Recompensas!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODALES DE CONFIRMACIÓN O NOTIFICACIONES COZY -->
+    <div id="toast-notification" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-lg text-sm font-semibold z-50 flex items-center space-x-2 opacity-0 pointer-events-none transition-all duration-300">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-message">Mensaje</span>
+    </div>
+
+    <!-- MODAL CONFIRMACIÓN BORRADO -->
+    <div id="reset-confirm-modal" class="fixed inset-0 bg-brandDark/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">¿Estás completamente segura?</h3>
+            <p class="text-sm text-gray-500 mt-2">Esta acción borrará de forma irreversible tu nivel, racha, gemas y el registro de lecciones del local de tu PC.</p>
+            
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <button onclick="closeResetModal()" class="py-3 bg-gray-100 text-gray-600 rounded-2xl font-bold text-sm hover:bg-gray-200 transition">Cancelar</button>
+                <button onclick="resetAllProgress()" class="py-3 bg-red-500 text-white rounded-2xl font-bold text-sm hover:bg-red-600 transition">Sí, reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // BASE DE DATOS DE VÍDEOS (JSON proporcionado por Amaya)
+        const videosData = [
+            {
+                "palabra": "Hola",
+                "idioma": "es",
+                "video_url": "./videos/hola.mp4",
+                "descripcion": "Un saludo amistoso en español. También de despedida, como 'adiós' o 'hasta luego'."
+            },
+            {
+                "palabra": "Por favor",
+                "idioma": "es",
+                "video_url": "./videos/por-favor.mp4",
+                "descripcion": "Una expresión de cortesía en español para pedir algo."
+            },
+            {
+                "palabra": "Gracias",
+                "idioma": "es",
+                "video_url": "./videos/gracias.mp4",
+                "descripcion": "Una expresión de agradecimiento en español."
+            },
+            {
+                "palabra": "De nada",
+                "idioma": "es",
+                "video_url": "./videos/de-nada.mp4",
+                "descripcion": "Una expresión de cortesía en español para responder a un agradecimiento."
+            },
+            {
+                "palabra": "Nombre",
+                "idioma": "es",
+                "video_url": "./videos/nombre.mp4",
+                "descripcion": "Una forma de preguntar por el nombre de alguien en español."
+            },
+            {
+                "palabra": "Mi nombre es...",
+                "idioma": "es",
+                "video_url": "./videos/mi-nombre-es.mp4",
+                "descripcion": "Una forma de presentarse en español."
+            },
+            {
+                "palabra": "Yo",
+                "idioma": "es",
+                "video_url": "./videos/yo.mp4",
+                "descripcion": "Una forma de expresar el sujeto en español."
+            },
+            {
+                "palabra": "Tú",
+                "idioma": "es",
+                "video_url": "./videos/tu.mp4",
+                "descripcion": "Una forma de expresar el sujeto en español."
+            },
+            {
+                "palabra": "Familia",
+                "idioma": "es",
+                "video_url": "./videos/familia.mp4",
+                "descripcion": "Una palabra que se refiere a un grupo de personas relacionadas por parentesco en español."
+            },
+            {
+                "palabra": "amigo",
+                "idioma": "es",
+                "video_url": "./videos/amigo.mp4",
+                "descripcion": "Una palabra que se refiere a una persona con la que se tiene una relación de amistad en español."
+            },
+            {
+                "palabra": "Ayuda",
+                "idioma": "es",
+                "video_url": "./videos/ayuda.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de ayudar a alguien en español."
+            },
+            {
+                "palabra": "Comer",
+                "idioma": "es",
+                "video_url": "./videos/comer.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de consumir alimentos en español."
+            },
+            {
+                "palabra": "Beber",
+                "idioma": "es",
+                "video_url": "./videos/beber.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de consumir líquidos en español."
+            },
+            {
+                "palabra": "Baño",
+                "idioma": "es",
+                "video_url": "./videos/baño.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de lavarse o bañarse en español."
+            },
+            {
+                "palabra": "Querer",
+                "idioma": "es",
+                "video_url": "./videos/querer.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de tener afecto o interés por alguien o algo en español."
+            },
+            {
+                "palabra": "Sí",
+                "idioma": "es",
+                "video_url": "./videos/si.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de confirmar o aceptar algo en español."
+            },
+            {
+                "palabra": "No",
+                "idioma": "es",
+                "video_url": "./videos/no.mp4",
+                "descripcion": "Una palabra que se refiere a la acción de negar o rechazar algo en español."
+            },
+            {
+                "palabra": "Bien",
+                "idioma": "es",
+                "video_url": "./videos/bien.mp4",
+                "descripcion": "Una respuesta positiva a la pregunta '¿Cómo estás?' en español."
+            },
+            {
+                "palabra": "Mal",
+                "idioma": "es",
+                "video_url": "./videos/mal.mp4",
+                "descripcion": "Una respuesta negativa a la pregunta '¿Cómo estás?' en español."
+            },
+            {
+                "palabra": "No entiendo",
+                "idioma": "es",
+                "video_url": "./videos/no-entiendo.mp4",
+                "descripcion": "Una forma de expresar que no se comprende algo en español."
+            }
+        ];
+
+        // ESTRUCTURA DE BLOQUES / LECCIONES
+        const lessonsConfig = [
+            {
+                id: 1,
+                title: "Bloque 1: Saludos y Cortesía",
+                desc: "Domina las reglas de oro de la cortesía y la comunicación inicial.",
+                words: ["Hola", "Por favor", "Gracias", "De nada"],
+                icon: "fa-comments",
+                bgGrad: "from-emerald-500 to-green-600"
+            },
+            {
+                id: 2,
+                title: "Bloque 2: Identificación",
+                desc: "Preséntate y habla sobre tu entorno de personas cercanas.",
+                words: ["Nombre", "Mi nombre es...", "Yo", "Tú", "Familia", "amigo"],
+                icon: "fa-id-card",
+                bgGrad: "from-blue-500 to-teal-600"
+            },
+            {
+                id: 3,
+                title: "Bloque 3: Necesidades Básicas",
+                desc: "Expresa necesidades inmediatas y acciones del día a día.",
+                words: ["Ayuda", "Comer", "Beber", "Baño", "Querer"],
+                icon: "fa-utensils",
+                bgGrad: "from-orange-500 to-amber-600"
+            },
+            {
+                id: 4,
+                title: "Bloque 4: Conceptos Clave",
+                desc: "Aprende respuestas esenciales y la clave para pedir aclaración.",
+                words: ["Sí", "No", "Bien", "Mal", "No entiendo"],
+                icon: "fa-circle-question",
+                bgGrad: "from-purple-500 to-indigo-600"
+            }
+        ];
+
+        // ESTADO GLOBAL DE LA APP (Guardado en LocalStorage)
+        let appState = {
+            streak: 0,
+            gems: 15,
+            xp: 0,
+            level: 1,
+            completedLessons: [], // IDs de lecciones completas
+            lastActiveDate: null // Formato YYYY-MM-DD
+        };
+
+        // VARIABLES DE LECCIÓN ACTIVA (Flujo Rediseñado)
+        let currentLesson = null;
+        let lessonWordsQueue = []; // Lista dinámica de palabras para la fase activa
+        let currentQueueIndex = 0; // Índice dentro de la lista actual
+        let isQuizPhase = false; // False = Fase Descubrir (secuencial), True = Fase Cuestionario (aleatorio)
+        let quizSelectedAnswer = null;
+        let currentLessonLives = 3;
+
+        // WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS
+        let audioCtx = null;
+        function playSound(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    // Alegre sonido en escala de Do
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                } else if (type === 'wrong') {
+                    // Sonido grave decepcionante
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220.00, audioCtx.currentTime); // A3
+                    osc.frequency.exponentialRampToValueAtTime(110.00, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'level-up') {
+                    // Fanfarria triunfal
+                    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, index) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.value = freq;
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        g.gain.setValueAtTime(0.15, audioCtx.currentTime + (index * 0.08));
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.08) + 0.3);
+                        o.start(audioCtx.currentTime + (index * 0.08));
+                        o.stop(audioCtx.currentTime + (index * 0.08) + 0.3);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio no iniciado por seguridad del navegador.");
+            }
+        }
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            loadProgress();
+            updateStreakLogic();
+            renderDashboard();
+            renderDictionary();
+            updateHeaderUI();
+        };
+
+        // GESTIÓN DEL LOCAL STORAGE
+        function saveProgress() {
+            localStorage.setItem('signlingo_progress_v1', JSON.stringify(appState));
+            updateHeaderUI();
+        }
+
+        function loadProgress() {
+            const data = localStorage.getItem('signlingo_progress_v1');
+            if (data) {
+                appState = JSON.parse(data);
+            }
+        }
+
+        // CONTROL DE RACHA (STREAK)
+        function updateStreakLogic() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (!appState.lastActiveDate) {
+                appState.streak = 0;
+                appState.lastActiveDate = todayStr;
+                saveProgress();
+                return;
+            }
+
+            const lastDate = new Date(appState.lastActiveDate);
+            const todayDate = new Date(todayStr);
+            const diffTime = Math.abs(todayDate - lastDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                // Siguiente día, se mantiene perfecto. Al completar lección se subirá.
+            } else if (diffDays > 1) {
+                // Rompió la racha :(
+                appState.streak = 0;
+                saveProgress();
+            }
+        }
+
+        function updateHeaderUI() {
+            document.getElementById('header-streak').innerText = appState.streak;
+            document.getElementById('header-gems').innerText = appState.gems;
+            document.getElementById('header-xp-num').innerText = appState.xp;
+            
+            // Lógica de niveles
+            const calculatedLevel = Math.floor(appState.xp / 100) + 1;
+            if (calculatedLevel > appState.level) {
+                appState.level = calculatedLevel;
+                playSound('level-up');
+                showToast("¡Subiste de Nivel! 🎉 Ahora eres Nivel " + appState.level, "success");
+            }
+            appState.level = calculatedLevel;
+            document.getElementById('header-level-num').innerText = appState.level;
+            document.getElementById('header-level-badge').innerText = appState.level;
+            
+            // Vista de Perfil
+            document.getElementById('profile-badge-lvl').innerText = appState.level;
+            document.getElementById('stat-streak').innerText = appState.streak;
+            document.getElementById('stat-gems').innerText = appState.gems;
+            document.getElementById('stat-xp').innerText = appState.xp;
+
+            // Progreso en perfil
+            const progContainer = document.getElementById('profile-lessons-progress');
+            if (progContainer) {
+                progContainer.innerHTML = '';
+                lessonsConfig.forEach(lesson => {
+                    const isCompleted = appState.completedLessons.includes(lesson.id);
+                    progContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <span class="font-medium text-sm text-gray-700">${lesson.title}</span>
+                            <span class="text-xs font-bold ${isCompleted ? 'text-brandGreen' : 'text-gray-400'}">
+                                ${isCompleted ? '<i class="fa-solid fa-circle-check"></i> Superada' : 'Pendiente'}
+                            </span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // NAVEGACIÓN ENTRE PESTAÑAS
+        function switchTab(tabId) {
+            // Ocultar todas las pestañas
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-dictionary').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+
+            // Mostrar pestaña activa
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Actualizar estilos botones navegación desktop
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brandGreen', 'bg-green-50');
+                btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+            });
+            const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-500', 'hover:bg-gray-100');
+                activeBtn.classList.add('text-brandGreen', 'bg-green-50');
+            }
+
+            // Actualizar estilos botones navegación móvil
+            const mobileButtons = ['dashboard', 'dictionary', 'profile'];
+            mobileButtons.forEach(mb => {
+                const btnM = document.getElementById(`btn-tab-mobile-${mb}`);
+                if (btnM) {
+                    if (mb === tabId) {
+                        btnM.classList.remove('text-gray-400');
+                        btnM.classList.add('text-brandGreen');
+                    } else {
+                        btnM.classList.remove('text-brandGreen');
+                        btnM.classList.add('text-gray-400');
+                    }
+                }
+            });
+        }
+
+        // RENDERIZAR MAPA DE LECCIONES
+        function renderDashboard() {
+            const container = document.getElementById('lessons-list');
+            container.innerHTML = '';
+
+            lessonsConfig.forEach(lesson => {
+                const isCompleted = appState.completedLessons.includes(lesson.id);
+                const wordsListText = lesson.words.slice(0, 3).join(', ') + (lesson.words.length > 3 ? '...' : '');
+                
+                container.innerHTML += `
+                    <div class="bg-white rounded-3xl p-5 border-2 ${isCompleted ? 'border-brandGreen' : 'border-gray-200'} shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${lesson.bgGrad} text-white flex items-center justify-center text-xl">
+                                    <i class="fa-solid ${lesson.icon}"></i>
+                                </div>
+                                ${isCompleted ? 
+                                    `<span class="bg-green-100 text-brandGreen text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-circle-check"></i> Superada
+                                    </span>` : 
+                                    `<span class="bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-bold">
+                                        Pendiente
+                                    </span>`
+                                }
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-lg text-gray-800">${lesson.title}</h4>
+                                <p class="text-xs text-gray-400 mt-1">${lesson.desc}</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100 text-xs text-gray-500">
+                                <strong class="text-gray-700">Vocabulario:</strong> ${wordsListText}
+                            </div>
+                        </div>
+                        <button onclick="startLesson(${lesson.id})" class="w-full mt-5 py-3 ${isCompleted ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-brandGreen hover:bg-green-700 text-white shadow-lg shadow-green-100'} rounded-2xl font-bold transition text-sm">
+                            ${isCompleted ? 'Volver a repasar' : 'Comenzar lección'}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // RENDERIZAR VOCABULARIO COMPLETO
+        function renderDictionary() {
+            const grid = document.getElementById('dictionary-grid');
+            grid.innerHTML = '';
+
+            videosData.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-400 font-semibold uppercase">${item.idioma}</span>
+                            <h4 class="font-bold text-lg text-brandGreen mt-1">${item.palabra}</h4>
+                            <p class="text-xs text-gray-500 mt-1 line-clamp-3">${item.descripcion}</p>
+                        </div>
+                        <button onclick="previewDictionaryWord('${item.palabra}')" class="mt-4 w-full py-2 bg-green-50 text-brandGreen font-bold rounded-xl text-xs hover:bg-green-100 transition">
+                            <i class="fa-solid fa-play mr-1"></i> Ver Signo
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // PREVISUALIZAR PALABRA DEL GLOSARIO (ABRE LECCIÓN EN MODO SÓLO LECTURA)
+        function previewDictionaryWord(wordName) {
+            const wordObj = videosData.find(w => w.palabra === wordName);
+            if (!wordObj) return;
+
+            document.getElementById('lesson-screen').classList.remove('hidden');
+            document.getElementById('lesson-lives-container').classList.add('hidden');
+            document.getElementById('lesson-progress-bar').parentElement.classList.add('hidden');
+
+            // Configurar vista de aprendizaje puro
+            document.getElementById('mode-learn-container').classList.remove('hidden');
+            document.getElementById('mode-practice-container').classList.add('hidden');
+            
+            document.getElementById('learn-word-title').innerText = wordObj.palabra;
+            document.getElementById('learn-word-desc').innerText = wordObj.descripcion;
+            
+            const player = document.getElementById('learn-video-player');
+            const source = document.getElementById('learn-video-source');
+            source.src = wordObj.video_url;
+            player.load();
+            player.play();
+
+            // Ocultar placeholders de carga
+            hidePlaceholderErrors();
+
+            const primaryBtn = document.getElementById('lesson-primary-btn');
+            primaryBtn.innerHTML = `<span>Cerrar Vista</span>`;
+            primaryBtn.onclick = function() {
+                exitLesson();
+            };
+        }
+
+        // CONTROL DE ERRORES DEL VÍDEO MP4 (Sino existen en local, se pone aviso lindo)
+        function handleVideoError(videoElement) {
+            const container = videoElement.parentElement;
+            if (container) {
+                const placeholder = container.querySelector('.video-placeholder');
+                if (placeholder) {
+                    placeholder.classList.remove('hidden');
+                }
+            }
+        }
+
+        function hidePlaceholderErrors() {
+            document.querySelectorAll('.video-placeholder').forEach(p => p.classList.add('hidden'));
+        }
+
+        // MOTOR DE LECCIÓN COMPLETO (Estructura de dos fases: aprender seguidas, luego quiz aleatorio)
+        function startLesson(lessonId) {
+            currentLesson = lessonsConfig.find(l => l.id === lessonId);
+            currentQueueIndex = 0;
+            isQuizPhase = false; // Empezamos siempre descubriendo las palabras secuencialmente (V1)
+            currentLessonLives = 3;
+
+            // La cola inicial de aprendizaje es la lista secuencial del bloque
+            lessonWordsQueue = [...currentLesson.words];
+
+            // Restablecer UI de lección
+            document.getElementById('lesson-screen').classList.remove('hidden');
+            document.getElementById('lesson-lives-container').classList.remove('hidden');
+            document.getElementById('lesson-progress-bar').parentElement.classList.remove('hidden');
+            document.getElementById('lesson-lives-count').innerText = currentLessonLives;
+
+            updateLessonProgress();
+            loadStepData();
+        }
+
+        function updateLessonProgress() {
+            // El progreso mide los pasos completados del total de palabras x 2 (aprender + practicar)
+            const totalSteps = currentLesson.words.length * 2;
+            const currentStep = isQuizPhase ? (currentLesson.words.length + currentQueueIndex) : currentQueueIndex;
+            const percentage = (currentStep / totalSteps) * 100;
+            document.getElementById('lesson-progress-bar').style.width = `${percentage}%`;
+        }
+
+        function loadStepData() {
+            const wordName = lessonWordsQueue[currentQueueIndex];
+            const wordObj = videosData.find(w => w.palabra.toLowerCase() === wordName.toLowerCase());
+            
+            if (!wordObj) {
+                showToast("Fallo en la base de datos de la palabra: " + wordName, "error");
+                return;
+            }
+
+            hidePlaceholderErrors();
+
+            if (!isQuizPhase) {
+                // VERSIÓN 1: MODO APRENDER / DESCUBRIR (Secuencial una detrás de otra)
+                document.getElementById('mode-learn-container').classList.remove('hidden');
+                document.getElementById('mode-practice-container').classList.add('hidden');
+
+                document.getElementById('learn-word-title').innerText = wordObj.palabra;
+                document.getElementById('learn-word-desc').innerText = wordObj.descripcion;
+
+                const player = document.getElementById('learn-video-player');
+                const source = document.getElementById('learn-video-source');
+                source.src = wordObj.video_url;
+                player.load();
+                player.play();
+
+                // Botón de seguir adelante
+                const primaryBtn = document.getElementById('lesson-primary-btn');
+                primaryBtn.disabled = false;
+
+                const isLastLearn = (currentQueueIndex === lessonWordsQueue.length - 1);
+                if (isLastLearn) {
+                    primaryBtn.innerHTML = `<span>Empezar Cuestionario</span> <i class="fa-solid fa-gamepad"></i>`;
+                } else {
+                    primaryBtn.innerHTML = `<span>Siguiente Palabra</span> <i class="fa-solid fa-arrow-right"></i>`;
+                }
+                primaryBtn.className = "w-full sm:w-auto px-10 py-4 bg-brandGreen text-white font-bold text-lg rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-100 flex items-center justify-center space-x-2";
+            } else {
+                // VERSIÓN 2: MODO PRÁCTICA / EXAMEN (Cuestionario Aleatorio)
+                document.getElementById('mode-learn-container').classList.add('hidden');
+                document.getElementById('mode-practice-container').classList.remove('hidden');
+
+                // Reproducir el vídeo del signo inmediatamente
+                const practicePlayer = document.getElementById('practice-video-player');
+                const practiceSource = document.getElementById('practice-video-source');
+                practiceSource.src = wordObj.video_url;
+                practicePlayer.load();
+                practicePlayer.play();
+
+                // Generar alternativas de examen para elegir
+                generateQuizOptions(wordObj.palabra);
+
+                const primaryBtn = document.getElementById('lesson-primary-btn');
+                primaryBtn.innerHTML = `<span>Comprobar respuesta</span> <i class="fa-solid fa-circle-question"></i>`;
+                primaryBtn.className = "w-full sm:w-auto px-10 py-4 bg-gray-300 text-gray-500 font-bold text-lg rounded-2xl transition flex items-center justify-center space-x-2";
+                primaryBtn.disabled = true;
+            }
+        }
+
+        // GENERADOR DE PREGUNTAS OPCIÓN MÚLTIPLE (ADIVINAR PALABRA EN BASE AL SIGNO)
+        function generateQuizOptions(correctWord) {
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = '';
+            quizSelectedAnswer = null;
+
+            // Conseguir distractores erróneos de la misma base de datos
+            let pool = videosData.map(w => w.palabra).filter(p => p.toLowerCase() !== correctWord.toLowerCase());
+            pool = pool.sort(() => 0.5 - Math.random()).slice(0, 3); // Coger 3 aleatorios
+
+            // Añadir respuesta correcta y barajar
+            const options = [...pool, correctWord].sort(() => 0.5 - Math.random());
+
+            options.forEach((opt, index) => {
+                const charCode = String.fromCharCode(65 + index); // A, B, C, D
+                container.innerHTML += `
+                    <button onclick="selectQuizOption('${opt}', this)" class="quiz-opt-btn w-full p-4 bg-white border-2 border-gray-200 rounded-2xl font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition flex items-center space-x-4">
+                        <span class="w-8 h-8 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-xs uppercase border border-gray-200">${charCode}</span>
+                        <span class="text-base flex-1 text-left">${opt}</span>
+                    </button>
+                `;
+            });
+        }
+
+        function selectQuizOption(word, element) {
+            quizSelectedAnswer = word;
+
+            // Limpiar selección previa
+            document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
+                btn.classList.remove('border-brandGreen', 'bg-green-50');
+                btn.classList.add('border-gray-200', 'bg-white');
+            });
+
+            // Seleccionar elemento
+            element.classList.remove('border-gray-200', 'bg-white');
+            element.classList.add('border-brandGreen', 'bg-green-50');
+
+            // Habilitar botón de comprobar
+            const primaryBtn = document.getElementById('lesson-primary-btn');
+            primaryBtn.disabled = false;
+            primaryBtn.className = "w-full sm:w-auto px-10 py-4 bg-brandGreen text-white font-bold text-lg rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-100 flex items-center justify-center space-x-2 cursor-pointer";
+        }
+
+        // ACCIÓN DEL BOTÓN PRINCIPAL (FLUJO DUOLINGO)
+        function handlePrimaryAction() {
+            if (!isQuizPhase) {
+                // Estamos en la Fase de Descubrimiento (secuencial)
+                currentQueueIndex++;
+                if (currentQueueIndex < lessonWordsQueue.length) {
+                    updateLessonProgress();
+                    loadStepData();
+                } else {
+                    // ¡Hemos terminado de ver todas las palabras secuencialmente!
+                    // Generamos una cola aleatoria mezclada (shuffled) para la Fase de Cuestionario
+                    lessonWordsQueue = [...currentLesson.words].sort(() => 0.5 - Math.random());
+                    currentQueueIndex = 0;
+                    isQuizPhase = true; // Cambiamos la fase
+
+                    showToast("¡Fase de aprendizaje completada! Comienza el cuestionario aleatorio ⚡", "success");
+                    updateLessonProgress();
+                    loadStepData();
+                }
+            } else {
+                // Estamos en la Fase de Cuestionario
+                const wordName = lessonWordsQueue[currentQueueIndex];
+                const primaryBtn = document.getElementById('lesson-primary-btn');
+
+                // Si ya estamos comprobando el resultado (estado del botón) - Pasa al siguiente paso del Quiz
+                if (primaryBtn.innerHTML.includes("Continuar") || primaryBtn.innerHTML.includes("Siguiente")) {
+                    currentQueueIndex++;
+                    if (currentQueueIndex < lessonWordsQueue.length) {
+                        updateLessonProgress();
+                        loadStepData();
+                    } else {
+                        // ¡Fin del cuestionario con éxito! Desbloquear cofre
+                        triggerLessonSuccess();
+                    }
+                    return;
+                }
+
+                // Ejecutar validación de respuesta
+                const isCorrect = quizSelectedAnswer.toLowerCase() === wordName.toLowerCase();
+
+                // Cambiar el diseño de los botones según resultado
+                document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
+                    const textSpan = btn.querySelector('span:nth-child(2)').innerText;
+                    if (textSpan.toLowerCase() === wordName.toLowerCase()) {
+                        btn.classList.add('border-green-500', 'bg-green-50');
+                    } else if (textSpan === quizSelectedAnswer && !isCorrect) {
+                        btn.classList.add('border-red-500', 'bg-red-50');
+                    }
+                    btn.disabled = true; // Desactivar clics
+                });
+
+                if (isCorrect) {
+                    playSound('correct');
+                    showToast("¡Buen trabajo! Respuesta Correcta 🎉", "success");
+                    primaryBtn.innerHTML = `<span>Siguiente Pregunta</span> <i class="fa-solid fa-arrow-right"></i>`;
+                } else {
+                    playSound('wrong');
+                    currentLessonLives--;
+                    document.getElementById('lesson-lives-count').innerText = currentLessonLives;
+                    showToast("¡Incorrecto! No pasa nada, sigue practicando. 💪", "error");
+
+                    if (currentLessonLives <= 0) {
+                        showToast("Te has quedado sin intentos. ¡Inténtalo de nuevo!", "error");
+                        setTimeout(() => exitLesson(), 2000);
+                        return;
+                    }
+
+                    primaryBtn.innerHTML = `<span>Continuar</span> <i class="fa-solid fa-arrow-right"></i>`;
+                }
+            }
+        }
+
+        // FINALIZAR LECCIÓN CON ÉXITO
+        function triggerLessonSuccess() {
+            // Detener vídeo por precaución
+            document.getElementById('learn-video-player').pause();
+            document.getElementById('practice-video-player').pause();
+
+            // Guardar progreso en el estado de la aplicación
+            if (!appState.completedLessons.includes(currentLesson.id)) {
+                appState.completedLessons.push(currentLesson.id);
+            }
+
+            // Gestionar racha diaria
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (appState.lastActiveDate !== todayStr) {
+                appState.streak++;
+                appState.lastActiveDate = todayStr;
+            }
+
+            saveProgress();
+            renderDashboard();
+
+            // Abrir Modal de Recompensa de Cofre
+            openChestModal();
+        }
+
+        // MODAL DE COFRE RECOMPENSA
+        function openChestModal() {
+            // Ocultar ventana de lección
+            document.getElementById('lesson-screen').classList.add('hidden');
+
+            document.getElementById('chest-modal').classList.remove('hidden');
+            
+            // Restablecer cofre
+            document.getElementById('coffer-icon-open').style.display = 'none';
+            document.getElementById('coffer-icon-closed').style.display = 'block';
+            document.getElementById('coffer-loot').classList.add('hidden');
+            document.getElementById('chest-close-btn').disabled = true;
+        }
+
+        function openCoffer() {
+            // Sonido de victoria / apertura
+            playSound('level-up');
+
+            document.getElementById('coffer-icon-closed').style.display = 'none';
+            document.getElementById('coffer-icon-open').style.display = 'block';
+
+            // Generar botín aleatorio para motivar
+            const rewardedXP = 50; 
+            const rewardedGems = Math.floor(Math.random() * 15) + 10; // entre 10 y 25 gemas
+
+            document.getElementById('loot-gems').innerText = rewardedGems;
+            document.getElementById('loot-xp').innerText = rewardedXP;
+
+            document.getElementById('coffer-loot').classList.remove('hidden');
+            document.getElementById('chest-close-btn').disabled = false;
+
+            // Actualizar datos en backend local
+            appState.xp += rewardedXP;
+            appState.gems += rewardedGems;
+            saveProgress();
+        }
+
+        function closeChestModal() {
+            document.getElementById('chest-modal').classList.add('hidden');
+            switchTab('dashboard');
+        }
+
+        function exitLesson() {
+            document.getElementById('learn-video-player').pause();
+            document.getElementById('practice-video-player').pause();
+            document.getElementById('lesson-screen').classList.add('hidden');
+        }
+
+        // RESETEAR PROGRESO COMPLETO
+        function confirmResetProgress() {
+            document.getElementById('reset-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-confirm-modal').classList.add('hidden');
+        }
+
+        // RESETEAR PROGRESO COMPLETO
+        function resetAllProgress() {
+            appState = {
+                streak: 0,
+                gems: 15,
+                xp: 0,
+                level: 1,
+                completedLessons: [],
+                lastActiveDate: null
+            };
+            saveProgress();
+            renderDashboard();
+            renderDictionary();
+            closeResetModal();
+            showToast("Progreso borrado correctamente. ¡Vuelta a empezar!", "success");
+        }
+
+        // TOAST NOTIFICACIONES
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast-notification');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.innerText = message;
+            if (type === "success") {
+                icon.className = "fa-solid fa-circle-check text-green-400";
+            } else {
+                icon.className = "fa-solid fa-triangle-exclamation text-red-400";
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

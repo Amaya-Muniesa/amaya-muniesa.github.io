@@ -1,0 +1,122 @@
+[
+    {
+        "palabra": "Hola",
+        "idioma": "es",
+        "video_url": "./videos/hola.mp4",
+        "descripcion": "Un saludo amistoso en español. También de despedida, como 'adiós' o 'hasta luego'."
+    },
+    {
+        "palabra": "Por favor",
+        "idioma": "es",
+        "video_url": "./videos/por-favor.mp4",
+        "descripcion": "Una expresión de cortesía en español para pedir algo."
+    },
+    {
+        "palabra": "Gracias",
+        "idioma": "es",
+        "video_url": "./videos/gracias.mp4",
+        "descripcion": "Una expresión de agradecimiento en español."
+    },
+    {
+        "palabra": "De nada",
+        "idioma": "es",
+        "video_url": "./videos/de-nada.mp4",
+        "descripcion": "Una expresión de cortesía en español para responder a un agradecimiento."
+    },
+    {
+        "palabra": "Nombre",
+        "idioma": "es",
+        "video_url": "./videos/nombre.mp4",
+        "descripcion": "Una forma de preguntar por el nombre de alguien en español."
+    },
+    {
+        "palabra": "Mi nombre es...",
+        "idioma": "es",
+        "video_url": "./videos/mi-nombre-es.mp4",
+        "descripcion": "Una forma de presentarse en español."
+    },
+    {
+        "palabra": "Yo",
+        "idioma": "es",
+        "video_url": "./videos/yo.mp4",
+        "descripcion": "Una forma de expresar el sujeto en español."
+    },
+    {
+        "palabra": "Tú",
+        "idioma": "es",
+        "video_url": "./videos/tu.mp4",
+        "descripcion": "Una forma de expresar el sujeto en español."
+    },
+    {
+        "palabra": "Familia",
+        "idioma": "es",
+        "video_url": "./videos/familia.mp4",
+        "descripcion": "Una palabra que se refiere a un grupo de personas relacionadas por parentesco en español."
+    },
+    {
+        "palabra": "amigo",
+        "idioma": "es",
+        "video_url": "./videos/amigo.mp4",
+        "descripcion": "Una palabra que se refiere a una persona con la que se tiene una relación de amistad en español."
+    },
+    {
+        "palabra": "Ayuda",
+        "idioma": "es",
+        "video_url": "./videos/ayuda.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de ayudar a alguien en español."
+    },
+    {
+        "palabra": "Comer",
+        "idioma": "es",
+        "video_url": "./videos/comer.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de consumir alimentos en español."
+    },
+    {
+        "palabra": "Beber",
+        "idioma": "es",
+        "video_url": "./videos/beber.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de consumir líquidos en español."
+    },
+    {
+        "palabra": "Baño",
+        "idioma": "es",
+        "video_url": "./videos/baño.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de lavarse o bañarse en español."
+    },
+    {
+        "palabra": "Querer",
+        "idioma": "es",
+        "video_url": "./videos/querer.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de tener afecto o interés por alguien o algo en español."
+    },
+    {
+        "palabra": "Sí",
+        "idioma": "es",
+        "video_url": "./videos/si.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de confirmar o aceptar algo en español."
+    },
+    {
+        "palabra": "No",
+        "idioma": "es",
+        "video_url": "./videos/no.mp4",
+        "descripcion": "Una palabra que se refiere a la acción de negar o rechazar algo en español."
+    },
+    {
+        "palabra": "Bien",
+        "idioma": "es",
+        "video_url": "./videos/bien.mp4",
+        "descripcion": "Una respuesta positiva a la pregunta '¿Cómo estás?' en español."
+    },
+    {
+        "palabra": "Mal",
+        "idioma": "es",
+        "video_url": "./videos/mal.mp4",
+        "descripcion": "Una respuesta negativa a la pregunta '¿Cómo estás?' en español."
+    },
+    {
+        "palabra": "No entiendo",
+        "idioma": "es",
+        "video_url": "./videos/no-entiendo.mp4",
+        "descripcion": "Una forma de expresar que no se comprende algo en español."
+    }
+]
