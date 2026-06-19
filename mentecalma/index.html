@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MenteCalma - Apoyo TLP y Regulación Emocional</title>
+
+    <!-- Tailwind CSS para el diseño premium y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Iconos FontAwesome para elementos visuales y amigables -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts - Tipografía suave, moderna y legible -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f6f8fb;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Animación de pulsación para el ejercicio de respiración */
+        @keyframes breatheIn {
+            0% {
+                transform: scale(1);
+                background-color: rgba(224, 242, 254, 0.8);
+            }
+
+            100% {
+                transform: scale(1.4);
+                background-color: rgba(186, 230, 253, 0.9);
+            }
+        }
+
+        @keyframes breatheOut {
+            0% {
+                transform: scale(1.4);
+                background-color: rgba(186, 230, 253, 0.9);
+            }
+
+            100% {
+                transform: scale(1);
+                background-color: rgba(240, 253, 244, 0.8);
+            }
+        }
+
+        .breathing-circle.inhale {
+            animation: breatheIn 4s forwards cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .breathing-circle.hold {
+            transform: scale(1.4);
+            background-color: rgba(233, 213, 255, 0.9);
+        }
+
+        .breathing-circle.exhale {
+            animation: breatheOut 8s forwards cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Estilos personalizados para las barras de rango */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -6px;
+            background-color: var(--theme-accent, #6366f1);
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Animación de Confeti de Celebración */
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f59e0b;
+            animation: confettiFall 4s linear infinite;
+        }
+
+        /* Temas Dinámicos del Sistema */
+        body.theme-indigo {
+            --theme-primary: #6366f1;
+            --theme-primary-hover: #4f46e5;
+            --theme-bg-accent: #e0f2fe;
+            --theme-accent: #6366f1;
+        }
+
+        body.theme-emerald {
+            background-color: #f0fdf4;
+            --theme-primary: #10b981;
+            --theme-primary-hover: #059669;
+            --theme-bg-accent: #d1fae5;
+            --theme-accent: #10b981;
+        }
+
+        body.theme-sunset {
+            background-color: #fffbeb;
+            --theme-primary: #f43f5e;
+            --theme-primary-hover: #e11d48;
+            --theme-bg-accent: #ffe4e6;
+            --theme-accent: #f43f5e;
+        }
+
+        body.theme-midnight {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            --theme-primary: #38bdf8;
+            --theme-primary-hover: #0ea5e9;
+            --theme-bg-accent: #1e293b;
+            --theme-accent: #38bdf8;
+        }
+
+        body.theme-midnight .bg-white {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            border-color: #334155;
+        }
+
+        body.theme-midnight .text-slate-900,
+        body.theme-midnight .text-slate-800,
+        body.theme-midnight h1,
+        body.theme-midnight h2,
+        body.theme-midnight h3 {
+            color: #f8fafc;
+        }
+
+        body.theme-midnight .text-slate-600,
+        body.theme-midnight .text-slate-500 {
+            color: #cbd5e1;
+        }
+
+        body.theme-midnight .bg-slate-50 {
+            background-color: #334155;
+        }
+
+        body.theme-midnight header {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.theme-midnight input,
+        body.theme-midnight textarea,
+        body.theme-midnight select {
+            background-color: #334155;
+            color: #f1f5f9;
+            border-color: #475569;
+        }
+
+        body.theme-aurora {
+            background-color: #faf5ff;
+            --theme-primary: #a855f7;
+            --theme-primary-hover: #9333ea;
+            --theme-bg-accent: #f3e8ff;
+            --theme-accent: #a855f7;
+        }
+
+        .accent-bg {
+            background-color: var(--theme-primary) !important;
+        }
+
+        .accent-bg:hover {
+            background-color: var(--theme-primary-hover) !important;
+        }
+
+        .accent-text {
+            color: var(--theme-primary) !important;
+        }
+
+        .accent-border {
+            border-color: var(--theme-primary) !important;
+        }
+
+        .accent-ring:focus {
+            --tw-ring-color: var(--theme-primary) !important;
+        }
+    </style>
+</head>
+
+<body
+    class="theme-indigo text-slate-800 antialiased min-h-screen flex flex-col pb-16 md:pb-0 transition-colors duration-300">
+
+    <!-- Header / Barra Superior -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-100 theme-gradient">
+                    <i class="fa-solid fa-seedling text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight text-slate-900">MenteCalma</span>
+                    <span
+                        class="text-xs block text-indigo-500 font-semibold uppercase tracking-wider theme-accent-text">Tu
+                        refugio DBT</span>
+                </div>
+            </div>
+
+            <!-- Estado de Autenticación / Perfil -->
+            <div class="flex items-center space-x-3" id="auth-status-container">
+                <span class="text-slate-400 text-sm"><i class="fa-solid fa-spinner animate-spin"></i> Cargando...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal (Layout de Dos Columnas en Escritorio) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Barra lateral izquierda (Perfil, Racha y Gamificación) -->
+        <aside class="lg:col-span-3 flex flex-col space-y-6">
+
+            <!-- Card del Perfil & Gamificación -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-6 -mt-6 -z-0 opacity-50">
+                </div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg accent-bg accent-text"
+                            id="user-avatar" style="background-color: rgba(99, 102, 241, 0.1);">
+                            U
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-slate-900" id="user-display-name">Bienvenido</h2>
+                            <div class="flex items-center space-x-1.5">
+                                <span
+                                    class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full accent-bg"
+                                    id="user-level-badge">Nivel 1</span>
+                                <p class="text-xs text-slate-500" id="user-email">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Racha y Puntos (Mecánica de Gamificación) -->
+                    <div class="bg-slate-50 rounded-2xl p-4 grid grid-cols-2 gap-2 mb-4">
+                        <div class="text-center border-r border-slate-200">
+                            <span class="text-xs text-slate-500 block">Racha Actual</span>
+                            <div class="flex items-center justify-center space-x-1 mt-1">
+                                <i class="fa-solid fa-fire text-amber-500 text-lg"></i>
+                                <span class="font-extrabold text-slate-900 text-xl" id="streak-counter">0</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">días seguidos</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-xs text-slate-500 block">Puntos Bienestar</span>
+                            <div class="flex items-center justify-center space-x-1 mt-1">
+                                <i class="fa-solid fa-star text-indigo-500 text-lg accent-text"></i>
+                                <span class="font-extrabold text-slate-900 text-xl" id="xp-counter">0</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">XP acumulados</span>
+                        </div>
+                    </div>
+
+                    <!-- Progreso del Nivel Diario -->
+                    <div class="space-y-1 mb-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Experiencia para Nivel <span
+                                    id="next-level-val">2</span></span>
+                            <span class="text-indigo-600 font-bold accent-text" id="level-progress-txt">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-indigo-500 h-2.5 transition-all duration-500 accent-bg"
+                                id="level-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 text-center italic">Completa tareas para ganar XP y desbloquear
+                        temas y citas.</p>
+                </div>
+            </div>
+
+            <!-- Botón de SOS Inmediato (Destacado) -->
+            <button onclick="switchTab('sos')"
+                class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-6 rounded-3xl transition duration-300 shadow-lg shadow-rose-100 flex items-center justify-center space-x-3 transform active:scale-98">
+                <span class="relative flex h-3 w-3">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
+                <span>🆘 CRISIS: ALIVIO INMEDIATO</span>
+            </button>
+
+            <!-- Menú de Navegación Lateral (Para Desktop) -->
+            <nav class="hidden lg:flex flex-col space-y-1 bg-white rounded-3xl p-4 border border-slate-100 shadow-xs">
+                <button onclick="switchTab('inicio')"
+                    class="nav-btn active flex items-center space-x-3 px-4 py-3 rounded-2xl text-left text-sm font-semibold transition"
+                    id="nav-inicio">
+                    <i class="fa-solid fa-house w-5"></i>
+                    <span>Inicio / Mente Sabia</span>
+                </button>
+                <button onclick="switchTab('diario')"
+                    class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-2xl text-left text-sm font-semibold transition"
+                    id="nav-diario">
+                    <i class="fa-solid fa-book-open w-5"></i>
+                    <span>Diario de Ánimo</span>
+                </button>
+                <button onclick="switchTab('recompensas')"
+                    class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-2xl text-left text-sm font-semibold transition"
+                    id="nav-recompensas">
+                    <i class="fa-solid fa-gift w-5 text-amber-500"></i>
+                    <span class="flex items-center justify-between w-full">
+                        <span>Premios y Temas</span>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                            id="rewards-count-badge">0</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('sos')"
+                    class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-2xl text-left text-sm font-semibold transition"
+                    id="nav-sos">
+                    <i class="fa-solid fa-kit-medical w-5"></i>
+                    <span>Kit de Emergencia (TIPP)</span>
+                </button>
+                <button onclick="switchTab('habilidades')"
+                    class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-2xl text-left text-sm font-semibold transition"
+                    id="nav-habilidades">
+                    <i class="fa-solid fa-brain w-5"></i>
+                    <span>Biblioteca de Habilidades</span>
+                </button>
+            </nav>
+
+        </aside>
+
+        <!-- Contenido Principal Dinámico -->
+        <section class="lg:col-span-9 flex flex-col space-y-6">
+
+            <!-- Mensaje informativo cuando está en modo Sandbox sin loguear -->
+            <div id="sandbox-warning"
+                class="hidden bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start space-x-3">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1"></i>
+                <div class="text-sm text-amber-800">
+                    <p class="font-bold">Modo local sin conexión activa</p>
+                    <p class="text-xs text-amber-700">Por seguridad o restricciones de iframe, estás utilizando la app
+                        en modo local. Puedes seguir sumando experiencia e interactuando normalmente.</p>
+                </div>
+            </div>
+
+            <!-- NOTIFICACIÓN / MENSAJE FLOTANTE PARA EVITAR ALERT() -->
+            <div id="toast-message"
+                class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-xl z-50 flex items-center space-x-2 transition duration-300">
+                <i class="fa-solid fa-circle-check text-indigo-400" id="toast-icon"></i>
+                <span class="text-sm font-medium" id="toast-text">¡Guardado con éxito!</span>
+            </div>
+
+            <!-- MODAL DE FELICITACIONES POR SUBIDA DE NIVEL -->
+            <div id="level-up-modal"
+                class="hidden fixed inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                <div
+                    class="bg-white rounded-3xl max-w-md w-full p-8 text-center relative overflow-hidden shadow-2xl transform scale-95 transition-all">
+                    <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
+                    <div
+                        class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 animate-bounce">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-slate-900 mb-2">¡Nivel Superado!</h3>
+                    <p class="text-sm text-slate-600 mb-6">Has alcanzado el <strong class="text-indigo-600 accent-text"
+                            id="modal-level-num">Nivel 2</strong> de MenteCalma. Tu esfuerzo en el autocuidado diario
+                        está dando sus frutos.</p>
+
+                    <div class="bg-indigo-50/50 rounded-2xl p-4 mb-6 border border-indigo-100 text-left space-y-2">
+                        <h4 class="font-bold text-xs text-indigo-800 uppercase tracking-wider"><i
+                                class="fa-solid fa-gift mr-1"></i> Desbloqueado en este nivel:</h4>
+                        <ul class="text-xs text-slate-700 space-y-1" id="unlocked-items-list">
+                            <!-- Se rellenará dinámicamente -->
+                        </ul>
+                    </div>
+
+                    <button onclick="closeLevelUpModal()"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-2xl transition duration-200 accent-bg text-sm">
+                        ¡Estupendo! Continuar
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: INICIO / DASHBOARD -->
+            <div id="tab-inicio" class="tab-content flex flex-col space-y-6">
+
+                <!-- Tarjeta de Bienvenida & Semáforo Emocional -->
+                <div
+                    class="bg-gradient-to-tr from-indigo-500 via-indigo-600 to-purple-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden theme-gradient accent-bg">
+                    <div class="absolute right-0 bottom-0 transform translate-y-6 translate-x-6 opacity-10">
+                        <i class="fa-solid fa-seedling text-[200px]"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold mb-2">¿Cómo se siente tu clima interno hoy?</h1>
+                    <p class="text-indigo-100 text-sm max-w-2xl mb-6">El semáforo de crisis te ayuda a identificar
+                        rápidamente qué herramientas usar según tu nivel actual de tensión emocional.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Verde: Estable -->
+                        <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-4 transition cursor-pointer border border-white/10 flex flex-col justify-between"
+                            onclick="switchTab('habilidades')">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span
+                                        class="w-3.5 h-3.5 bg-emerald-400 rounded-full ring-4 ring-emerald-400/20"></span>
+                                    <span class="font-bold text-sm">Verde: Estable</span>
+                                </div>
+                                <p class="text-xs text-indigo-100 leading-relaxed">Te sientes controlado. Es el momento
+                                    óptimo para practicar nuevas habilidades DBT y escribir tus pensamientos.</p>
+                            </div>
+                            <span class="text-[11px] text-emerald-200 mt-4 block font-semibold">Ir a habilidades <i
+                                    class="fa-solid fa-arrow-right ml-1"></i></span>
+                        </div>
+
+                        <!-- Amarillo: Alerta -->
+                        <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-4 transition cursor-pointer border border-white/10 flex flex-col justify-between"
+                            onclick="switchTab('diario')">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="w-3.5 h-3.5 bg-amber-400 rounded-full ring-4 ring-amber-400/20"></span>
+                                    <span class="font-bold text-sm">Amarillo: Tensión</span>
+                                </div>
+                                <p class="text-xs text-indigo-100 leading-relaxed">Sientes agitación u obsesión. Usa el
+                                    método STOP o la técnica ACCEPTS de distracción para no perder el control.</p>
+                            </div>
+                            <span class="text-[11px] text-amber-200 mt-4 block font-semibold">Registrar malestar <i
+                                    class="fa-solid fa-arrow-right ml-1"></i></span>
+                        </div>
+
+                        <!-- Rojo: Emergencia -->
+                        <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-4 transition cursor-pointer border border-white/10 flex flex-col justify-between"
+                            onclick="switchTab('sos')">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="w-3.5 h-3.5 bg-rose-400 rounded-full ring-4 ring-rose-400/20"></span>
+                                    <span class="font-bold text-sm">Rojo: Crisis Aguda</span>
+                                </div>
+                                <p class="text-xs text-indigo-100 leading-relaxed">Desborde o impulsos destructivos. Ve
+                                    directo a las habilidades TIPP: frío en la cara o respiración guiada de emergencia.
+                                </p>
+                            </div>
+                            <span class="text-[11px] text-rose-200 mt-4 block font-semibold">Kit de Crisis <i
+                                    class="fa-solid fa-arrow-right ml-1"></i></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Habilidad del Día -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-compass text-indigo-500 text-lg accent-text"></i>
+                            <h2 class="font-bold text-slate-900 text-lg">Habilidad de Hoy</h2>
+                        </div>
+                        <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full accent-text"
+                            style="background-color: rgba(99, 102, 241, 0.1);">Recomendado</span>
+                    </div>
+
+                    <div
+                        class="bg-slate-50 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="max-w-xl">
+                            <h3 class="font-extrabold text-slate-900 text-md mb-1">Aceptación Radical (Mente Sabia)</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Significa aceptar la realidad tal y como
+                                es en este preciso momento, sin juicios y sin resistencia. Detener la lucha contra lo
+                                inalterable evita que el dolor natural se multiplique en sufrimiento crónico.</p>
+                        </div>
+                        <div>
+                            <button onclick="markSkillPracticed('Aceptación Radical')"
+                                class="whitespace-nowrap bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2 w-full md:w-auto accent-text"
+                                style="background-color: rgba(99, 102, 241, 0.1);">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Practicado Hoy (+20 XP)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logros Desbloqueados (Gamificación) -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <h2 class="font-bold text-slate-900 text-lg mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        <span>Tus Logros de Autocuidado</span>
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="badges-container">
+                        <div class="bg-slate-50 rounded-2xl p-4 text-center opacity-40 transition border border-dashed"
+                            id="badge-prime">
+                            <div
+                                class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center mb-2 text-lg">
+                                <i class="fa-solid fa-feather"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-800">Primer Respiro</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Completa una sesión de respiración 4-7-8.</p>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl p-4 text-center opacity-40 transition border border-dashed"
+                            id="badge-mood">
+                            <div
+                                class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center mb-2 text-lg">
+                                <i class="fa-solid fa-journal-whills"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-800">Mente Abierta</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Registra tu ánimo en el diario por primera vez.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl p-4 text-center opacity-40 transition border border-dashed"
+                            id="badge-streak">
+                            <div
+                                class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center mb-2 text-lg">
+                                <i class="fa-solid fa-fire"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-800">Hábito de Hierro</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Consigue una racha diaria de 3 días.</p>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl p-4 text-center opacity-40 transition border border-dashed"
+                            id="badge-master">
+                            <div
+                                class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 mx-auto flex items-center justify-center mb-2 text-lg">
+                                <i class="fa-solid fa-seedling"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-800">Sabiduría Interior</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Acumula más de 100 puntos de Bienestar.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: DIARIO DE ÁNIMO -->
+            <div id="tab-diario" class="tab-content hidden flex flex-col space-y-6">
+
+                <!-- Formulario del Diario -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fa-solid fa-pen-fancy text-indigo-500 text-lg accent-text"></i>
+                        <h2 class="font-bold text-slate-900 text-lg">Nuevo Registro de Ánimo</h2>
+                    </div>
+
+                    <form id="mood-form" onsubmit="saveMoodLog(event)" class="space-y-6">
+
+                        <!-- Sliders de Estado Emocional -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                            <!-- Nivel de Tensión -->
+                            <div class="bg-rose-50/50 border border-rose-100/50 rounded-2xl p-4 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-rose-700 flex items-center"><i
+                                            class="fa-solid fa-gauge-high mr-1"></i> Tensión / Estrés</span>
+                                    <span id="val-tension"
+                                        class="text-sm font-extrabold text-rose-700 bg-white px-2 py-0.5 rounded-full border border-rose-100">5</span>
+                                </div>
+                                <input type="range" id="input-tension" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-tension').innerText = this.value"
+                                    class="w-full">
+                                <div class="flex justify-between text-[10px] text-rose-600">
+                                    <span>Tranquilo (1)</span>
+                                    <span>Crisis Total (10)</span>
+                                </div>
+                            </div>
+
+                            <!-- Estado de Ánimo -->
+                            <div class="bg-indigo-50/50 border border-indigo-100/50 rounded-2xl p-4 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-indigo-700 flex items-center"><i
+                                            class="fa-solid fa-face-smile mr-1"></i> Estado de Ánimo</span>
+                                    <span id="val-mood"
+                                        class="text-sm font-extrabold text-indigo-700 bg-white px-2 py-0.5 rounded-full border border-indigo-100">5</span>
+                                </div>
+                                <input type="range" id="input-mood" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-mood').innerText = this.value" class="w-full">
+                                <div class="flex justify-between text-[10px] text-indigo-600">
+                                    <span>Triste/Vacío (1)</span>
+                                    <span>Eufórico/Feliz (10)</span>
+                                </div>
+                            </div>
+
+                            <!-- Energía / Vitalidad -->
+                            <div class="bg-emerald-50/50 border border-emerald-100/50 rounded-2xl p-4 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-emerald-700 flex items-center"><i
+                                            class="fa-solid fa-bolt mr-1"></i> Nivel de Energía</span>
+                                    <span id="val-energy"
+                                        class="text-sm font-extrabold text-emerald-700 bg-white px-2 py-0.5 rounded-full border border-emerald-100">5</span>
+                                </div>
+                                <input type="range" id="input-energy" min="1" max="10" value="5"
+                                    oninput="document.getElementById('val-energy').innerText = this.value"
+                                    class="w-full">
+                                <div class="flex justify-between text-[10px] text-emerald-600">
+                                    <span>Sin fuerzas (1)</span>
+                                    <span>Muy activo (10)</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Detonantes / Triggers -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">¿Cuál es
+                                el posible detonante (Trigger)?</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="trigger" value="Relación Social" class="sr-only peer">
+                                    <span
+                                        class="inline-block px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 transition">💬
+                                        Discusión / Vínculo</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="trigger" value="Estrés Académico/Laboral"
+                                        class="sr-only peer">
+                                    <span
+                                        class="inline-block px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 transition">💼
+                                        Trabajo / Estudio</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="trigger" value="Pensamientos Rumiativos"
+                                        class="sr-only peer" checked>
+                                    <span
+                                        class="inline-block px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 transition">🧠
+                                        Pensamientos repetitivos</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="trigger" value="Falta de Sueño / Cansancio"
+                                        class="sr-only peer">
+                                    <span
+                                        class="inline-block px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 peer-checked:bg-indigo-50 peer-checked:border-indigo-500 peer-checked:text-indigo-700 transition">😴
+                                        Sueño / Malestar físico</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Notas / Pensamientos -->
+                        <div class="space-y-1">
+                            <label for="input-notes"
+                                class="block text-xs font-bold uppercase text-slate-500 tracking-wider">Describe tus
+                                pensamientos sin juzgarlos</label>
+                            <textarea id="input-notes" rows="3"
+                                placeholder="Ej. 'Siento miedo a que mi amigo no me responda hoy, pero reconozco que esto puede ser un pensamiento automático...'"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-800 focus:ring-2 focus:ring-indigo-400 focus:outline-none focus:ring-offset-2"></textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl transition duration-200 text-xs shadow-md shadow-indigo-100 flex items-center space-x-2 accent-bg">
+                                <i class="fa-solid fa-save"></i>
+                                <span>Guardar Registro Diario (+15 XP)</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Historial de Registros -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <h2 class="font-bold text-slate-900 text-lg mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-history"></i>
+                        <span>Tus Registros Anteriores</span>
+                    </h2>
+
+                    <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2" id="mood-history-list">
+                        <p class="text-xs text-slate-400 text-center py-6">No hay registros guardados todavía. Completa
+                            el formulario de arriba.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: PREMIOS Y ASPECTOS (RECOMPENSAS) -->
+            <div id="tab-recompensas" class="tab-content hidden flex flex-col space-y-6">
+
+                <!-- Tarjeta de Progreso -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-md shadow-amber-100">
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-slate-900 text-lg">Centro de Recompensas</h2>
+                            <p class="text-xs text-slate-500">Sube de nivel para cambiar el diseño de la aplicación y
+                                desbloquear citas de apoyo.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="space-y-2">
+                            <span class="text-xs text-indigo-600 font-extrabold uppercase tracking-wider accent-text"
+                                id="user-current-level-lbl">Nivel actual: 1</span>
+                            <h3 class="text-xl font-extrabold text-slate-900" id="user-xp-status">0 / 100 XP</h3>
+                            <p class="text-xs text-slate-500 max-w-md">Cada actividad diaria, sesión de respiración o
+                                meditación DBT te otorga puntos. ¡Completa tu camino de sanación!</p>
+                        </div>
+
+                        <div class="w-32 h-32 relative shrink-0">
+                            <!-- Círculo de Progreso SVG -->
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="64" cy="64" r="50" class="stroke-slate-200" stroke-width="8"
+                                    fill="transparent" />
+                                <circle id="svg-progress-circle" cx="64" cy="64" r="50"
+                                    class="stroke-indigo-500 transition-all duration-500" stroke-width="8"
+                                    fill="transparent" stroke-dasharray="314.16" stroke-dashoffset="314.16"
+                                    style="stroke: var(--theme-primary);" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                <span class="text-2xl font-black text-slate-900" id="inner-level-lbl">N1</span>
+                                <span class="text-[9px] text-slate-400 uppercase tracking-wider">Progreso</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventario de Aspectos / Temas Visuales -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <h3 class="font-bold text-slate-900 text-md mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-palette text-indigo-500 accent-text"></i>
+                        <span>Aspectos para la Web (Personaliza tu espacio)</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="themes-grid">
+
+                        <!-- Tema 1 (Nivel 1): Refugio Índigo -->
+                        <div
+                            class="border border-slate-100 rounded-2xl p-4 flex items-center justify-between bg-slate-50">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-500 ring-2 ring-indigo-200"></div>
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">Refugio Índigo</h4>
+                                    <span
+                                        class="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">Desbloqueado</span>
+                                </div>
+                            </div>
+                            <button onclick="applyWebTheme('indigo', 1)"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition">Activar</button>
+                        </div>
+
+                        <!-- Tema 2 (Nivel 2): Menta Serena -->
+                        <div class="border border-slate-100 rounded-2xl p-4 flex items-center justify-between"
+                            id="theme-card-emerald">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500"></div>
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">Menta Serena</h4>
+                                    <span class="text-[9px] text-slate-400 font-semibold"
+                                        id="theme-lbl-emerald">Desbloquea en Nivel 2</span>
+                                </div>
+                            </div>
+                            <button id="theme-btn-emerald" disabled onclick="applyWebTheme('emerald', 2)"
+                                class="bg-slate-100 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-xl cursor-not-allowed">Bloqueado</button>
+                        </div>
+
+                        <!-- Tema 3 (Nivel 3): Atardecer Cálido -->
+                        <div class="border border-slate-100 rounded-2xl p-4 flex items-center justify-between"
+                            id="theme-card-sunset">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-rose-500"></div>
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">Atardecer Cálido</h4>
+                                    <span class="text-[9px] text-slate-400 font-semibold"
+                                        id="theme-lbl-sunset">Desbloquea en Nivel 3</span>
+                                </div>
+                            </div>
+                            <button id="theme-btn-sunset" disabled onclick="applyWebTheme('sunset', 3)"
+                                class="bg-slate-100 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-xl cursor-not-allowed">Bloqueado</button>
+                        </div>
+
+                        <!-- Tema 4 (Nivel 4): Oasis Nocturno -->
+                        <div class="border border-slate-100 rounded-2xl p-4 flex items-center justify-between"
+                            id="theme-card-midnight">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-800 ring-2 ring-slate-600"></div>
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">Oasis Nocturno</h4>
+                                    <span class="text-[9px] text-slate-400 font-semibold"
+                                        id="theme-lbl-midnight">Desbloquea en Nivel 4</span>
+                                </div>
+                            </div>
+                            <button id="theme-btn-midnight" disabled onclick="applyWebTheme('midnight', 4)"
+                                class="bg-slate-100 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-xl cursor-not-allowed">Bloqueado</button>
+                        </div>
+
+                        <!-- Tema 5 (Nivel 5): Aurora Mística -->
+                        <div class="border border-slate-100 rounded-2xl p-4 flex items-center justify-between"
+                            id="theme-card-aurora">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-500"></div>
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-900">Aurora Mística</h4>
+                                    <span class="text-[9px] text-slate-400 font-semibold"
+                                        id="theme-lbl-aurora">Desbloquea en Nivel 5</span>
+                                </div>
+                            </div>
+                            <button id="theme-btn-aurora" disabled onclick="applyWebTheme('aurora', 5)"
+                                class="bg-slate-100 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-xl cursor-not-allowed">Bloqueado</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Citas de Psicología Desbloqueadas -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <h3 class="font-bold text-slate-900 text-md mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-quote-left text-indigo-500 accent-text"></i>
+                        <span>Citas de Sabiduría Desbloqueadas</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quotes-container">
+                        <!-- Se rellenará dinámicamente según el nivel -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: EMERGENCY SOS KIT (TIPP & RESPIRACIÓN) -->
+            <div id="tab-sos" class="tab-content hidden flex flex-col space-y-6">
+
+                <!-- Alerta de Emergencia Informativa -->
+                <div class="bg-rose-50 border border-rose-100 rounded-3xl p-6 text-rose-900">
+                    <div class="flex items-start space-x-4">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600 text-xl shrink-0">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-extrabold text-lg mb-1">¡Estás a salvo aquí!</h2>
+                            <p class="text-xs text-rose-800 leading-relaxed mb-3">La intensidad emocional es como una
+                                ola: alcanza un punto máximo y luego desciende naturalmente si no reaccionamos con
+                                impulsividad destructiva. Estas técnicas científicas actúan sobre tu sistema autónomo
+                                para calmar la crisis.</p>
+                            <div class="flex items-center space-x-2 text-xs font-semibold text-rose-700">
+                                <span>¿Crisis severa? Teléfono de Emergencia (España): 112 / Teléfono de Ayuda:
+                                    024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guía Interactiva de Respiración 4-7-8 -->
+                <div
+                    class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full accent-bg"></span>
+                            <h3 class="font-extrabold text-slate-900 text-md">Técnica de Respiración 4-7-8</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">Sigue el círculo visual de la derecha para
+                            calmar la hiperventilación y el pánico extremo. Ralentizar la exhalación activa el nervio
+                            vago reduciendo la frecuencia cardíaca.</p>
+                        <div class="space-y-2 text-xs text-slate-500">
+                            <p><strong class="text-slate-800">1. Inhala</strong> por la nariz durante 4 segundos.</p>
+                            <p><strong class="text-slate-800">2. Mantén</strong> el aire en tus pulmones por 7 segundos.
+                            </p>
+                            <p><strong class="text-slate-800">3. Exhala</strong> lentamente por la boca durante 8
+                                segundos.</p>
+                        </div>
+                        <button id="start-breathing-btn" onclick="startBreathingExercise()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl transition duration-200 text-xs shadow-md w-full md:w-auto accent-bg">
+                            <i class="fa-solid fa-play mr-2"></i> Comenzar Ciclo (3 repeticiones)
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl">
+                        <!-- Círculo de respiración con animación -->
+                        <div id="breathing-circle"
+                            class="w-44 h-44 rounded-full bg-indigo-50 flex flex-col items-center justify-center text-center shadow-inner transition-all duration-300 transform breathing-circle">
+                            <span class="text-sm font-extrabold text-slate-800 tracking-wide block"
+                                id="breath-status">Esperando...</span>
+                            <span class="text-3xl font-extrabold text-indigo-600 mt-1 accent-text"
+                                id="breath-timer">--</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Habilidades TIPP -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs">
+                    <h2 class="font-bold text-slate-900 text-lg mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-snowflake text-indigo-500 accent-text"></i>
+                        <span>Técnicas de Alivio TIPP</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <!-- Temperatura -->
+                        <div class="bg-sky-50/50 border border-sky-100 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-droplet text-sky-500"></i>
+                                <h3 class="font-bold text-slate-900 text-sm">T - Temperatura</h3>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Pon tu cara en agua muy fría o sostén
+                                cubitos de hielo en tus manos. El frío extremo estimula el reflejo de inmersión
+                                mamífera, reduciendo la frecuencia cardíaca y desviando la sangre hacia los órganos
+                                vitales, deteniendo el pánico físico.</p>
+                        </div>
+
+                        <!-- Ejercicio Intenso -->
+                        <div class="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-running text-amber-500"></i>
+                                <h3 class="font-bold text-slate-900 text-sm">I - Ejercicio Intenso</h3>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Sube escaleras corriendo, haz flexiones o
+                                salta durante 5-10 minutos. El ejercicio rápido quema el exceso de adrenalina y cortisol
+                                producido por la rabia o angustia, permitiendo que tu cerebro vuelva a enfocar con
+                                calma.</p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: BIBLIOTECA DE HABILIDADES DBT -->
+            <div id="tab-habilidades" class="tab-content hidden flex flex-col space-y-6">
+
+                <!-- Buscador o filtros rápidos -->
+                <div
+                    class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-lg">Biblioteca DBT</h2>
+                        <p class="text-xs text-slate-500">Técnicas basadas en la evidencia científica para navegar
+                            emociones intensas.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="filterSkills('all')"
+                            class="skill-tab-btn active bg-indigo-50 text-indigo-700 text-xs font-semibold px-4 py-2 rounded-xl transition"
+                            id="filter-all">Todas</button>
+                        <button onclick="filterSkills('mindfulness')"
+                            class="skill-tab-btn text-slate-600 text-xs font-semibold px-4 py-2 rounded-xl transition hover:bg-slate-100"
+                            id="filter-mindfulness">Atención Plena</button>
+                        <button onclick="filterSkills('crisis')"
+                            class="skill-tab-btn text-slate-600 text-xs font-semibold px-4 py-2 rounded-xl transition hover:bg-slate-100"
+                            id="filter-crisis">Tolerancia al Dolor</button>
+                    </div>
+                </div>
+
+                <!-- Habilidades Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="skills-grid">
+
+                    <!-- Habilidad: Aceptación Radical -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs flex flex-col justify-between space-y-4 skill-card"
+                        data-category="crisis">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="bg-rose-50 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Tolerancia
+                                    al Malestar</span>
+                                <i class="fa-solid fa-compass text-rose-400"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-900 text-md">Aceptación Radical</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Consiste en reconocer la realidad tal como
+                                es hoy sin añadir sufrimiento o auto-boicot intelectual. Decir "Esto es lo que me pasa
+                                hoy, y está bien así" desarma la culpa compulsiva.</p>
+                        </div>
+                        <button onclick="markSkillPracticed('Aceptación Radical')"
+                            class="w-full bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Marcar como practicado (+20 XP)</span>
+                        </button>
+                    </div>
+
+                    <!-- Habilidad: STOP -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs flex flex-col justify-between space-y-4 skill-card"
+                        data-category="crisis">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="bg-rose-50 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Tolerancia
+                                    al Malestar</span>
+                                <i class="fa-solid fa-hand text-rose-400"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-900 text-md">Técnica STOP</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed"><strong>S</strong> (Para),
+                                <strong>T</strong> (Toma aire), <strong>O</strong> (Observa tus sensaciones corporales),
+                                <strong>P</strong> (Procede con conciencia). Ideal para frenar respuestas impulsivas
+                                inmediatas.
+                            </p>
+                        </div>
+                        <button onclick="markSkillPracticed('Técnica STOP')"
+                            class="w-full bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Marcar como practicado (+20 XP)</span>
+                        </button>
+                    </div>
+
+                    <!-- Habilidad: Mente Sabia -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs flex flex-col justify-between space-y-4 skill-card"
+                        data-category="mindfulness">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Mindfulness</span>
+                                <i class="fa-solid fa-brain text-emerald-400"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-900 text-md">La Mente Sabia</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">El equilibrio perfecto entre la <em>Mente
+                                    Emocional</em> (sentimientos extremos) y la <em>Mente Racional</em> (lógica fría).
+                                Te permite actuar con serenidad y valores propios.</p>
+                        </div>
+                        <button onclick="markSkillPracticed('Mente Sabia')"
+                            class="w-full bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Marcar como practicado (+20 XP)</span>
+                        </button>
+                    </div>
+
+                    <!-- Habilidad: Auto-calma con los 5 Sentidos -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xs flex flex-col justify-between space-y-4 skill-card"
+                        data-category="mindfulness">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Mindfulness</span>
+                                <i class="fa-solid fa-eye text-emerald-400"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-900 text-md">Foco en los 5 Sentidos</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Encuentra en tu habitación 5 cosas que
+                                puedas ver, 4 cosas que oír, 3 que tocar, 2 que oler y 1 que probar. Grounding rápido
+                                contra la disociación.</p>
+                        </div>
+                        <button onclick="markSkillPracticed('Foco en los 5 Sentidos')"
+                            class="w-full bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Marcar como practicado (+20 XP)</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Navegación móvil inferior (Menú flotante para celulares) -->
+    <nav
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-2 flex justify-around items-center z-40 shadow-lg">
+        <button onclick="switchTab('inicio')"
+            class="mobile-nav-btn active flex flex-col items-center text-xs font-semibold text-slate-400 py-1"
+            id="mobile-nav-inicio">
+            <i class="fa-solid fa-house text-lg mb-1"></i>
+            <span>Inicio</span>
+        </button>
+        <button onclick="switchTab('diario')"
+            class="mobile-nav-btn flex flex-col items-center text-xs font-semibold text-slate-400 py-1"
+            id="mobile-nav-diario">
+            <i class="fa-solid fa-book-open text-lg mb-1"></i>
+            <span>Diario</span>
+        </button>
+        <button onclick="switchTab('sos')"
+            class="mobile-nav-btn flex flex-col items-center text-xs font-semibold text-rose-400 py-1"
+            id="mobile-nav-sos">
+            <i class="fa-solid fa-kit-medical text-lg mb-1"></i>
+            <span>Alivio</span>
+        </button>
+        <button onclick="switchTab('habilidades')"
+            class="mobile-nav-btn flex flex-col items-center text-xs font-semibold text-slate-400 py-1"
+            id="mobile-nav-habilidades">
+            <i class="fa-solid fa-brain text-lg mb-1"></i>
+            <span>DBT</span>
+        </button>
+    </nav>
+
+    <!-- Scripts e importaciones Firebase SDK (v11 de Firebase) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Credenciales de Firebase de la app web
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzsAMI0IiWiDUpcyCDgldDc9Kzu4L8I34",
+            authDomain: "tlp-app-c166c.firebaseapp.com",
+            databaseURL: "https://tlp-app-c166c-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "tlp-app-c166c",
+            storageBucket: "tlp-app-c166c.firebasestorage.app",
+            messagingSenderId: "5888622750",
+            appId: "1:5888622750:web:b25743b190930649c83b8f"
+        };
+
+        let app, auth, db, user = null;
+        const appId = "tlp-app-c166c";
+
+        // Lista de Citas de Sabiduría desbloqueables según el nivel (Gamificación avanzada)
+        const unlockableQuotes = {
+            1: {
+                text: "“Incluso la noche más oscura terminará y el sol saldrá.”",
+                author: "Víctor Hugo",
+                unlockedAt: "Nivel 1 (Por registrar tu primer check-in)"
+            },
+            2: {
+                text: "“Saber que eres el creador de tu propia paz es el paso más grande hacia la libertad emocional.”",
+                author: "Marsha M. Linehan (Creadora de la DBT)",
+                unlockedAt: "Nivel 2 (Desbloqueado)"
+            },
+            3: {
+                text: "“Tus emociones son como olas: no puedes detenerlas, pero puedes aprender a surfear.”",
+                author: "Jon Kabat-Zinn (Padre del Mindfulness moderno)",
+                unlockedAt: "Nivel 3 (Desbloqueado)"
+            },
+            4: {
+                text: "“No puedes controlar las circunstancias que te tocaron vivir en el pasado, pero sí puedes elegir cómo vivir tu presente.”",
+                author: "Mariona Fuster (Historia de superación TLP)",
+                unlockedAt: "Nivel 4 (Desbloqueado)"
+            },
+            5: {
+                text: "“La curiosa paradoja es que cuando me acepto tal como soy, entonces puedo cambiar.”",
+                author: "Carl Rogers",
+                unlockedAt: "Nivel 5 (Desbloqueado)"
+            }
+        };
+
+        // Estado del usuario inicial
+        let userState = {
+            xp: 0,
+            streak: 0,
+            lastCheckIn: null,
+            badges: [],
+            currentTheme: "indigo"
+        };
+
+        function enableSandboxFallback() {
+            document.getElementById('sandbox-warning').classList.remove('hidden');
+            setupMockSession();
+        }
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            onAuthStateChanged(auth, async (currentUser) => {
+                if (currentUser) {
+                    user = currentUser;
+                    updateAuthUI(true);
+                    await loadUserState();
+                    listenToMoodLogs();
+                } else {
+                    user = null;
+                    updateAuthUI(false);
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (e) {
+                        enableSandboxFallback();
+                    }
+                }
+            });
+        } catch (error) {
+            enableSandboxFallback();
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            const authContainer = document.getElementById('auth-status-container');
+            if (isLoggedIn && user) {
+                authContainer.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="hidden md:inline text-xs font-semibold text-slate-500">${user.isAnonymous ? 'Usuario Anónimo' : user.displayName}</span>
+            <button id="logout-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-3 rounded-xl transition flex items-center space-x-1">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span class="hidden md:inline">Salir</span>
+            </button>
+          </div>
+        `;
+                document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+                document.getElementById('user-avatar').innerText = user.isAnonymous ? 'A' : (user.displayName ? user.displayName[0] : 'U');
+                document.getElementById('user-display-name').innerText = user.isAnonymous ? 'Usuario de Apoyo' : user.displayName;
+                document.getElementById('user-email').innerText = user.isAnonymous ? 'Sesión privada local' : user.email;
+            } else {
+                authContainer.innerHTML = `
+          <button id="login-google-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-xl transition shadow-sm flex items-center space-x-2 accent-bg">
+            <i class="fa-brands fa-google"></i>
+            <span>Acceder con Google</span>
+          </button>
+        `;
+                document.getElementById('login-google-btn').addEventListener('click', async () => {
+                    try {
+                        const provider = new GoogleAuthProvider();
+                        await signInWithPopup(auth, provider);
+                    } catch (error) {
+                        showToast("No se pudo iniciar sesión. Usando sesión anónima.");
+                    }
+                });
+            }
+        }
+
+        async function loadUserState() {
+            if (!user) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userState', 'main');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    userState = docSnap.data();
+                    userState.xp = userState.xp || 0;
+                    userState.streak = userState.streak || 0;
+                    userState.badges = userState.badges || [];
+                    userState.currentTheme = userState.currentTheme || "indigo";
+                } else {
+                    userState = {
+                        xp: 0,
+                        streak: 0,
+                        lastCheckIn: null,
+                        badges: [],
+                        currentTheme: "indigo"
+                    };
+                    await setDoc(docRef, userState);
+                }
+
+                // Aplicar el tema guardado
+                applyTheme(userState.currentTheme);
+                updateGamificationUI();
+            } catch (error) {
+                setupMockSession();
+            }
+        }
+
+        function listenToMoodLogs() {
+            if (!user) return;
+            const collRef = collection(db, 'artifacts', appId, 'users', user.uid, 'moodLogs');
+            onSnapshot(collRef, (snapshot) => {
+                const logs = [];
+                snapshot.forEach((doc) => {
+                    logs.push({ id: doc.id, ...doc.data() });
+                });
+                logs.sort((a, b) => b.timestamp - a.timestamp);
+                renderMoodLogs(logs);
+            }, (error) => {
+                console.error(error);
+            });
+        }
+
+        function renderMoodLogs(logs) {
+            const container = document.getElementById('mood-history-list');
+            if (logs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No hay registros guardados todavía.</p>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(log => {
+                const dateStr = new Date(log.timestamp).toLocaleString('es-ES', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                });
+
+                let tensionColorClass = "bg-emerald-100 text-emerald-800";
+                if (log.tension >= 8) tensionColorClass = "bg-rose-100 text-rose-800";
+                else if (log.tension >= 5) tensionColorClass = "bg-amber-100 text-amber-800";
+
+                return `
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col md:flex-row justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-slate-500">${dateStr}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${tensionColorClass}">Tensión: ${log.tension}/10</span>
+              </div>
+              <p class="text-xs text-slate-700 italic">"${log.notes || 'Sin anotaciones'}"</p>
+              <span class="inline-block text-[10px] bg-slate-200/60 text-slate-600 px-2.5 py-1 rounded-lg font-semibold mt-1">Trigger: ${log.trigger}</span>
+            </div>
+            <div class="flex items-center space-x-2 shrink-0 self-end md:self-center">
+              <span class="text-[11px] font-semibold text-slate-400">Ánimo: ${log.mood}/10 | Energía: ${log.energy}/10</span>
+            </div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        window.saveMoodLog = async function (event) {
+            event.preventDefault();
+
+            const tension = parseInt(document.getElementById('input-tension').value);
+            const mood = parseInt(document.getElementById('input-mood').value);
+            const energy = parseInt(document.getElementById('input-energy').value);
+            const trigger = document.querySelector('input[name="trigger"]:checked').value;
+            const notes = document.getElementById('input-notes').value;
+
+            const newLog = {
+                tension,
+                mood,
+                energy,
+                trigger,
+                notes,
+                timestamp: Date.now()
+            };
+
+            if (user) {
+                try {
+                    const collRef = collection(db, 'artifacts', appId, 'users', user.uid, 'moodLogs');
+                    await addDoc(collRef, newLog);
+                    await awardXP(15);
+                    await checkDailyStreak();
+                    await unlockBadge('badge-mood');
+                    showToast("¡Registro de diario guardado con éxito! (+15 XP)");
+                    document.getElementById('mood-form').reset();
+                } catch (error) {
+                    saveLocalBackupLog(newLog);
+                }
+            } else {
+                saveLocalBackupLog(newLog);
+            }
+        };
+
+        function saveLocalBackupLog(log) {
+            const localLogs = JSON.parse(localStorage.getItem('mentecalma_mood_logs') || '[]');
+            localLogs.push(log);
+            localStorage.setItem('mentecalma_mood_logs', JSON.stringify(localLogs));
+
+            userState.xp += 15;
+            userState.badges.push('badge-mood');
+            localStorage.setItem('mentecalma_user_state', JSON.stringify(userState));
+
+            updateGamificationUI();
+            renderMoodLogs(localLogs.reverse());
+            showToast("Guardado localmente en este dispositivo. ¡15 XP ganados!");
+            document.getElementById('mood-form').reset();
+        }
+
+        // Calcula el nivel actual basándose en los XP acumulados
+        // Cada 100 de XP es un nivel (Nivel 1: 0-99, Nivel 2: 100-199, Nivel 3: 200-299, etc.)
+        function getLevelFromXP(xp) {
+            return Math.floor(xp / 100) + 1;
+        }
+
+        // Almacena y actualiza el XP, detectando si hay una subida de nivel
+        async function awardXP(points) {
+            const oldXP = userState.xp || 0;
+            const newXP = oldXP + points;
+
+            const oldLevel = getLevelFromXP(oldXP);
+            const newLevel = getLevelFromXP(newXP);
+
+            userState.xp = newXP;
+
+            // Si subió de nivel, lanzar celebración
+            if (newLevel > oldLevel) {
+                triggerLevelUpCelebration(newLevel);
+            }
+
+            if (userState.xp >= 100) {
+                await unlockBadge('badge-master');
+            }
+
+            if (user) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userState', 'main');
+                    await setDoc(docRef, userState, { merge: true });
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                localStorage.setItem('mentecalma_user_state', JSON.stringify(userState));
+            }
+            updateGamificationUI();
+        }
+
+        // Modal interactivo de subida de nivel
+        function triggerLevelUpCelebration(newLevel) {
+            document.getElementById('modal-level-num').innerText = `Nivel ${newLevel}`;
+
+            // Detallar qué se ha desbloqueado según el nivel
+            const listContainer = document.getElementById('unlocked-items-list');
+            listContainer.innerHTML = '';
+
+            let unlocks = [];
+            if (newLevel === 2) {
+                unlocks.push("🎨 Aspecto de interfaz: <strong>Menta Serena</strong> (Relajación)");
+                unlocks.push("💬 Cita: <em>\"La aceptación radical...\"</em> por Dra. Marsha Linehan.");
+            } else if (newLevel === 3) {
+                unlocks.push("🎨 Aspecto de interfaz: <strong>Atardecer Cálido</strong> (Calidez)");
+                unlocks.push("💬 Cita: <em>\"Tus emociones son como olas...\"</em> por Jon Kabat-Zinn.");
+            } else if (newLevel === 4) {
+                unlocks.push("🎨 Aspecto de interfaz: <strong>Oasis Nocturno</strong> (Modo Oscuro)");
+                unlocks.push("💬 Cita: <em>\"No puedes controlar las circunstancias...\"</em> por Mariona Fuster.");
+            } else if (newLevel >= 5) {
+                unlocks.push("🎨 Aspecto de interfaz: <strong>Aurora Mística</strong> (Brillo Premium)");
+                unlocks.push("💬 Cita: <em>\"La curiosa paradoja...\"</em> por Carl Rogers.");
+            }
+
+            unlocks.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "flex items-start space-x-2";
+                li.innerHTML = `<span class="text-amber-500">✨</span><span>${item}</span>`;
+                listContainer.appendChild(li);
+            });
+
+            // Crear confeti visual
+            const confettiContainer = document.getElementById('confetti-container');
+            confettiContainer.innerHTML = '';
+            for (let i = 0; i < 40; i++) {
+                const div = document.createElement('div');
+                div.className = 'confetti';
+                div.style.left = Math.random() * 100 + '%';
+                div.style.animationDelay = Math.random() * 3 + 's';
+                div.style.backgroundColor = ['#f59e0b', '#10b981', '#a855f7', '#3b82f6', '#ec4899'][Math.floor(Math.random() * 5)];
+                confettiContainer.appendChild(div);
+            }
+
+            document.getElementById('level-up-modal').classList.remove('hidden');
+        }
+
+        window.closeLevelUpModal = function () {
+            document.getElementById('level-up-modal').classList.add('hidden');
+        };
+
+        async function checkDailyStreak() {
+            const today = new Date().toDateString();
+            const lastCheck = userState.lastCheckIn;
+
+            if (lastCheck === today) return;
+
+            if (lastCheck) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (new Date(lastCheck).toDateString() === yesterday.toDateString()) {
+                    userState.streak = (userState.streak || 0) + 1;
+                } else {
+                    userState.streak = 1;
+                }
+            } else {
+                userState.streak = 1;
+            }
+
+            userState.lastCheckIn = today;
+
+            if (userState.streak >= 3) {
+                await unlockBadge('badge-streak');
+            }
+
+            if (user) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userState', 'main');
+                    await setDoc(docRef, userState, { merge: true });
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            updateGamificationUI();
+        }
+
+        async function unlockBadge(badgeId) {
+            if (!userState.badges) userState.badges = [];
+            if (userState.badges.includes(badgeId)) return;
+
+            userState.badges.push(badgeId);
+            showToast("🏆 ¡Has desbloqueado un nuevo logro de bienestar!");
+
+            if (user) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userState', 'main');
+                    await setDoc(docRef, userState, { merge: true });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            updateGamificationUI();
+        }
+
+        // Cambiar y persistir temas visuales
+        window.applyWebTheme = async function (themeId, requiredLevel) {
+            const currentLevel = getLevelFromXP(userState.xp);
+            if (currentLevel < requiredLevel) {
+                showToast(`🔒 Requiere Nivel ${requiredLevel} para usar este aspecto.`);
+                return;
+            }
+
+            userState.currentTheme = themeId;
+            applyTheme(themeId);
+            showToast(`🎨 Aspecto cambiado a: ${themeId.toUpperCase()}`);
+
+            if (user) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userState', 'main');
+                    await setDoc(docRef, userState, { merge: true });
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                localStorage.setItem('mentecalma_user_state', JSON.stringify(userState));
+            }
+        };
+
+        function applyTheme(themeId) {
+            document.body.className = "text-slate-800 antialiased min-h-screen flex flex-col pb-16 md:pb-0 transition-colors duration-300";
+            document.body.classList.add(`theme-${themeId}`);
+        }
+
+        // Actualizar elementos dinámicos de la UI de gamificación
+        function updateGamificationUI() {
+            const xp = userState.xp || 0;
+            const currentLevel = getLevelFromXP(xp);
+            const levelXpFloor = (currentLevel - 1) * 100;
+            const progressXp = xp - levelXpFloor; // experiencia del nivel actual
+            const percent = Math.min(progressXp, 100);
+
+            document.getElementById('xp-counter').innerText = xp;
+            document.getElementById('streak-counter').innerText = userState.streak || 0;
+            document.getElementById('user-level-badge').innerText = `Nivel ${currentLevel}`;
+
+            // Tarjeta de recompensas
+            document.getElementById('user-current-level-lbl').innerText = `Nivel actual: ${currentLevel}`;
+            document.getElementById('user-xp-status').innerText = `${xp} XP acumulados`;
+            document.getElementById('next-level-val').innerText = currentLevel + 1;
+            document.getElementById('inner-level-lbl').innerText = `N${currentLevel}`;
+            document.getElementById('level-progress-txt').innerText = `${percent}%`;
+            document.getElementById('level-progress-bar').style.width = `${percent}%`;
+
+            // Círculo SVG de progreso
+            const circumference = 314.16; // 2 * pi * r (50)
+            const offset = circumference - (percent / 100) * circumference;
+            document.getElementById('svg-progress-circle').setAttribute('stroke-dashoffset', offset);
+
+            // Actualizar estado de botones e inputs de temas visuales
+            const themes = ['emerald', 'sunset', 'midnight', 'aurora'];
+            const levelsMap = { 'emerald': 2, 'sunset': 3, 'midnight': 4, 'aurora': 5 };
+            let unlockedRewardsCount = 1; // El primero ya viene por defecto
+
+            themes.forEach(theme => {
+                const reqLvl = levelsMap[theme];
+                const card = document.getElementById(`theme-card-${theme}`);
+                const lbl = document.getElementById(`theme-lbl-${theme}`);
+                const btn = document.getElementById(`theme-btn-${theme}`);
+
+                if (currentLevel >= reqLvl) {
+                    unlockedRewardsCount++;
+                    card.className = "border border-slate-200 rounded-2xl p-4 flex items-center justify-between bg-slate-50";
+                    lbl.innerHTML = `<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">Desbloqueado</span>`;
+                    btn.className = "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer accent-bg";
+                    btn.disabled = false;
+                    btn.innerText = "Activar";
+                } else {
+                    card.className = "border border-slate-100 rounded-2xl p-4 flex items-center justify-between opacity-55";
+                    lbl.innerText = `Desbloquea en Nivel ${reqLvl}`;
+                    btn.className = "bg-slate-100 text-slate-400 text-[10px] font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
+                    btn.disabled = true;
+                    btn.innerText = "Bloqueado";
+                }
+            });
+
+            document.getElementById('rewards-count-badge').innerText = unlockedRewardsCount;
+
+            // Renderizar citas de apoyo según el nivel
+            renderQuotes(currentLevel);
+
+            // Encender insignias ganadas
+            const allBadges = ['badge-prime', 'badge-mood', 'badge-streak', 'badge-master'];
+            allBadges.forEach(badgeId => {
+                const badgeEl = document.getElementById(badgeId);
+                if (userState.badges && userState.badges.includes(badgeId)) {
+                    badgeEl.classList.remove('opacity-40', 'border-dashed');
+                    badgeEl.classList.add('bg-indigo-50', 'border-indigo-200');
+                    const circle = badgeEl.querySelector('.rounded-full');
+                    circle.classList.remove('bg-slate-200', 'text-slate-400');
+                    circle.classList.add('accent-bg', 'text-white');
+                }
+            });
+        }
+
+        // Copiar cita al portapapeles de forma segura (sin alertas tradicionales)
+        window.copyQuoteText = function (text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("💬 Cita copiada para tus notas personales.");
+        };
+
+        // Renderizar citas según el nivel
+        function renderQuotes(currentLevel) {
+            const container = document.getElementById('quotes-container');
+            container.innerHTML = '';
+
+            Object.keys(unlockableQuotes).forEach(lvl => {
+                const quoteLvl = parseInt(lvl);
+                const quote = unlockableQuotes[quoteLvl];
+
+                if (currentLevel >= quoteLvl) {
+                    // Desbloqueada
+                    container.innerHTML += `
+            <div class="border border-slate-200 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between space-y-3 relative overflow-hidden transition hover:border-slate-300">
+              <div class="space-y-1">
+                <span class="text-[9px] text-indigo-600 font-extrabold uppercase tracking-wider accent-text">${quote.unlockedAt}</span>
+                <p class="text-xs text-slate-800 font-medium italic">"${quote.text}"</p>
+                <p class="text-[10px] text-slate-500 text-right">— ${quote.author}</p>
+              </div>
+              <button onclick="copyQuoteText('${quote.text.replace(/'/g, "\\'")} — ${quote.author}')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold py-2 rounded-xl transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-copy"></i>
+                <span>Copiar Cita</span>
+              </button>
+            </div>
+          `;
+                } else {
+                    // Bloqueada
+                    container.innerHTML += `
+            <div class="border border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-2 opacity-55">
+              <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
+                <i class="fa-solid fa-lock text-xs"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-slate-600">Cita Bloqueada</h4>
+                <p class="text-[10px] text-slate-400">Desbloquea al alcanzar el Nivel ${quoteLvl}</p>
+              </div>
+            </div>
+          `;
+                }
+            });
+        }
+
+        function setupMockSession() {
+            const mockState = JSON.parse(localStorage.getItem('mentecalma_user_state'));
+            if (mockState) {
+                userState = mockState;
+            } else {
+                userState = {
+                    xp: 15,
+                    streak: 1,
+                    lastCheckIn: new Date().toDateString(),
+                    badges: ['badge-prime'],
+                    currentTheme: "indigo"
+                };
+            }
+            applyTheme(userState.currentTheme);
+            updateGamificationUI();
+
+            const localLogs = JSON.parse(localStorage.getItem('mentecalma_mood_logs') || '[]');
+            renderMoodLogs(localLogs.reverse());
+        }
+
+        window.markSkillPracticed = async function (skillName) {
+            await awardXP(20);
+            showToast(`¡Has practicado: ${skillName}! Ganaste 20 XP.`);
+        };
+
+        window.triggerBreathingBadge = async function () {
+            await awardXP(25);
+            await unlockBadge('badge-prime');
+        };
+
+    </script>
+
+    <!-- Lógica Interactiva Front-End General -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-50', 'text-indigo-600');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-indigo-50', 'text-indigo-600');
+            }
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600');
+                btn.classList.add('text-slate-400');
+            });
+            const activeMobileBtn = document.getElementById(`mobile-nav-${tabId}`);
+            if (activeMobileBtn) {
+                activeMobileBtn.classList.remove('text-slate-400');
+                activeMobileBtn.classList.add('text-indigo-600');
+            }
+        }
+
+        let breathingInterval = null;
+        function startBreathingExercise() {
+            const circle = document.getElementById('breathing-circle');
+            const statusText = document.getElementById('breath-status');
+            const timerText = document.getElementById('breath-timer');
+            const btn = document.getElementById('start-breathing-btn');
+
+            btn.disabled = true;
+            btn.innerText = "Respirando...";
+
+            let cycle = 0;
+            const maxCycles = 3;
+
+            function runCycle() {
+                if (cycle >= maxCycles) {
+                    clearInterval(breathingInterval);
+                    circle.className = "w-44 h-44 rounded-full bg-emerald-50 flex flex-col items-center justify-center text-center shadow-inner transform scale-100 transition duration-500";
+                    statusText.innerText = "¡Excelente!";
+                    timerText.innerText = "✓";
+                    btn.disabled = false;
+                    btn.innerText = "Comenzar Ciclo (3 repeticiones)";
+
+                    if (window.triggerBreathingBadge) {
+                        window.triggerBreathingBadge();
+                    }
+                    return;
+                }
+
+                cycle++;
+
+                // Fase 1: Inhalar (4 segundos)
+                circle.className = "w-44 h-44 rounded-full bg-sky-100 flex flex-col items-center justify-center text-center shadow-inner inhale";
+                statusText.innerText = "Inhala";
+                let count = 4;
+                timerText.innerText = count;
+
+                let interval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(interval);
+
+                        // Fase 2: Retener aire (7 segundos)
+                        circle.className = "w-44 h-44 rounded-full bg-purple-100 flex flex-col items-center justify-center text-center shadow-inner hold";
+                        statusText.innerText = "Retén";
+                        let holdCount = 7;
+                        timerText.innerText = holdCount;
+
+                        let holdInterval = setInterval(() => {
+                            holdCount--;
+                            if (holdCount <= 0) {
+                                clearInterval(holdInterval);
+
+                                // Fase 3: Exhalar (8 segundos)
+                                circle.className = "w-44 h-44 rounded-full bg-emerald-100 flex flex-col items-center justify-center text-center shadow-inner exhale";
+                                statusText.innerText = "Exhala";
+                                let exhaleCount = 8;
+                                timerText.innerText = exhaleCount;
+
+                                let exhaleInterval = setInterval(() => {
+                                    exhaleCount--;
+                                    if (exhaleCount <= 0) {
+                                        clearInterval(exhaleInterval);
+                                        runCycle();
+                                    } else {
+                                        timerText.innerText = exhaleCount;
+                                    }
+                                }, 1000);
+
+                            } else {
+                                timerText.innerText = holdCount;
+                            }
+                        }, 1000);
+
+                    } else {
+                        timerText.innerText = count;
+                    }
+                }, 1000);
+            }
+
+            runCycle();
+        }
+
+        function filterSkills(category) {
+            document.querySelectorAll('.skill-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-50', 'text-indigo-700');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            const activeBtn = document.getElementById(`filter-${category}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-indigo-50', 'text-indigo-700');
+            }
+
+            document.querySelectorAll('.skill-card').forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            const text = document.getElementById('toast-text');
+            text.innerText = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
