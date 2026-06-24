@@ -111,7 +111,7 @@
                 <nav class="flex flex-col gap-2" aria-label="Navegación del Portal Único">
                     <button onclick="switchTab('tab-dni')" class="tab-btn active-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium border text-left bg-blue-600/15 border-blue-500/30 text-blue-400" id="btn-tab-dni">
                         <i data-lucide="fingerprint" class="w-5 h-5"></i>
-                        <span>DNI & Identidad</span>
+                        <span>Documento de Identidad</span>
                     </button>
                     <button onclick="switchTab('tab-voto')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium border text-left bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white" id="btn-tab-voto">
                         <i data-lucide="vote" class="w-5 h-5"></i>
@@ -123,7 +123,7 @@
                     </button>
                     <button onclick="switchTab('tab-laboral')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium border text-left bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white" id="btn-tab-laboral">
                         <i data-lucide="briefcase" class="w-5 h-5"></i>
-                        <span>Tinder Laboral & HUD</span>
+                        <span>Perfil Laboral</span>
                     </button>
                     <button onclick="switchTab('tab-kit')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium border text-left bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white" id="btn-tab-kit">
                         <i data-lucide="home" class="w-5 h-5"></i>
@@ -160,11 +160,11 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-800 pb-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
-                            <i data-lucide="fingerprint" class="text-blue-500"></i> DNI & Identidad Desvinculada
+                            <i data-lucide="fingerprint" class="text-blue-500"></i> Documento de Identidad
                         </h2>
                         <p class="text-xs text-slate-400 mt-1">Artículo 27: Soporte modular sin dirección física para garantizar la privacidad y seguridad criptográfica.</p>
                     </div>
-                    <span class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-mono">DNI-TOKEN: #8874-TDL</span>
+                    <span class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-mono">ID-TOKEN: #8874-TDL</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -194,7 +194,7 @@
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div>
                                         <p class="text-[9px] text-slate-400 uppercase">Nacimiento</p>
-                                        <p class="font-semibold text-slate-200">10/04/1990</p>
+                                        <p class="font-semibold text-slate-200">10/04</p>
                                     </div>
                                     <div>
                                         <p class="text-[9px] text-slate-400 uppercase">Clase Cívica</p>
@@ -212,7 +212,7 @@
 
                     <!-- Panel de Controles del DNI -->
                     <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4">
-                        <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2">Controles de Seguridad (HUD)</h3>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2">Controles de Seguridad</h3>
                         
                         <!-- Control de Biometría Facial -->
                         <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
@@ -249,7 +249,9 @@
                         <div class="pt-2">
                             <button onclick="revocarDniToken()" class="w-full bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 hover:border-red-600 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                                Revocar DNI por Pérdida o Robo
+                                Revocar Documento de Identidad
+                                <br>
+                                por Pérdida o Robo
                             </button>
                             <p class="text-[10px] text-slate-500 mt-2 text-center">Invalida de inmediato tu llave de firmas en todo el país. Podrás solicitar uno nuevo gratis.</p>
                         </div>
@@ -499,12 +501,12 @@
                 </div>
             </section>
 
-            <!-- ================= TAB: TINDER LABORAL & HUD ================= -->
+            <!-- ================= TAB: Perfil LABORAL & HUD ================= -->
             <section id="tab-laboral" class="tab-content hidden">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-800 pb-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
-                            <i data-lucide="briefcase" class="text-blue-500"></i> Tinder Laboral & HUD Estatal
+                            <i data-lucide="briefcase" class="text-blue-500"></i> Perfil Laboral
                         </h2>
                         <p class="text-xs text-slate-400 mt-1">Artículos 33-40: Cómputo inteligente de jornada por geolocalización, vacaciones y emparejamiento inteligente de empleo por IA.</p>
                     </div>
@@ -513,8 +515,8 @@
                 <!-- HUD LABORAL DE FICHAJE EN VIVO -->
                 <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-6 rounded-2xl border-2 border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div class="space-y-2 text-center md:text-left">
-                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 font-bold uppercase">HUD Laboral Activo (Geolocalización)</span>
-                        <h3 class="text-lg font-bold text-white">Fichar Jornada de 6 Horas</h3>
+                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 font-bold uppercase">Perfil Laboral Activo (Geolocalización)</span>
+                        <h3 class="text-lg font-bold text-white">Fichar Jornada (6 Horas Máx.)</h3>
                         <p class="text-xs text-slate-400">Ficha cuando salgas de tu domicilio (el trayecto está regulado y te calcula la media estimada en plus).</p>
                     </div>
                     <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -528,7 +530,7 @@
                     </div>
                 </div>
 
-                <!-- Buscador de Empleo / Match Laboral -->
+                <!-- Buscador de Empleo / Perfil Laboral -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 space-y-4">
                         <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2">
@@ -745,7 +747,7 @@
                             <div class="flex gap-2">
                                 <input type="text" id="edu-ia-prompt" placeholder="Ej: Explícame de forma práctica la Ley de Gravedad" class="flex-grow bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white">
                                 <button onclick="consultarIaTutora()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 text-xs font-bold rounded-lg transition-all shrink-0">
-                                    Consultar IA
+                                    Consultar
                                 </button>
                             </div>
                             <div id="edu-ia-response" class="hidden p-3 bg-slate-950 rounded-lg border border-slate-900 text-xs text-slate-300 font-mono mt-2">
@@ -1043,7 +1045,7 @@
         // DNI & Identidad
         function revocarDniToken() {
             openModal(
-                "Revocar Firma Criptográfica del DNI",
+                "Revocar Firma Criptográfica del Documento de Identidad",
                 "¿Estás segura de que quieres invalidar tu firma digital? Esto detendrá de inmediato el reconocimiento facial y tus credenciales de votación hasta que verifiques un token secundario.",
                 () => {
                     document.getElementById('dni-status').textContent = 'REVOCADO';
@@ -1090,7 +1092,7 @@
             showNotification("Conectando con el registro público distribuido del Estado (Trazabilidad radical)...");
         }
 
-        // Tinder Laboral y HUD de Fichaje
+        // Perfil Laboral y HUD de Fichaje
         function toggleFichar() {
             const btn = document.getElementById('ficharBtn');
             const timerEl = document.getElementById('workTimer');
