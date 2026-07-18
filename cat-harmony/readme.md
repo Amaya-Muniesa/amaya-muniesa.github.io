@@ -34,4 +34,4 @@ Como diseñadora técnica, mi rol se centró en:
 
 ## 🚀 Cómo Ejecutar el Proyecto
 
-Ve a la página [https://amaya-muniesa.github.io/cat-harmony/index.html]
+Ve a la página [https://amaya-muniesa.github.io/cat-harmony/index.html].
