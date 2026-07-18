@@ -31,3 +31,7 @@ Como diseñadora técnica, mi rol se centró en:
 1.  **Dirección de Arte y UI/UX:** Conceptualización visual completa, paleta cromática, tipografías y diseño de componentes de interfaz legibles y accesibles.
 2.  **Arquitectura de la Información:** Definición de flujos y jerarquía visual (menú de controles vs. zona de creación musical).
 3.  **Lógica del Secuenciador:** Modelado de los requerimientos y control de calidad (*testing*) del comportamiento del bucle de audio y eventos del DOM interactivos.
+
+## 🚀 Cómo Ejecutar el Proyecto
+
+Ve a la página [https://amaya-muniesa.github.io/cat-harmony/index.html]
