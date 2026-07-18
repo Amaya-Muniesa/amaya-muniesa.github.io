@@ -2,7 +2,7 @@
 
 > Una aplicación web interactiva y lúdica que funciona como un secuenciador de música simple, permitiendo a los usuarios componer melodías utilizando notas musicales con temática gatuna.
 
-![Demostración de Cat Harmony](demo.mp4)
+![Demostración de Cat Harmony](demo.gif)
 
 ---
 
