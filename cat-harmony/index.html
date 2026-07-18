@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
-        
+
         body {
             font-family: 'Fredoka One', cursive;
             background-color: #fef2f2;
@@ -31,8 +32,13 @@
         }
 
         @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-5px); }
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-5px);
+            }
         }
 
         .playing {
@@ -40,9 +46,20 @@
         }
 
         @keyframes pulse-note {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.1); filter: brightness(1.3); }
-            100% { transform: scale(1); filter: brightness(1); }
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                filter: brightness(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
         }
 
         .speed-badge {
@@ -62,11 +79,17 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body class="p-4 md:p-8">
     <div class="max-w-4xl mx-auto">
         <header class="text-center mb-6">
@@ -79,19 +102,24 @@
             <div class="w-full md:w-1/4 bg-white p-6 rounded-3xl shadow-xl border-4 border-pink-200">
                 <h2 class="text-lg text-pink-500 mb-4 text-center">Notas Gatunas</h2>
                 <div class="grid grid-cols-2 gap-3" id="cat-palette"></div>
-                
+
                 <div class="mt-8">
                     <h2 class="text-lg text-pink-500 mb-2 text-center">Controles</h2>
                     <div class="space-y-2">
-                        <button id="play-stop" class="w-full py-2 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors shadow-sm">Play / Pausa</button>
-                        <button id="clear-board" class="w-full py-2 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-colors">Limpiar Todo</button>
+                        <button id="play-stop"
+                            class="w-full py-2 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors shadow-sm">Play
+                            / Pausa</button>
+                        <button id="clear-board"
+                            class="w-full py-2 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-colors">Limpiar
+                            Todo</button>
                     </div>
                 </div>
 
                 <div class="mt-6 pt-6 border-t border-pink-100">
                     <h2 class="text-lg text-pink-500 mb-2 text-center">Análisis Musical</h2>
                     <div class="space-y-2">
-                        <button id="ai-analyze" class="w-full py-2 bg-indigo-500 text-white rounded-xl shadow-md hover:bg-indigo-600 transition-all flex items-center justify-center gap-2">
+                        <button id="ai-analyze"
+                            class="w-full py-2 bg-indigo-500 text-white rounded-xl shadow-md hover:bg-indigo-600 transition-all flex items-center justify-center gap-2">
                             <span>✨ Analizar Obra</span>
                         </button>
                     </div>
@@ -103,8 +131,9 @@
                 <div class="bg-white p-4 rounded-3xl shadow-2xl border-4 border-pink-300 relative">
                     <div class="grid grid-cols-4 gap-4" id="game-board"></div>
                 </div>
-                
-                <div id="ai-status" class="hidden bg-white p-4 rounded-2xl border-2 border-indigo-200 text-indigo-700 italic shadow-inner">
+
+                <div id="ai-status"
+                    class="hidden bg-white p-4 rounded-2xl border-2 border-indigo-200 text-indigo-700 italic shadow-inner">
                     <div id="ai-message">Consultando al jurado felino...</div>
                 </div>
             </div>
@@ -115,12 +144,14 @@
     <div id="audio-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-3xl text-center shadow-2xl">
             <h3 class="text-2xl text-pink-600 mb-4">¿Lista para componer?</h3>
-            <button id="start-btn" class="px-8 py-3 bg-pink-500 text-white rounded-full text-xl hover:bg-pink-600 transition-all">¡Miau! (Entrar)</button>
+            <button id="start-btn"
+                class="px-8 py-3 bg-pink-500 text-white rounded-full text-xl hover:bg-pink-600 transition-all">¡Miau!
+                (Entrar)</button>
         </div>
     </div>
 
     <script>
-        const apiKey = ""; 
+        const apiKey = typeof __api_key !== 'undefined' ? __api_key : '';
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'cat-harmony-sequencer';
 
         const notes = [
@@ -179,7 +210,7 @@
             cell.classList.add('active-step');
 
             const data = boardState[currentStep];
-            let waitTime = 600; 
+            let waitTime = 600;
 
             if (data) {
                 waitTime = speeds[data.speedIndex].ms;
@@ -275,19 +306,66 @@
         }
 
         // --- IA ANALIZAR ---
+        function buildLocalAnalysis(board) {
+            const filled = board.filter(Boolean);
+            const noteNames = filled.map(note => note.name);
+            const uniqueNotes = [...new Set(noteNames)].length;
+            const silenceCount = board.filter(note => note?.isSilence).length;
+            const firstNote = filled[0]?.name || 'sin notas';
+            const rhythmKinds = [...new Set(filled.map(note => speeds[note.speedIndex].label))];
+
+            if (filled.length === 0) {
+                return '😺 El tablero está vacío. Añade unas notas y volveré a darte mi veredicto felino.';
+            }
+
+            const mood = uniqueNotes >= 4 ? 'muy variada y curiosa' : 'equilibrada y sencilla';
+            const rhythmText = rhythmKinds.length > 1 ? `con ritmos ${rhythmKinds.join(', ')}` : `con ritmo ${rhythmKinds[0]}`;
+
+            return `😺 Tu obra suena ${mood}. Tiene ${filled.length} sonidos, ${silenceCount} silencios y ${uniqueNotes} notas distintas. El protagonista empieza con ${firstNote}, y ${rhythmText}. Un diseño bastante digno para un repertorio de gato compositor.`;
+        }
+
         async function fetchGemini(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: "Eres un gato experto en crítica musical. Eres un poco sarcástico pero divertido." }] }
-            };
-            const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
-            const result = await res.json();
-            return result.candidates[0].content.parts[0].text;
+            const hasApiKey = typeof apiKey === 'string' && apiKey.trim().length > 0;
+
+            if (!hasApiKey) {
+                return buildLocalAnalysis(boardState);
+            }
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: 'Eres un gato experto en crítica musical. Eres un poco sarcástico pero divertido.' }] }
+                };
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Error en la API: ${res.status}`);
+                }
+
+                const result = await res.json();
+                return result?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || buildLocalAnalysis(boardState);
+            } catch (error) {
+                console.warn('No se pudo usar Gemini, usando análisis local:', error);
+                return buildLocalAnalysis(boardState);
+            }
         }
 
         document.getElementById('ai-analyze').onclick = async () => {
             const msg = document.getElementById('ai-message');
+            // Validar si el tablero está vacío
+            if (boardState.every(cell => cell === null)) {
+                document.getElementById('ai-status').classList.remove('hidden');
+                msg.innerText = "😺 ¡El tablero está vacío! Pon algunas notas antes de pedirme que aguce el oído.";
+                return;
+            }
             document.getElementById('ai-status').classList.remove('hidden');
             msg.innerHTML = '<span class="loader mr-2"></span> Aguzando el oído...';
             try {
@@ -296,7 +374,6 @@
                 msg.innerText = "😺 " + res;
             } catch (e) { msg.innerText = "Miau... algo ha fallado en la conexión."; }
         };
-
         // --- EVENTOS ---
         document.getElementById('start-btn').onclick = () => {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -309,8 +386,9 @@
             document.getElementById('play-stop').classList.replace('bg-red-400', 'bg-pink-500');
             resetSequencer();
             boardState.fill(null);
-            for(let i=0; i<16; i++) renderCell(i);
+            for (let i = 0; i < 16; i++) renderCell(i);
         };
     </script>
 </body>
+
 </html>
