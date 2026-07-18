@@ -35,3 +35,7 @@ Como diseñadora técnica, mi rol se centró en:
 ## 🚀 Cómo Ejecutar el Proyecto
 
 Ve a la página [https://amaya-muniesa.github.io/cat-harmony/index.html].
+
+## 💡 Posibles mejoras
+
+1. **Borrar Nota:** Que permita al usuario el quitar una nota mediante una pequeña "x" o de alguna otra forma que sea sencilla de implementar y usar.
