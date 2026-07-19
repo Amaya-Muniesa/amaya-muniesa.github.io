@@ -36,3 +36,7 @@ El objetivo de este proyecto era construir una herramienta funcional priorizando
 ## 🚀 Cómo Ejecutar el Proyecto
 
 Ve a la página [Diario Personal](https://amaya-muniesa.github.io/diario-personal/index.html).
+
+## 💡 Posibles mejoras
+1. Meter más mejoras en la Tienda de Temas, así aprovechar mejor las monedas.
+2. Poner alguna otra sección más, como ejercicios de relajación o concentración.

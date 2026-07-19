@@ -157,24 +157,10 @@
                 <h3 class="text-2xl font-bold text-white">Personalización</h3>
                 <button id="close-shop" class="text-2xl text-white">&times;</button>
             </div>
-            <div class="grid grid-cols-1 gap-4">
-                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
-                    <span>Modo Noche</span>
-                    <button data-price="10" data-theme="theme-dark"
-                        class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">10 <i
-                            class="fas fa-coins text-yellow-500"></i></button>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
-                    <span>Bosque Zen</span>
-                    <button data-price="25" data-theme="theme-forest"
-                        class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">25 <i
-                            class="fas fa-coins text-yellow-500"></i></button>
-                </div>
-            </div>
+            <div id="theme-options" class="grid grid-cols-1 gap-4"></div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -197,6 +183,89 @@
 
         let currentUser = null;
         let selectedMood = '🤔';
+        const themeOptions = [
+            { id: 'default', label: 'Por Defecto', price: 0 },
+            { id: 'theme-dark', label: 'Modo Noche', price: 10 },
+            { id: 'theme-forest', label: 'Bosque Zen', price: 25 }
+        ];
+
+        function applyTheme(theme) {
+            const baseClass = 'min-h-screen';
+            if (!theme || theme === 'default') {
+                document.body.className = baseClass;
+                return;
+            }
+            document.body.className = `${baseClass} ${theme}`;
+        }
+
+        function renderThemeOptions(profileData) {
+            const container = document.getElementById('theme-options');
+            if (!container) return;
+
+            const unlocked = profileData.unlockedThemes || ['default'];
+            const currentTheme = profileData.currentTheme || 'default';
+
+            container.innerHTML = themeOptions.map(theme => {
+                const isUnlocked = unlocked.includes(theme.id);
+                const isSelected = currentTheme === theme.id;
+                const buttonLabel = theme.id === 'default'
+                    ? 'Seleccionar'
+                    : isUnlocked
+                        ? 'Seleccionar'
+                        : `Comprar ${theme.price} <i class="fas fa-coins text-yellow-500"></i>`;
+                const buttonClasses = isUnlocked
+                    ? 'select-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700'
+                    : 'buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700';
+
+                return `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
+                        <div>
+                            <div class="font-semibold">${theme.label}</div>
+                            <div class="text-xs opacity-70">${isUnlocked ? 'Desbloqueado' : `Precio ${theme.price} monedas`}</div>
+                        </div>
+                        <button
+                            data-theme="${theme.id}"
+                            data-price="${theme.price}"
+                            class="${buttonClasses} ${isSelected ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${isSelected ? 'disabled' : ''}
+                        >${buttonLabel}</button>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.select-theme, .buy-theme').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const button = e.currentTarget;
+                    const theme = button.dataset.theme;
+                    if (!theme) return;
+                    const price = parseInt(button.dataset.price || '0', 10);
+                    const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+                    const snap = await getDoc(userRef);
+                    const data = snap.data();
+                    const unlockedThemes = data.unlockedThemes || ['default'];
+                    const currentTheme = data.currentTheme || 'default';
+
+                    if (theme === currentTheme) return;
+
+                    if (unlockedThemes.includes(theme)) {
+                        await updateDoc(userRef, { currentTheme: theme });
+                        applyTheme(theme);
+                    } else {
+                        if (data.coins >= price) {
+                            const updatedThemes = Array.from(new Set([...unlockedThemes, theme]));
+                            await updateDoc(userRef, {
+                                coins: data.coins - price,
+                                currentTheme: theme,
+                                unlockedThemes: updatedThemes
+                            });
+                            applyTheme(theme);
+                        } else {
+                            alert('No tienes suficientes monedas para desbloquear este estilo.');
+                        }
+                    }
+                });
+            });
+        }
 
         // --- Auth Logic ---
         document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
@@ -249,8 +318,17 @@
                     lastEntryDate: null,
                     level: 1,
                     exp: 0,
+                    currentTheme: 'default',
                     unlockedThemes: ['default']
                 });
+            } else {
+                const data = snap.data();
+                const updateFields = {};
+                if (!data.currentTheme) updateFields.currentTheme = 'default';
+                if (!Array.isArray(data.unlockedThemes)) updateFields.unlockedThemes = ['default'];
+                if (Object.keys(updateFields).length > 0) {
+                    await updateDoc(userRef, updateFields);
+                }
             }
 
             // Listen to profile changes
@@ -260,6 +338,10 @@
                 document.getElementById('stat-racha').innerText = data.racha;
                 document.getElementById('level-progress').style.width = `${(data.exp % 100)}%`;
                 document.getElementById('user-rank').innerText = getRankTitle(data.level);
+                if (data.currentTheme) {
+                    applyTheme(data.currentTheme);
+                }
+                renderThemeOptions(data);
             });
         }
 
@@ -379,27 +461,6 @@
         // --- UI Interactions ---
         document.getElementById('open-shop').onclick = () => document.getElementById('shop-modal').classList.remove('hidden');
         document.getElementById('close-shop').onclick = () => document.getElementById('shop-modal').classList.add('hidden');
-
-        document.querySelectorAll('.buy-theme').forEach(btn => {
-            btn.onclick = async () => {
-                const price = parseInt(btn.dataset.price);
-                const theme = btn.dataset.theme;
-                const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
-                const snap = await getDoc(userRef);
-                const data = snap.data();
-
-                if (data.coins >= price) {
-                    await updateDoc(userRef, {
-                        coins: data.coins - price,
-                        currentTheme: theme
-                    });
-                    document.body.className = 'min-h-screen ' + theme;
-                    document.getElementById('shop-modal').classList.add('hidden');
-                } else {
-                    alert(currentUser.displayName + ", no tenemos suficientes monedas para estos lujos. ¡A escribir!");
-                }
-            };
-        });
 
         function showComment() {
             const comments = [
