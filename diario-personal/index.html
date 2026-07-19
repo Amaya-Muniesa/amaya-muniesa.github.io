@@ -206,21 +206,34 @@
             if (user) {
                 currentUser = user;
                 const displayName = user.displayName || 'persona';
-                document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('user-name').innerText = displayName.split(' ')[0];
-                document.getElementById('auth-user-name').innerText = displayName.split(' ')[0];
-                document.getElementById('entry-text').placeholder = `¿Qué ronda hoy por tu cabeza, ${displayName}? No te preocupes, que tomo nota...`;
-                document.title = `El Diario de ${displayName} | Pensamientos en Red`;
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) authOverlay.classList.add('opacity-0', 'pointer-events-none');
+                const appEl = document.getElementById('app');
+                if (appEl) appEl.classList.remove('hidden');
+
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) userNameEl.innerText = displayName.split(' ')[0];
+
+                const authUserNameEl = document.getElementById('auth-user-name');
+                if (authUserNameEl) authUserNameEl.innerText = displayName.split(' ')[0];
+
+                const entryTextEl = document.getElementById('entry-text');
+                if (entryTextEl) entryTextEl.placeholder = `¿Qué ronda hoy por tu cabeza, ${displayName}? No te preocupes, que tomo nota...`;
+
+                try { document.title = `El Diario de ${displayName} | Pensamientos en Red`; } catch (e) { /* ignore */ }
+
                 if (user.photoURL) {
-                    document.getElementById('user-avatar').innerHTML = `<img src="${user.photoURL}" class="rounded-2xl">`;
+                    const avatarEl = document.getElementById('user-avatar');
+                    if (avatarEl) avatarEl.innerHTML = `<img src="${user.photoURL}" class="rounded-2xl">`;
                 }
 
                 await initUserData();
                 loadEntries();
             } else {
-                document.getElementById('auth-overlay').classList.remove('opacity-0', 'pointer-events-none');
-                document.getElementById('app').classList.add('hidden');
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) authOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                const appEl = document.getElementById('app');
+                if (appEl) appEl.classList.add('hidden');
             }
         });
 
