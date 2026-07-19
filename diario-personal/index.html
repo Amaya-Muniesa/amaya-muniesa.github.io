@@ -178,7 +178,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, doc, setDoc, getDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, setDoc, getDoc, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCMPpJUmzmmfjStAC2M7BtGzo4H9kZIRis",
@@ -312,18 +312,35 @@
 
                 const sorted = snapshot.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
 
-                sorted.forEach(doc => {
-                    const data = doc.data();
+                sorted.forEach(entry => {
+                    const data = entry.data();
                     const date = data.timestamp.toDate().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
                     const card = document.createElement('div');
-                    card.className = 'glass p-6 rounded-3xl shadow-sm border-l-4 border-indigo-500';
+                    card.className = 'glass p-6 rounded-3xl shadow-sm border-l-4 border-indigo-500 relative';
                     card.innerHTML = `
+                        <button class="delete-entry absolute top-4 right-4 text-red-500 hover:text-red-700" title="Borrar entrada">&times;</button>
                         <div class="flex justify-between mb-2">
                             <span class="text-xs font-bold opacity-40 uppercase tracking-widest">${date}</span>
                             <span>${data.mood}</span>
                         </div>
                         <p class="text-lg leading-relaxed">${data.content}</p>
                     `;
+
+                    // Attach delete handler
+                    const deleteBtn = card.querySelector('.delete-entry');
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const confirmDelete = confirm('¿Seguro/a que quieres borrar esta entrada?');
+                        if (!confirmDelete) return;
+                        try {
+                            const entryRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', entry.id);
+                            await deleteDoc(entryRef);
+                        } catch (err) {
+                            console.error('Error borrando entrada:', err);
+                            alert('No se pudo borrar la entrada. Revisa la consola.');
+                        }
+                    });
+
                     feed.appendChild(card);
                 });
             }, (error) => console.error("Error cargando entradas:", error));
