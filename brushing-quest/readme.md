@@ -38,5 +38,6 @@ Este proyecto fue ideado para explorar cómo la **gamificación ligera** ayuda a
 Ve a la página [Brushing Quest](https://amaya-muniesa.github.io/brushing-quest/index.html).
 
 ## 💡 Posibles mejoras
-1. Añadir recompensas por rachas o con monedas de juego para luego gastar en congelador de rachas, u otros cambios como variación en el estilo.
-2. Incrustar vídeos o animaciones para explicar cómo lavarse los dientes correctamente.
+1. Poner recordatorios en el calendario.
+2. Añadir recompensas por rachas o con monedas de juego para luego gastar en congelador de rachas, u otros cambios como variación en el estilo.
+3. Incrustar vídeos o animaciones para explicar cómo lavarse los dientes correctamente.
