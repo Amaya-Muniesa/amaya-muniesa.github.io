@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Diario de Amaya | Pensamientos en Red</title>
+    <title>Tu Diario Personal | Pensamientos en Red</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -47,19 +48,28 @@
         }
 
         @keyframes flame {
-            from { filter: drop-shadow(0 0 2px #f59e0b); }
-            to { filter: drop-shadow(0 0 8px #ef4444); }
+            from {
+                filter: drop-shadow(0 0 2px #f59e0b);
+            }
+
+            to {
+                filter: drop-shadow(0 0 8px #ef4444);
+            }
         }
     </style>
 </head>
+
 <body class="min-h-screen">
 
     <!-- Auth Overlay -->
-    <div id="auth-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-90 transition-opacity">
+    <div id="auth-overlay"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-90 transition-opacity">
         <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm mx-4">
-            <h1 class="text-3xl font-bold text-slate-800 mb-4">Bienvenida, Amaya</h1>
-            <p class="text-slate-600 mb-8">Sebastian te espera. Identifícate para acceder a tus pensamientos.</p>
-            <button id="login-btn" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-105">
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">Te doy la bienvenida a tu Diario Personal
+            </h1>
+            <p class="text-slate-600 mb-8">Tu momento te espera. Identifícate para acceder a tus pensamientos.</p>
+            <button id="login-btn"
+                class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-105">
                 <i class="fab fa-google text-xl"></i>
                 Entrar con Google
             </button>
@@ -68,16 +78,17 @@
 
     <!-- Main Content -->
     <div id="app" class="hidden max-w-4xl mx-auto px-4 py-6">
-        
+
         <!-- Header & Stats -->
         <header class="flex justify-between items-center mb-8 sticky top-0 z-30 py-2">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white text-xl shadow-lg" id="user-avatar">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white text-xl shadow-lg"
+                    id="user-avatar">
                     A
                 </div>
                 <div>
-                    <h2 class="font-bold text-lg leading-tight" id="user-name">Amaya</h2>
-                    <p class="text-xs opacity-60" id="user-rank">Aprendiz de Pensadora</p>
+                    <h2 class="font-bold text-lg leading-tight" id="user-name">Persona</h2>
+                    <p class="text-xs opacity-60" id="user-rank">Aprendiz</p>
                 </div>
             </div>
 
@@ -90,7 +101,8 @@
                     <i class="fas fa-coins text-yellow-500"></i>
                     <span id="stat-coins" class="font-bold">0</span>
                 </div>
-                <button id="logout-btn" class="p-2 opacity-40 hover:opacity-100 transition-opacity"><i class="fas fa-sign-out-alt"></i></button>
+                <button id="logout-btn" class="p-2 opacity-40 hover:opacity-100 transition-opacity"><i
+                        class="fas fa-sign-out-alt"></i></button>
             </div>
         </header>
 
@@ -102,15 +114,23 @@
         <!-- Quick Entry -->
         <section class="mb-10">
             <div class="glass p-6 rounded-3xl shadow-xl transition-all focus-within:ring-2 ring-indigo-400">
-                <textarea id="entry-text" placeholder="¿Qué ronda hoy por tu cabeza, Amaya? Sebastian toma nota..." class="w-full bg-transparent border-none focus:ring-0 text-xl resize-none min-h-[120px] placeholder:opacity-50" spellcheck="false"></textarea>
-                <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <textarea id="entry-text" placeholder="¿Qué ronda hoy por tu cabeza? No te preocupes, que tomo nota..."
+                    class="w-full bg-transparent border-none focus:ring-0 text-xl resize-none min-h-[120px] placeholder:opacity-50"
+                    spellcheck="false"></textarea>
+                <div
+                    class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                     <div class="flex gap-2" id="mood-selector">
-                        <button data-mood="😊" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">😊</button>
-                        <button data-mood="🤔" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🤔</button>
-                        <button data-mood="🔥" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🔥</button>
-                        <button data-mood="😢" class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">😢</button>
+                        <button data-mood="😊"
+                            class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">😊</button>
+                        <button data-mood="🤔"
+                            class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🤔</button>
+                        <button data-mood="🔥"
+                            class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">🔥</button>
+                        <button data-mood="😢"
+                            class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all">😢</button>
                     </div>
-                    <button id="save-entry" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">Guardar</button>
+                    <button id="save-entry"
+                        class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">Guardar</button>
                 </div>
             </div>
         </section>
@@ -137,24 +157,14 @@
                 <h3 class="text-2xl font-bold text-white">Personalización</h3>
                 <button id="close-shop" class="text-2xl text-white">&times;</button>
             </div>
-            <div class="grid grid-cols-1 gap-4">
-                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
-                    <span>Modo Noche</span>
-                    <button data-price="10" data-theme="theme-dark" class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">10 <i class="fas fa-coins text-yellow-500"></i></button>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
-                    <span>Bosque Zen</span>
-                    <button data-price="25" data-theme="theme-forest" class="buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">25 <i class="fas fa-coins text-yellow-500"></i></button>
-                </div>
-            </div>
+            <div id="theme-options" class="grid grid-cols-1 gap-4"></div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, doc, setDoc, getDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, setDoc, getDoc, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCMPpJUmzmmfjStAC2M7BtGzo4H9kZIRis",
@@ -173,6 +183,89 @@
 
         let currentUser = null;
         let selectedMood = '🤔';
+        const themeOptions = [
+            { id: 'default', label: 'Por Defecto', price: 0 },
+            { id: 'theme-dark', label: 'Modo Noche', price: 10 },
+            { id: 'theme-forest', label: 'Bosque Zen', price: 25 }
+        ];
+
+        function applyTheme(theme) {
+            const baseClass = 'min-h-screen';
+            if (!theme || theme === 'default') {
+                document.body.className = baseClass;
+                return;
+            }
+            document.body.className = `${baseClass} ${theme}`;
+        }
+
+        function renderThemeOptions(profileData) {
+            const container = document.getElementById('theme-options');
+            if (!container) return;
+
+            const unlocked = profileData.unlockedThemes || ['default'];
+            const currentTheme = profileData.currentTheme || 'default';
+
+            container.innerHTML = themeOptions.map(theme => {
+                const isUnlocked = unlocked.includes(theme.id);
+                const isSelected = currentTheme === theme.id;
+                const buttonLabel = theme.id === 'default'
+                    ? 'Seleccionar'
+                    : isUnlocked
+                        ? 'Seleccionar'
+                        : `Comprar ${theme.price} <i class="fas fa-coins text-yellow-500"></i>`;
+                const buttonClasses = isUnlocked
+                    ? 'select-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700'
+                    : 'buy-theme bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700';
+
+                return `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-white">
+                        <div>
+                            <div class="font-semibold">${theme.label}</div>
+                            <div class="text-xs opacity-70">${isUnlocked ? 'Desbloqueado' : `Precio ${theme.price} monedas`}</div>
+                        </div>
+                        <button
+                            data-theme="${theme.id}"
+                            data-price="${theme.price}"
+                            class="${buttonClasses} ${isSelected ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${isSelected ? 'disabled' : ''}
+                        >${buttonLabel}</button>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.select-theme, .buy-theme').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const button = e.currentTarget;
+                    const theme = button.dataset.theme;
+                    if (!theme) return;
+                    const price = parseInt(button.dataset.price || '0', 10);
+                    const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+                    const snap = await getDoc(userRef);
+                    const data = snap.data();
+                    const unlockedThemes = data.unlockedThemes || ['default'];
+                    const currentTheme = data.currentTheme || 'default';
+
+                    if (theme === currentTheme) return;
+
+                    if (unlockedThemes.includes(theme)) {
+                        await updateDoc(userRef, { currentTheme: theme });
+                        applyTheme(theme);
+                    } else {
+                        if (data.coins >= price) {
+                            const updatedThemes = Array.from(new Set([...unlockedThemes, theme]));
+                            await updateDoc(userRef, {
+                                coins: data.coins - price,
+                                currentTheme: theme,
+                                unlockedThemes: updatedThemes
+                            });
+                            applyTheme(theme);
+                        } else {
+                            alert('No tienes suficientes monedas para desbloquear este estilo.');
+                        }
+                    }
+                });
+            });
+        }
 
         // --- Auth Logic ---
         document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
@@ -181,18 +274,35 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
+                const displayName = user.displayName || 'persona';
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) authOverlay.classList.add('opacity-0', 'pointer-events-none');
+                const appEl = document.getElementById('app');
+                if (appEl) appEl.classList.remove('hidden');
+
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) userNameEl.innerText = displayName.split(' ')[0];
+
+                const authUserNameEl = document.getElementById('auth-user-name');
+                if (authUserNameEl) authUserNameEl.innerText = displayName.split(' ')[0];
+
+                const entryTextEl = document.getElementById('entry-text');
+                if (entryTextEl) entryTextEl.placeholder = `¿Qué ronda hoy por tu cabeza, ${displayName}? No te preocupes, que tomo nota...`;
+
+                try { document.title = `El Diario de ${displayName} | Pensamientos en Red`; } catch (e) { /* ignore */ }
+
                 if (user.photoURL) {
-                    document.getElementById('user-avatar').innerHTML = `<img src="${user.photoURL}" class="rounded-2xl">`;
+                    const avatarEl = document.getElementById('user-avatar');
+                    if (avatarEl) avatarEl.innerHTML = `<img src="${user.photoURL}" class="rounded-2xl">`;
                 }
-                
+
                 await initUserData();
                 loadEntries();
             } else {
-                document.getElementById('auth-overlay').classList.remove('opacity-0', 'pointer-events-none');
-                document.getElementById('app').classList.add('hidden');
+                const authOverlay = document.getElementById('auth-overlay');
+                if (authOverlay) authOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                const appEl = document.getElementById('app');
+                if (appEl) appEl.classList.add('hidden');
             }
         });
 
@@ -200,7 +310,7 @@
         async function initUserData() {
             const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
             const snap = await getDoc(userRef);
-            
+
             if (!snap.exists()) {
                 await setDoc(userRef, {
                     coins: 0,
@@ -208,10 +318,19 @@
                     lastEntryDate: null,
                     level: 1,
                     exp: 0,
+                    currentTheme: 'default',
                     unlockedThemes: ['default']
                 });
+            } else {
+                const data = snap.data();
+                const updateFields = {};
+                if (!data.currentTheme) updateFields.currentTheme = 'default';
+                if (!Array.isArray(data.unlockedThemes)) updateFields.unlockedThemes = ['default'];
+                if (Object.keys(updateFields).length > 0) {
+                    await updateDoc(userRef, updateFields);
+                }
             }
-            
+
             // Listen to profile changes
             onSnapshot(userRef, (doc) => {
                 const data = doc.data();
@@ -219,14 +338,18 @@
                 document.getElementById('stat-racha').innerText = data.racha;
                 document.getElementById('level-progress').style.width = `${(data.exp % 100)}%`;
                 document.getElementById('user-rank').innerText = getRankTitle(data.level);
+                if (data.currentTheme) {
+                    applyTheme(data.currentTheme);
+                }
+                renderThemeOptions(data);
             });
         }
 
         function getRankTitle(level) {
-            if (level < 3) return "Aprendiz de Pensadora";
+            if (level < 3) return "Aprendiz";
             if (level < 7) return "Cronista de Medianoche";
-            if (level < 15) return "Arquitecta del Caos";
-            return "Sabia Absoluta";
+            if (level < 15) return "Arquitecta/o del Caos";
+            return "Sabia/o Absoluta";
         }
 
         // --- Diary Logic ---
@@ -257,7 +380,7 @@
             const now = new Date();
             const lastDate = profileData.lastEntryDate?.toDate();
             let newRacha = profileData.racha;
-            
+
             if (!lastDate || (now - lastDate) > 86400000 * 2) {
                 newRacha = 1;
             } else if ((now - lastDate) > 86400000) {
@@ -273,7 +396,7 @@
             });
 
             document.getElementById('entry-text').value = '';
-            showSebastianComment();
+            showComment();
         };
 
         function loadEntries() {
@@ -281,21 +404,55 @@
             onSnapshot(q, (snapshot) => {
                 const feed = document.getElementById('feed');
                 feed.innerHTML = '';
-                
-                const sorted = snapshot.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
-                
-                sorted.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.timestamp.toDate().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                // Normalize entries with a numeric timestamp so sorting won't fail
+                const entries = snapshot.docs.map(d => {
+                    const data = d.data();
+                    let ts = 0;
+                    if (data.timestamp && typeof data.timestamp.toMillis === 'function') {
+                        ts = data.timestamp.toMillis();
+                    } else if (data.timestamp && data.timestamp.seconds) {
+                        ts = (data.timestamp.seconds || 0) * 1000;
+                    } else if (data.timestamp) {
+                        ts = new Date(data.timestamp).getTime() || 0;
+                    }
+                    return { id: d.id, data, ts };
+                });
+
+                entries.sort((a, b) => b.ts - a.ts);
+
+                entries.forEach(entry => {
+                    const data = entry.data;
+                    const date = data.timestamp && typeof data.timestamp.toDate === 'function'
+                        ? data.timestamp.toDate().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
+                        : new Date(entry.ts).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+
                     const card = document.createElement('div');
-                    card.className = 'glass p-6 rounded-3xl shadow-sm border-l-4 border-indigo-500';
+                    card.className = 'glass p-6 rounded-3xl shadow-sm border-l-4 border-indigo-500 relative';
                     card.innerHTML = `
+                        <button class="delete-entry absolute bottom-4 right-4 text-red-500 hover:text-red-700" title="Borrar entrada">&times;</button>
                         <div class="flex justify-between mb-2">
                             <span class="text-xs font-bold opacity-40 uppercase tracking-widest">${date}</span>
-                            <span>${data.mood}</span>
+                            <span>${data.mood || ''}</span>
                         </div>
-                        <p class="text-lg leading-relaxed">${data.content}</p>
+                        <p class="text-lg leading-relaxed">${data.content || ''}</p>
                     `;
+
+                    // Attach delete handler
+                    const deleteBtn = card.querySelector('.delete-entry');
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const confirmDelete = confirm('¿Seguro/a que quieres borrar esta entrada?');
+                        if (!confirmDelete) return;
+                        try {
+                            const entryRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'entries', entry.id);
+                            await deleteDoc(entryRef);
+                        } catch (err) {
+                            console.error('Error borrando entrada:', err);
+                            alert('No se pudo borrar la entrada. Revisa la consola.');
+                        }
+                    });
+
                     feed.appendChild(card);
                 });
             }, (error) => console.error("Error cargando entradas:", error));
@@ -305,33 +462,12 @@
         document.getElementById('open-shop').onclick = () => document.getElementById('shop-modal').classList.remove('hidden');
         document.getElementById('close-shop').onclick = () => document.getElementById('shop-modal').classList.add('hidden');
 
-        document.querySelectorAll('.buy-theme').forEach(btn => {
-            btn.onclick = async () => {
-                const price = parseInt(btn.dataset.price);
-                const theme = btn.dataset.theme;
-                const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
-                const snap = await getDoc(userRef);
-                const data = snap.data();
-
-                if (data.coins >= price) {
-                    await updateDoc(userRef, { 
-                        coins: data.coins - price,
-                        currentTheme: theme 
-                    });
-                    document.body.className = 'min-h-screen ' + theme;
-                    document.getElementById('shop-modal').classList.add('hidden');
-                } else {
-                    alert("Amaya, no tenemos suficientes monedas para estos lujos. ¡A escribir!");
-                }
-            };
-        });
-
-        function showSebastianComment() {
+        function showComment() {
             const comments = [
                 "Anotado. Una joya más para tu colección de pensamientos.",
-                "Vaya, Amaya. Profundo. O al menos lo parece.",
+                "Vaya, " + currentUser.displayName + ". Profundo. O al menos lo parece.",
                 "Guardado. Tu cerebro está que echa chispas hoy.",
-                "Hecho. Sebastian se encarga de que esto no se pierda."
+                "Hecho. Me encargaré de que esto no se pierda."
             ];
             const msg = comments[Math.floor(Math.random() * comments.length)];
             const toast = document.createElement('div');
@@ -342,4 +478,5 @@
         }
     </script>
 </body>
+
 </html>
