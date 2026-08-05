@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+<body>
+<aside id="sidebar">
+<h1>🌸 Life Dashboard</h1>
+<nav>
+<a href="#home">🏠 Inicio</a>
+<a href="#imports">📥 Importar</a>
+<a href="#activity">🚶 Actividad</a>
+<a href="#cycle">🌸 Ciclo</a>
+<a href="#correlations">🔬 Correlaciones</a>
+<a href="#statistics">📈 Estadísticas</a>
+<a href="#insights">🤖 Insights</a>
+<a href="#settings">⚙ Configuración</a>
+</nav>
+</aside>
+<main>
+<header><h2>Centro de mando</h2><button id="themeToggle">🌙</button></header>
+
+<section id="imports">
+<h2>Importar datos</h2>
+<div class="import-card">
+<h3>Google Takeout</h3>
+<input type="file" id="googleTakeoutInput" accept=".zip">
+<button id="importGoogleButton">Importar ZIP</button>
+<p id="googleImportStatus">Sin importar</p>
+</div>
+<div class="import-card">
+<h3>WomanLog</h3>
+<input type="file" id="womanLogInput" accept=".csv">
+<button id="importWomanLogButton">Importar CSV</button>
+<p id="womanImportStatus">Sin importar</p>
+</div>
+<progress id="importProgressBar" max="100" value="0"></progress>
+<span id="progressText">Esperando...</span>
+</section>
+
+<section id="home"><h2>Resumen</h2>
+<div class="card"><h3>Pasos hoy</h3><span id="stepsToday">--</span></div>
+<div class="card"><h3>Media</h3><span id="averageSteps">--</span></div>
+<div class="card"><h3>Fase</h3><span id="currentPhase">--</span></div>
+<div class="card"><h3>Día ciclo</h3><span id="cycleDay">--</span></div>
+</section>
+
+<section id="activity">
+<h2>Actividad</h2>
+<canvas id="stepsChart"></canvas>
+<canvas id="monthlyChart"></canvas>
+<canvas id="yearlyChart"></canvas>
+</section>
+
+<section id="cycle">
+<h2>Ciclo</h2>
+<canvas id="cycleChart"></canvas>
+<div id="cycleCalendar"></div>
+</section>
+
+<section id="correlations">
+<h2>Correlaciones</h2>
+<canvas id="phaseChart"></canvas>
+<canvas id="cycleDayChart"></canvas>
+<canvas id="scatterChart"></canvas>
+</section>
+
+<section id="statistics">
+<h2>Estadísticas</h2>
+<div id="heatmap"></div>
+<div class="card"><span id="recordDay">--</span></div>
+<div class="card"><span id="recordWeek">--</span></div>
+<div class="card"><span id="recordMonth">--</span></div>
+<div class="card"><span id="recordYear">--</span></div>
+</section>
+
+<section id="insights">
+<h2>Insights</h2>
+<div id="insightsContainer"></div>
+</section>
+
+<section id="settings">
+<h2>Configuración</h2>
+<button id="reloadData">Reimportar</button>
+<button id="clearDatabase">Borrar base local</button>
+</section>
+
+<script src="js/database.js"></script>
+<script src="js/parserWomanLog.js"></script>
+<script src="js/parserGoogleFit.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/app.js"></script>
+</main>
+</body></html>
