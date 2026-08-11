@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HistoriGO - Aprende Historia Jugando</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts (Fredoka for Duolingo playful typography & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f7f9fa;
+      user-select: none;
+    }
+
+    .font-duo {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+
+    /* 3D Duolingo Style Buttons */
+    .btn-duo-green {
+      background-color: #58cc02;
+      box-shadow: 0 4px 0 #46a302;
+      transition: all 0.1s ease;
+    }
+    .btn-duo-green:hover {
+      background-color: #61e002;
+    }
+    .btn-duo-green:active {
+      box-shadow: 0 0 0 #46a302;
+      transform: translateY(4px);
+    }
+
+    .btn-duo-blue {
+      background-color: #1cb0f6;
+      box-shadow: 0 4px 0 #1899d6;
+      transition: all 0.1s ease;
+    }
+    .btn-duo-blue:hover {
+      background-color: #2bb8ff;
+    }
+    .btn-duo-blue:active {
+      box-shadow: 0 0 0 #1899d6;
+      transform: translateY(4px);
+    }
+
+    .btn-duo-gold {
+      background-color: #ffc800;
+      box-shadow: 0 4px 0 #e5b200;
+      transition: all 0.1s ease;
+    }
+    .btn-duo-gold:hover {
+      background-color: #ffd21a;
+    }
+    .btn-duo-gold:active {
+      box-shadow: 0 0 0 #e5b200;
+      transform: translateY(4px);
+    }
+
+    .btn-duo-gray {
+      background-color: #e5e7eb;
+      box-shadow: 0 4px 0 #d1d5db;
+      color: #9ca3af;
+    }
+
+    .btn-duo-red {
+      background-color: #ff4b4b;
+      box-shadow: 0 4px 0 #ea2b2b;
+      transition: all 0.1s ease;
+    }
+    .btn-duo-red:hover {
+      background-color: #ff5959;
+    }
+    .btn-duo-red:active {
+      box-shadow: 0 0 0 #ea2b2b;
+      transform: translateY(4px);
+    }
+
+    .card-3d {
+      border: 2px solid #e5e7eb;
+      box-shadow: 0 4px 0 #e5e7eb;
+      transition: all 0.15s ease;
+    }
+
+    .card-3d-active {
+      border-color: #84d8ff;
+      background-color: #ddf4ff;
+      box-shadow: 0 4px 0 #84d8ff;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    /* Keyframe Animations */
+    @keyframes pulse-subtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-bounce-short {
+      animation: bounce 1s infinite;
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between">
+
+  <!-- TOP HEADER / NAV BAR -->
+  <header class="sticky top-0 z-40 bg-white border-b-2 border-slate-200 px-4 py-3 shadow-sm">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      
+      <!-- Country/Region Selector Trigger -->
+      <button onclick="openCountryModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-200 px-3 py-1.5 rounded-2xl transition font-bold text-slate-700">
+        <span id="header-country-flag" class="text-2xl">🇪🇸</span>
+        <span id="header-country-name" class="font-duo text-lg">España</span>
+        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+      </button>
+
+      <!-- Gamification Counters -->
+      <div class="flex items-center gap-3 sm:gap-6 font-duo font-bold text-base sm:text-lg">
+        <!-- Streak -->
+        <div class="flex items-center gap-1.5 text-amber-500" title="Racha de días">
+          <i class="fa-solid fa-fire text-xl animate-pulse"></i>
+          <span id="user-streak">3</span>
+        </div>
+        
+        <!-- Coins/Gems -->
+        <div class="flex items-center gap-1.5 text-sky-500" title="Gemas">
+          <i class="fa-solid fa-gem text-xl"></i>
+          <span id="user-gems">450</span>
+        </div>
+
+        <!-- Total XP -->
+        <div class="flex items-center gap-1.5 text-amber-600" title="Experiencia total">
+          <i class="fa-solid fa-bolt text-xl text-yellow-400"></i>
+          <span id="user-xp">1,240</span>
+        </div>
+
+        <!-- Hearts / Energy -->
+        <button onclick="openEnergyModal()" class="flex items-center gap-1.5 text-rose-500 hover:bg-rose-50 p-1 px-2 rounded-xl border border-transparent hover:border-rose-200 transition" title="Energía">
+          <i class="fa-solid fa-heart text-xl animate-bounce-short"></i>
+          <span id="user-hearts">5</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-5xl mx-auto w-full flex-1 p-4 pb-24 md:pb-8 flex flex-col md:flex-row gap-8 justify-center">
+
+    <!-- VIEW 1: LEARN PATH (SNAKE ROAD) -->
+    <section id="view-learn" class="flex-1 max-w-xl mx-auto w-full flex flex-col items-center">
+      
+      <!-- Current Section Banner -->
+      <div id="section-banner" class="w-full bg-emerald-500 text-white rounded-3xl p-5 mb-8 shadow-lg border-b-4 border-emerald-700 relative overflow-hidden">
+        <div class="relative z-10">
+          <span class="bg-emerald-700/60 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">Sección Actual</span>
+          <h2 id="section-title" class="font-duo text-2xl font-bold mt-1">Edad Antigua y Numancia</h2>
+          <p id="section-desc" class="text-emerald-100 text-sm mt-1">Conoce los primeros pobladores, la llegada de los romanos y la geografía íbera.</p>
+        </div>
+        <i class="fa-solid fa-landmark absolute -right-4 -bottom-4 text-8xl opacity-20"></i>
+      </div>
+
+      <!-- Snake Path Container -->
+      <div id="path-container" class="w-full flex flex-col items-center gap-6 relative py-4">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: MAP & GEOGRAPHY -->
+    <section id="view-map" class="hidden flex-1 max-w-2xl mx-auto w-full flex flex-col">
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-md mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-duo text-2xl font-bold text-slate-800">Atlas Histórico Interactivo</h2>
+            <p class="text-slate-500 text-sm">Explora las fronteras y los imperios según el año elegido.</p>
+          </div>
+          <span class="bg-sky-100 text-sky-700 font-bold px-3 py-1 rounded-xl text-sm" id="map-era-badge">Año 218 a.C.</span>
+        </div>
+
+        <!-- SVG Interactive Geography Canvas -->
+        <div class="relative w-full aspect-video bg-sky-100 rounded-2xl border-2 border-slate-200 overflow-hidden flex items-center justify-center p-4" id="svg-map-wrapper">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2" id="map-era-tabs">
+          <!-- Era tabs rendered dynamically -->
+        </div>
+      </div>
+
+      <div id="map-info-card" class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 text-amber-900 flex items-start gap-3">
+        <i class="fa-solid fa-map-location-dot text-2xl text-amber-600 mt-1"></i>
+        <div>
+          <h4 class="font-bold text-base" id="map-info-title">Península Ibérica Prerromana</h4>
+          <p class="text-sm mt-0.5" id="map-info-desc">Selecciona los territorios señalados en el mapa para descubrir las diferentes tribus íberas, celtas y colonias fenicias.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: PROFILE -->
+    <section id="view-profile" class="hidden flex-1 max-w-xl mx-auto w-full flex flex-col gap-6">
+      
+      <!-- Profile Header Card -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+        <div class="relative">
+          <div class="w-24 h-24 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center text-4xl text-emerald-600 font-duo font-bold">
+            <i class="fa-solid fa-user-astronaut"></i>
+          </div>
+          <span class="absolute bottom-0 right-0 bg-amber-400 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-full border-2 border-white">Niv 5</span>
+        </div>
+        <div class="text-center sm:text-left flex-1">
+          <h2 class="font-duo text-2xl font-bold text-slate-800" id="profile-username">Historiador Explorador</h2>
+          <p class="text-slate-400 text-sm">Se unió en Agosto 2026</p>
+
+          <div class="mt-3 flex flex-wrap justify-center sm:justify-start gap-4 text-sm font-bold">
+            <div class="flex items-center gap-1.5 text-amber-500">
+              <i class="fa-solid fa-fire text-lg"></i>
+              <span>Racha máx: <strong id="profile-max-streak" class="text-slate-800">7 días</strong></span>
+            </div>
+            <div class="flex items-center gap-1.5 text-sky-500">
+              <i class="fa-solid fa-bolt text-lg text-yellow-400"></i>
+              <span>XP Total: <strong id="profile-total-xp" class="text-slate-800">1,240</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Courses -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
+        <h3 class="font-duo text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap text-emerald-500"></i> Cursos Iniciados
+        </h3>
+        <div id="profile-courses-list" class="flex flex-col gap-3">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Badges & Achievements -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
+        <h3 class="font-duo text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-amber-500"></i> Logros e Insignias
+        </h3>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="bg-slate-50 border-2 border-slate-200 p-3 rounded-2xl flex flex-col items-center">
+            <div class="text-3xl mb-1">📜</div>
+            <span class="font-bold text-xs text-slate-700">Primer Trazo</span>
+            <span class="text-[10px] text-slate-400">Completa 1 lección</span>
+          </div>
+          <div class="bg-slate-50 border-2 border-slate-200 p-3 rounded-2xl flex flex-col items-center">
+            <div class="text-3xl mb-1">🗺️</div>
+            <span class="font-bold text-xs text-slate-700">Cartógrafo</span>
+            <span class="text-[10px] text-slate-400">Explora 3 mapas</span>
+          </div>
+          <div class="bg-amber-50 border-2 border-amber-300 p-3 rounded-2xl flex flex-col items-center">
+            <div class="text-3xl mb-1">🔥</div>
+            <span class="font-bold text-xs text-amber-900">En Racha</span>
+            <span class="text-[10px] text-amber-700">3 días seguidos</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW 4: DAILY QUESTS -->
+    <section id="view-quests" class="hidden flex-1 max-w-xl mx-auto w-full flex flex-col gap-4">
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
+        <h2 class="font-duo text-2xl font-bold text-slate-800 mb-1">Misiones Diarias</h2>
+        <p class="text-slate-500 text-sm mb-6">Gana gemas y experiencia completando tus metas de hoy.</p>
+
+        <div class="space-y-4">
+          <!-- Quest 1 -->
+          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+            <div class="text-3xl bg-amber-100 p-3 rounded-2xl">⚡</div>
+            <div class="flex-1">
+              <div class="flex justify-between font-bold text-sm mb-1">
+                <span>Gana 50 XP hoy</span>
+                <span class="text-emerald-600">30 / 50</span>
+              </div>
+              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: 60%"></div>
+              </div>
+            </div>
+            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+20 💎</span>
+          </div>
+
+          <!-- Quest 2 -->
+          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+            <div class="text-3xl bg-sky-100 p-3 rounded-2xl">🎯</div>
+            <div class="flex-1">
+              <div class="flex justify-between font-bold text-sm mb-1">
+                <span>Completa 2 lecciones perfectas</span>
+                <span class="text-emerald-600">1 / 2</span>
+              </div>
+              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: 50%"></div>
+              </div>
+            </div>
+            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+30 💎</span>
+          </div>
+
+          <!-- Quest 3 -->
+          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+            <div class="text-3xl bg-rose-100 p-3 rounded-2xl">🗺️</div>
+            <div class="flex-1">
+              <div class="flex justify-between font-bold text-sm mb-1">
+                <span>Completa 1 lección de Geografía</span>
+                <span class="text-emerald-600">0 / 1</span>
+              </div>
+              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+15 💎</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION BAR (DUOLINGO STYLE) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-slate-200 px-4 py-2">
+    <div class="max-w-md mx-auto flex items-center justify-around">
+      <button onclick="switchTab('learn')" id="nav-btn-learn" class="nav-btn flex flex-col items-center gap-1 text-emerald-500 font-bold text-xs p-2 rounded-xl">
+        <i class="fa-solid fa-house text-2xl"></i>
+        <span>Aprender</span>
+      </button>
+
+      <button onclick="switchTab('map')" id="nav-btn-map" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
+        <i class="fa-solid fa-map-location-dot text-2xl"></i>
+        <span>Mapas</span>
+      </button>
+
+      <button onclick="switchTab('quests')" id="nav-btn-quests" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
+        <i class="fa-solid fa-scroll text-2xl"></i>
+        <span>Misiones</span>
+      </button>
+
+      <button onclick="switchTab('profile')" id="nav-btn-profile" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
+        <i class="fa-solid fa-circle-user text-2xl"></i>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: COUNTRY SELECTOR -->
+  <div id="modal-country" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-200 transform transition-all">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-duo text-2xl font-bold text-slate-800">Elige un País / Región</h3>
+        <button onclick="closeCountryModal()" class="text-slate-400 hover:text-slate-600 text-xl p-2">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="text-slate-500 text-sm mb-4">Cada región mantiene su propio progreso e historia independiente.</p>
+
+      <div id="country-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REFILL ENERGY / WATCH AD -->
+  <div id="modal-energy" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-200 text-center">
+      <div class="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-rose-500">
+        <i class="fa-solid fa-heart-pulse animate-pulse"></i>
+      </div>
+
+      <h3 class="font-duo text-2xl font-bold text-slate-800 mb-2">¿Te quedaste sin energía?</h3>
+      <p class="text-slate-500 text-sm mb-6">Necesitas energía para realizar lecciones. ¡Mira un video publicitario para recargar completas tus vidas o intercambia gemas!</p>
+
+      <div class="space-y-3">
+        <button onclick="simulateWatchAd()" class="w-full btn-duo-green text-white font-duo font-bold py-3 rounded-2xl text-lg flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-play text-xl"></i>
+          <span>Ver Anuncio (+5 ❤️ Gratis)</span>
+        </button>
+
+        <button onclick="buyEnergyWithGems()" class="w-full btn-duo-blue text-white font-duo font-bold py-3 rounded-2xl text-lg flex items-center justify-center gap-2">
+          <i class="fa-solid fa-gem text-xl"></i>
+          <span>Comprar Vidas por 100 💎</span>
+        </button>
+
+        <button onclick="closeEnergyModal()" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-2xl hover:bg-slate-200 transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SIMULATED AD RUNNER -->
+  <div id="modal-ad-sim" class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-6 text-white text-center">
+    <div class="max-w-sm w-full bg-slate-800 rounded-3xl p-6 border-2 border-slate-700 flex flex-col items-center">
+      <span class="bg-amber-400 text-slate-900 text-xs font-black uppercase px-2.5 py-1 rounded-md mb-4">Anuncio de Historia</span>
+      <div class="w-16 h-16 bg-slate-700 rounded-2xl flex items-center justify-center text-3xl mb-4 text-amber-400">
+        <i class="fa-solid fa-film"></i>
+      </div>
+      <h4 class="font-duo text-xl font-bold mb-2">Patrocinios HistoriGO</h4>
+      <p class="text-slate-300 text-sm mb-6">"Los grandes imperios no se construyeron en un día. ¡Sigue aprendiendo!"</p>
+      
+      <!-- Ad Timer Progress -->
+      <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden mb-4">
+        <div id="ad-progress-bar" class="bg-amber-400 h-full rounded-full w-0 transition-all duration-100"></div>
+      </div>
+
+      <p id="ad-timer-text" class="text-xs text-slate-400">Espera 5 segundos...</p>
+      
+      <button id="ad-claim-btn" onclick="finishAdReward()" disabled class="mt-4 w-full btn-duo-gray font-duo font-bold py-3 rounded-2xl cursor-not-allowed">
+        Reclamar Recompensa
+      </button>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN LESSON ENGINE -->
+  <div id="lesson-screen" class="fixed inset-0 z-50 bg-white hidden flex flex-col justify-between p-4 sm:p-6">
+    
+    <!-- Lesson Header -->
+    <div class="max-w-2xl mx-auto w-full flex items-center justify-between gap-4">
+      <button onclick="exitLessonConfirm()" class="text-slate-400 hover:text-slate-600 text-2xl">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Progress bar -->
+      <div class="flex-1 bg-slate-100 h-4 rounded-full overflow-hidden border-2 border-slate-200">
+        <div id="lesson-progress-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+
+      <!-- Hearts counter -->
+      <div class="flex items-center gap-1.5 text-rose-500 font-duo font-bold text-lg">
+        <i class="fa-solid fa-heart"></i>
+        <span id="lesson-hearts-val">5</span>
+      </div>
+    </div>
+
+    <!-- Lesson Content Body -->
+    <div class="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center my-4 overflow-y-auto pr-1" id="lesson-content-area">
+      <!-- Question / Curiosity card rendered here dynamically -->
+    </div>
+
+    <!-- Lesson Footer / Check Button Container -->
+    <div id="lesson-footer" class="border-t-2 border-slate-200 pt-4 max-w-2xl mx-auto w-full">
+      <div id="lesson-feedback-banner" class="hidden rounded-2xl p-4 mb-4 flex items-center gap-3">
+        <!-- Banner dynamics -->
+      </div>
+      <button id="lesson-action-btn" onclick="checkAnswer()" class="w-full btn-duo-green text-white font-duo text-xl font-bold py-4 rounded-2xl">
+        COMPROBAR
+      </button>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & DEMO DATA -->
+  <script>
+
+    // FIREBASE ACCESS CONFIGURATION TEMPLATE
+    // Inserte sus credenciales de Firebase aquí cuando desee habilitar la persistencia en la nube:
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+    };
+
+    // Global Demo Data for History Courses
+    const COURSES_DATA = {
+      es: {
+        id: 'es',
+        name: 'España',
+        flag: '🇪🇸',
+        sections: [
+          {
+            id: 'sec_1',
+            title: 'Edad Antigua y Numancia',
+            desc: 'Pobladores íberos, celtas, colonias fenicias y la conquista romana.',
+            lessons: [
+              {
+                id: 'l1_1',
+                title: 'Los Íberos y Celtas',
+                type: 'trivia',
+                question: '¿Qué famosa escultura representa el arte íbero del siglo IV a.C.?',
+                fact: 'La Dama de Elche es una de las esculturas más famosas del arte íbero, encontrada en Alicante en 1897.',
+                options: ['La Dama de Elche', 'El Acueducto de Segovia', 'La Mezquita de Córdoba', 'El Discóbolo'],
+                correct: 0
+              },
+              {
+                id: 'l1_2',
+                title: 'Mapa: Hispania Romana',
+                type: 'map',
+                era: 'Siglo I a.C.',
+                question: 'Identifica la capital de la provincia de Lusitania en Hispania:',
+                mapLocations: [
+                  { id: 'loc1', name: 'Emerita Augusta (Mérida)', x: 35, y: 65, isCorrect: true },
+                  { id: 'loc2', name: 'Tarraco (Tarragona)', x: 75, y: 35, isCorrect: false },
+                  { id: 'loc3', name: 'Hispalis (Sevilla)', x: 30, y: 80, isCorrect: false }
+                ]
+              },
+              {
+                id: 'l1_3',
+                title: 'La Gesta de Numancia',
+                type: 'memorize',
+                question: '¿En qué año cayó la ciudad de Numancia tras el asedio romano de Escipión?',
+                options: ['133 a.C.', '218 a.C.', '476 d.C.', '711 d.C.'],
+                correct: 0
+              }
+            ]
+          },
+          {
+            id: 'sec_2',
+            title: 'Al-Ándalus y los Reinos Cristianos',
+            desc: 'Desde la llegada en 711 hasta la Reconquista de Granada.',
+            lessons: [
+              {
+                id: 'l2_1',
+                title: 'El Califato de Córdoba',
+                type: 'trivia',
+                question: '¿Quién se proclamó el primer Califa de Córdoba en el año 929?',
+                fact: 'Abderramán III llevó a Al-Ándalus a su máximo esplendor cultural, científico y político.',
+                options: ['Abderramán III', 'Don Pelayo', 'El Cid Campeador', 'Almanzor'],
+                correct: 0
+              },
+              {
+                id: 'l2_2',
+                title: 'Mapa: Reinos en el año 1212',
+                type: 'map',
+                era: 'Año 1212 d.C.',
+                question: '¿Dónde tuvo lugar la decisiva batalla de las Navas de Tolosa?',
+                mapLocations: [
+                  { id: 'loc1', name: 'Navas de Tolosa (Jaén)', x: 48, y: 72, isCorrect: true },
+                  { id: 'loc2', name: 'Covadonga (Asturias)', x: 38, y: 15, isCorrect: false },
+                  { id: 'loc3', name: 'Toledo', x: 45, y: 50, isCorrect: false }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      jp: {
+        id: 'jp',
+        name: 'Japón',
+        flag: '🇯🇵',
+        sections: [
+          {
+            id: 'sec_jp1',
+            title: 'Japón Feudal y Samuráis',
+            desc: 'La era del Shogunato y el código del Bushido.',
+            lessons: [
+              {
+                id: 'l_jp1',
+                title: 'El Unificador de Japón',
+                type: 'trivia',
+                question: '¿Qué Shogun unificó Japón tras la batalla de Sekigahara en 1600?',
+                fact: 'Tokugawa Ieyasu estableció el Shogunato Tokugawa, dando inicio al periodo Edo de paz.',
+                options: ['Tokugawa Ieyasu', 'Oda Nobunaga', 'Emperador Meiji', 'Miyamoto Musashi'],
+                correct: 0
+              }
+            ]
+          }
+        ]
+      },
+      eg: {
+        id: 'eg',
+        name: 'Egipto',
+        flag: '🇪🇬',
+        sections: [
+          {
+            id: 'sec_eg1',
+            title: 'Antiguo Imperio Faraónico',
+            desc: 'Pirámides, jeroglíficos y la mitología a orillas del Nilo.',
+            lessons: [
+              {
+                id: 'l_eg1',
+                title: 'Las Pirámides de Guiza',
+                type: 'memorize',
+                question: '¿Para qué faraón se construyó la Gran Pirámide de Guiza?',
+                options: ['Jufu (KEOPS)', 'Ramsés II', 'Tutankamón', 'Akenatón'],
+                correct: 0
+              }
+            ]
+          }
+        ]
+      },
+      mx: {
+        id: 'mx',
+        name: 'México',
+        flag: '🇲🇽',
+        sections: [
+          {
+            id: 'sec_mx1',
+            title: 'Civilizaciones Mesoamericanas',
+            desc: 'Mayas, Aztecas y Tenochtitlan.',
+            lessons: [
+              {
+                id: 'l_mx1',
+                title: 'La Gran Tenochtitlan',
+                type: 'trivia',
+                question: '¿Sobre qué lago fue fundada la majestuosa ciudad azteca de Tenochtitlan?',
+                fact: 'Fue fundada en 1325 sobre el lago de Texcoco mediante un ingenioso sistema de chinampas.',
+                options: ['Lago de Texcoco', 'Lago de Cuitzeo', 'Lago de Chapala', 'Lago de Pátzcuaro'],
+                correct: 0
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    // State Variables
+    let userState = {
+      activeCountry: 'es',
+      streak: 3,
+      maxStreak: 7,
+      gems: 450,
+      xp: 1240,
+      hearts: 5,
+      completedLessons: {
+        'es': ['l1_1']
+      }
+    };
+
+    let activeLesson = null;
+    let currentQuestionIdx = 0;
+    let selectedOptionIdx = null;
+    let selectedMapLocId = null;
+
+
+    // Sound Synth using Web Audio API (Duolingo style audio response)
+    function playAudioTone(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
+          osc.frequency.setValueAtTime(196, ctx.currentTime + 0.15); // G3
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.4);
+        } else if (type === 'complete') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12);
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.24);
+          gain.gain.setValueAtTime(0.4, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.5);
+        }
+      } catch (e) {
+        console.log('Audio disabled or blocked by browser interactions');
+      }
+    }
+
+
+    // Initializer function for Firebase setup (when user provides keys)
+    function initFirebaseIfAvailable() {
+      if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 0) {
+        console.log("Conectando con Firebase...");
+        // Placeholder handler for user's eventual Firebase integration
+      } else {
+        console.log("HistoriGO usando estado local (plantilla demo).");
+      }
+    }
+
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+      // Update Nav active style
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-emerald-500');
+        btn.classList.add('text-slate-400');
+      });
+      const activeBtn = document.getElementById(`nav-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-emerald-500');
+      }
+
+      if (tabId === 'map') renderMapTabContent();
+      if (tabId === 'profile') renderProfileTabContent();
+    }
+
+    // Render Main Learn Path (Duolingo Path Snake)
+    function renderLearnPath() {
+      const countryData = COURSES_DATA[userState.activeCountry];
+      if (!countryData) return;
+
+      // Update Header Flag & Name
+      document.getElementById('header-country-flag').innerText = countryData.flag;
+      document.getElementById('header-country-name').innerText = countryData.name;
+
+      const section = countryData.sections[0]; // Active section demo
+      document.getElementById('section-title').innerText = section.title;
+      document.getElementById('section-desc').innerText = section.desc;
+
+      const pathContainer = document.getElementById('path-container');
+      pathContainer.innerHTML = '';
+
+      const completed = userState.completedLessons[userState.activeCountry] || [];
+
+      // Generate Snake Nodes
+      section.lessons.forEach((lesson, index) => {
+        const isDone = completed.includes(lesson.id);
+        const isCurrent = !isDone && (index === 0 || completed.includes(section.lessons[index - 1].id));
+
+        // Horizontal offset for Duolingo snake effect
+        const offsets = ['translate-x-0', 'translate-x-8', '-translate-x-8', 'translate-x-0'];
+        const offsetClass = offsets[index % offsets.length];
+
+        const nodeWrapper = document.createElement('div');
+        nodeWrapper.className = `flex flex-col items-center relative my-2 ${offsetClass}`;
+
+        let btnStyle = 'btn-duo-gray cursor-not-allowed';
+        let iconHtml = '<i class="fa-solid fa-lock text-2xl"></i>';
+
+        if (isDone) {
+          btnStyle = 'btn-duo-gold hover:scale-105';
+          iconHtml = '<i class="fa-solid fa-check text-2xl text-amber-900"></i>';
+        } else if (isCurrent) {
+          btnStyle = 'btn-duo-green animate-pulse-subtle hover:scale-105';
+          iconHtml = '<i class="fa-solid fa-star text-2xl text-white"></i>';
+        }
+
+        nodeWrapper.innerHTML = `
+          <button onclick="${isCurrent || isDone ? `startLesson('${lesson.id}')` : ''}" 
+            class="w-20 h-20 rounded-full ${btnStyle} flex items-center justify-center border-4 border-white shadow-xl relative z-10">
+            ${iconHtml}
+          </button>
+          <span class="font-duo font-bold text-sm text-slate-700 mt-2 bg-white px-3 py-1 rounded-xl shadow-sm border border-slate-200">
+            ${lesson.title}
+          </span>
+        `;
+
+        pathContainer.appendChild(nodeWrapper);
+      });
+    }
+
+    // Start Lesson Mode
+    function startLesson(lessonId) {
+      if (userState.hearts <= 0) {
+        openEnergyModal();
+        return;
+      }
+
+      const countryData = COURSES_DATA[userState.activeCountry];
+      let foundLesson = null;
+
+      countryData.sections.forEach(s => {
+        s.lessons.forEach(l => {
+          if (l.id === lessonId) foundLesson = l;
+        });
+      });
+
+      if (!foundLesson) return;
+
+      activeLesson = foundLesson;
+      currentQuestionIdx = 0;
+      selectedOptionIdx = null;
+      selectedMapLocId = null;
+
+      document.getElementById('lesson-screen').classList.remove('hidden');
+      document.getElementById('lesson-hearts-val').innerText = userState.hearts;
+      renderLessonQuestion();
+    }
+
+    // Render Current Question Inside Lesson
+    function renderLessonQuestion() {
+      const area = document.getElementById('lesson-content-area');
+      const actionBtn = document.getElementById('lesson-action-btn');
+      const feedbackBanner = document.getElementById('lesson-feedback-banner');
+
+      feedbackBanner.className = 'hidden rounded-2xl p-4 mb-4 flex items-center gap-3';
+      actionBtn.className = 'w-full btn-duo-green text-white font-duo text-xl font-bold py-4 rounded-2xl';
+      actionBtn.innerText = 'COMPROBAR';
+      actionBtn.onclick = checkAnswer;
+
+      selectedOptionIdx = null;
+      selectedMapLocId = null;
+
+      if (activeLesson.type === 'trivia' || activeLesson.type === 'memorize') {
+        area.innerHTML = `
+          <div class="flex flex-col items-center text-center max-w-lg mx-auto">
+            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+              ${activeLesson.type === 'trivia' ? 'Curiosidad Histórica' : 'Memorización'}
+            </span>
+            <h2 class="font-duo text-2xl sm:text-3xl font-bold text-slate-800 mb-6">${activeLesson.question}</h2>
+            
+            <div class="w-full flex flex-col gap-3">
+              ${activeLesson.options.map((opt, i) => `
+                <button onclick="selectOption(${i})" id="opt-btn-${i}" class="card-3d bg-white hover:bg-slate-50 text-left font-bold text-lg p-4 rounded-2xl text-slate-700 transition flex items-center justify-between">
+                  <span>${opt}</span>
+                  <span class="w-7 h-7 rounded-lg border-2 border-slate-200 flex items-center justify-center text-xs text-slate-400 font-mono">${i + 1}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (activeLesson.type === 'map') {
+        area.innerHTML = `
+          <div class="flex flex-col items-center text-center max-w-lg mx-auto w-full">
+            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+              Geografía e Historia (${activeLesson.era})
+            </span>
+            <h2 class="font-duo text-xl sm:text-2xl font-bold text-slate-800 mb-4">${activeLesson.question}</h2>
+            
+            <div class="relative w-full aspect-video bg-sky-100 rounded-2xl border-2 border-slate-300 overflow-hidden shadow-inner p-2">
+              <svg class="w-full h-full" viewBox="0 0 100 100">
+                <!-- Iberia outline simulation -->
+                <path d="M 20,20 L 70,15 L 85,40 L 75,85 L 35,90 L 15,65 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
+                ${activeLesson.mapLocations.map(loc => `
+                  <g onclick="selectMapLoc('${loc.id}')" class="cursor-pointer">
+                    <circle cx="${loc.x}" cy="${loc.y}" r="6" id="map-pin-${loc.id}" class="fill-rose-500 stroke-white stroke-2 hover:scale-125 transition transform origin-center" />
+                    <text x="${loc.x}" y="${loc.y - 8}" text-anchor="middle" class="text-[5px] font-bold fill-slate-800 bg-white px-1">${loc.name}</text>
+                  </g>
+                `).join('')}
+              </svg>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('lesson-progress-bar').style.width = '50%';
+    }
+
+    function selectOption(idx) {
+      selectedOptionIdx = idx;
+      activeLesson.options.forEach((_, i) => {
+        const btn = document.getElementById(`opt-btn-${i}`);
+        if (btn) {
+          if (i === idx) {
+            btn.className = 'card-3d card-3d-active text-left font-bold text-lg p-4 rounded-2xl text-slate-800 flex items-center justify-between';
+          } else {
+            btn.className = 'card-3d bg-white text-left font-bold text-lg p-4 rounded-2xl text-slate-700 flex items-center justify-between';
+          }
+        }
+      });
+    }
+
+    function selectMapLoc(locId) {
+      selectedMapLocId = locId;
+      activeLesson.mapLocations.forEach(loc => {
+        const pin = document.getElementById(`map-pin-${loc.id}`);
+        if (pin) {
+          if (loc.id === locId) {
+            pin.setAttribute('class', 'fill-amber-400 stroke-white stroke-2 scale-150 transition transform origin-center animate-bounce');
+          } else {
+            pin.setAttribute('class', 'fill-rose-500 stroke-white stroke-2 hover:scale-125 transition transform origin-center');
+          }
+        }
+      });
+    }
+
+    function checkAnswer() {
+      const feedbackBanner = document.getElementById('lesson-feedback-banner');
+      const actionBtn = document.getElementById('lesson-action-btn');
+
+      let isCorrect = false;
+
+      if (activeLesson.type === 'trivia' || activeLesson.type === 'memorize') {
+        if (selectedOptionIdx === null) return;
+        isCorrect = selectedOptionIdx === activeLesson.correct;
+      } else if (activeLesson.type === 'map') {
+        if (!selectedMapLocId) return;
+        const target = activeLesson.mapLocations.find(l => l.id === selectedMapLocId);
+        isCorrect = target ? target.isCorrect : false;
+      }
+
+      feedbackBanner.classList.remove('hidden');
+
+      if (isCorrect) {
+        playAudioTone('correct');
+        feedbackBanner.className = 'rounded-2xl p-4 mb-4 flex items-center gap-3 bg-emerald-100 border-2 border-emerald-300 text-emerald-900';
+        feedbackBanner.innerHTML = `
+          <i class="fa-solid fa-circle-check text-3xl text-emerald-600"></i>
+          <div>
+            <h4 class="font-duo font-bold text-lg">¡Excelente!</h4>
+            <p class="text-sm">${activeLesson.fact || '¡Respuesta correcta e histórica!'}</p>
+          </div>
+        `;
+
+        actionBtn.innerText = 'CONTINUAR';
+        actionBtn.className = 'w-full btn-duo-green text-white font-duo text-xl font-bold py-4 rounded-2xl';
+        actionBtn.onclick = finishLessonSuccess;
+
+      } else {
+        playAudioTone('wrong');
+        userState.hearts = Math.max(0, userState.hearts - 1);
+        document.getElementById('lesson-hearts-val').innerText = userState.hearts;
+        document.getElementById('user-hearts').innerText = userState.hearts;
+
+        feedbackBanner.className = 'rounded-2xl p-4 mb-4 flex items-center gap-3 bg-rose-100 border-2 border-rose-300 text-rose-900';
+        feedbackBanner.innerHTML = `
+          <i class="fa-solid fa-circle-xmark text-3xl text-rose-600"></i>
+          <div>
+            <h4 class="font-duo font-bold text-lg">Respuesta Incorrecta</h4>
+            <p class="text-sm">Vuelve a intentarlo para reforzar tu memoria.</p>
+          </div>
+        `;
+
+        if (userState.hearts <= 0) {
+          actionBtn.innerText = 'SIN ENERGÍA - SALIR';
+          actionBtn.className = 'w-full btn-duo-red text-white font-duo text-xl font-bold py-4 rounded-2xl';
+          actionBtn.onclick = () => {
+            document.getElementById('lesson-screen').classList.add('hidden');
+            openEnergyModal();
+          };
+        }
+      }
+    }
+
+    function finishLessonSuccess() {
+      playAudioTone('complete');
+
+      // Update progress
+      if (!userState.completedLessons[userState.activeCountry]) {
+        userState.completedLessons[userState.activeCountry] = [];
+      }
+      if (!userState.completedLessons[userState.activeCountry].includes(activeLesson.id)) {
+        userState.completedLessons[userState.activeCountry].push(activeLesson.id);
+      }
+
+      userState.xp += 20;
+      userState.gems += 10;
+
+      updateTopCounters();
+      renderLearnPath();
+
+      document.getElementById('lesson-screen').classList.add('hidden');
+    }
+
+    function exitLessonConfirm() {
+      document.getElementById('lesson-screen').classList.add('hidden');
+    }
+
+
+    function updateTopCounters() {
+      document.getElementById('user-streak').innerText = userState.streak;
+      document.getElementById('user-gems').innerText = userState.gems;
+      document.getElementById('user-xp').innerText = userState.xp.toLocaleString();
+      document.getElementById('user-hearts').innerText = userState.hearts;
+    }
+
+
+    // Render Country Selector Modal
+    function openCountryModal() {
+      const list = document.getElementById('country-list');
+      list.innerHTML = '';
+
+      Object.values(COURSES_DATA).forEach(c => {
+        const isActive = c.id === userState.activeCountry;
+        const item = document.createElement('button');
+        item.onclick = () => {
+          userState.activeCountry = c.id;
+          renderLearnPath();
+          closeCountryModal();
+        };
+        item.className = `w-full p-3 rounded-2xl border-2 flex items-center justify-between transition ${
+          isActive ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:bg-slate-50'
+        }`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">${c.flag}</span>
+            <div class="text-left">
+              <h4 class="font-duo font-bold text-slate-800 text-lg">${c.name}</h4>
+              <span class="text-xs text-slate-400">${c.sections.length} Secciones</span>
+            </div>
+          </div>
+          ${isActive ? '<i class="fa-solid fa-circle-check text-emerald-500 text-xl"></i>' : ''}
+        `;
+        list.appendChild(item);
+      });
+
+      document.getElementById('modal-country').classList.remove('hidden');
+    }
+
+    function closeCountryModal() {
+      document.getElementById('modal-country').classList.add('hidden');
+    }
+
+    // Energy Modal Logic
+    function openEnergyModal() {
+      document.getElementById('modal-energy').classList.remove('hidden');
+    }
+    function closeEnergyModal() {
+      document.getElementById('modal-energy').classList.add('hidden');
+    }
+
+    function simulateWatchAd() {
+      closeEnergyModal();
+      const adModal = document.getElementById('modal-ad-sim');
+      const progressBar = document.getElementById('ad-progress-bar');
+      const timerText = document.getElementById('ad-timer-text');
+      const claimBtn = document.getElementById('ad-claim-btn');
+
+      adModal.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      claimBtn.disabled = true;
+      claimBtn.className = 'mt-4 w-full btn-duo-gray font-duo font-bold py-3 rounded-2xl cursor-not-allowed';
+
+      let duration = 5;
+      let current = 0;
+
+      const interval = setInterval(() => {
+        current += 0.5;
+        const pct = (current / duration) * 100;
+        progressBar.style.width = `${pct}%`;
+        timerText.innerText = `Espera ${Math.ceil(duration - current)} segundos...`;
+
+        if (current >= duration) {
+          clearInterval(interval);
+          timerText.innerText = '¡Anuncio completado!';
+          claimBtn.disabled = false;
+          claimBtn.className = 'mt-4 w-full btn-duo-green text-white font-duo font-bold py-3 rounded-2xl';
+        }
+      }, 500);
+    }
+
+    function finishAdReward() {
+      userState.hearts = 5;
+      updateTopCounters();
+      document.getElementById('modal-ad-sim').classList.add('hidden');
+    }
+
+    function buyEnergyWithGems() {
+      if (userState.gems >= 100) {
+        userState.gems -= 100;
+        userState.hearts = 5;
+        updateTopCounters();
+        closeEnergyModal();
+      }
+    }
+
+    // Interactive Geography Tab Renderer
+    function renderMapTabContent() {
+      const wrapper = document.getElementById('svg-map-wrapper');
+      wrapper.innerHTML = `
+        <svg class="w-full h-full" viewBox="0 0 100 100">
+          <path d="M 20,20 L 70,15 L 85,40 L 75,85 L 35,90 L 15,65 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+          <circle cx="35" cy="65" r="5" class="fill-sky-500 animate-ping" />
+          <circle cx="35" cy="65" r="4" class="fill-sky-600 cursor-pointer" onclick="updateMapInfo('Emerita Augusta', 'Fundada en el 25 a.C. por orden del emperador Augusto para los soldados licenciados de las guerras cántabras.')" />
+          <circle cx="75" cy="35" r="4" class="fill-sky-600 cursor-pointer" onclick="updateMapInfo('Tarraco', 'Principal base militar y capital de la provincia Hispania Citerior.')" />
+        </svg>
+      `;
+    }
+
+    function updateMapInfo(title, desc) {
+      document.getElementById('map-info-title').innerText = title;
+      document.getElementById('map-info-desc').innerText = desc;
+    }
+
+    // Profile Tab Renderer
+    function renderProfileTabContent() {
+      document.getElementById('profile-total-xp').innerText = userState.xp.toLocaleString();
+      document.getElementById('profile-max-streak').innerText = `${userState.maxStreak} días`;
+
+      const coursesList = document.getElementById('profile-courses-list');
+      coursesList.innerHTML = '';
+
+      Object.values(COURSES_DATA).forEach(c => {
+        const completedCount = (userState.completedLessons[c.id] || []).length;
+        coursesList.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">${c.flag}</span>
+              <div>
+                <h4 class="font-duo font-bold text-slate-800">${c.name}</h4>
+                <p class="text-xs text-slate-400">${completedCount} lecciones completadas</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">Activo</span>
+          </div>
+        `;
+      });
+    }
+
+    window.onload = function() {
+      initFirebaseIfAvailable();
+      renderLearnPath();
+      updateTopCounters();
+    };
+  </script>
+</body>
+</html>
