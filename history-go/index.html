@@ -123,116 +123,56 @@
     }
   </style>
 </head>
-<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between">
+body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between">
+
+  <!-- LOGIN SCREEN OVERLAY (GOOGLE AUTH) -->
+  <div id="login-screen" class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border-2 border-slate-200 text-center flex flex-col items-center">
+      
+      <!-- App Badge & Title -->
+      <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center text-5xl mb-4 text-emerald-600 border-4 border-emerald-400 animate-bounce-short">
+        🏛️
+      </div>
+
+      <h1 class="font-duo text-3xl font-bold text-slate-800 mb-2">HistoriGO</h1>
+      <p class="text-slate-500 text-sm mb-8 leading-relaxed">
+        ¡Aprende la historia del mundo jugando! Inicia sesión para guardar tus rachas, gemas y progreso entre dispositivos.
+      </p>
+
+      <!-- Google Sign In Button -->
+      <button onclick="signInWithGoogle()" class="w-full card-3d bg-white hover:bg-slate-50 text-slate-700 font-duo font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-lg transition border-2 border-slate-200">
+        <svg class="w-6 h-6" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Continuar con Google</span>
+      </button>
+
+      <div id="auth-status-msg" class="text-xs text-slate-400 mt-4">
+        Acceso seguro mediante Google Firebase Auth
+      </div>
+    </div>
+  </div>
 
   <!-- TOP HEADER / NAV BAR -->
   <header class="sticky top-0 z-40 bg-white border-b-2 border-slate-200 px-4 py-3 shadow-sm">
-    <div class="max-w-5xl mx-auto flex items-center justify-between">
-      
-      <!-- Country/Region Selector Trigger -->
-      <button onclick="openCountryModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-200 px-3 py-1.5 rounded-2xl transition font-bold text-slate-700">
-        <span id="header-country-flag" class="text-2xl">🇪🇸</span>
-        <span id="header-country-name" class="font-duo text-lg">España</span>
-        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
-      </button>
-
-      <!-- Gamification Counters -->
-      <div class="flex items-center gap-3 sm:gap-6 font-duo font-bold text-base sm:text-lg">
-        <!-- Streak -->
-        <div class="flex items-center gap-1.5 text-amber-500" title="Racha de días">
-          <i class="fa-solid fa-fire text-xl animate-pulse"></i>
-          <span id="user-streak">3</span>
-        </div>
-        
-        <!-- Coins/Gems -->
-        <div class="flex items-center gap-1.5 text-sky-500" title="Gemas">
-          <i class="fa-solid fa-gem text-xl"></i>
-          <span id="user-gems">450</span>
-        </div>
-
-        <!-- Total XP -->
-        <div class="flex items-center gap-1.5 text-amber-600" title="Experiencia total">
-          <i class="fa-solid fa-bolt text-xl text-yellow-400"></i>
-          <span id="user-xp">1,240</span>
-        </div>
-
-        <!-- Hearts / Energy -->
-        <button onclick="openEnergyModal()" class="flex items-center gap-1.5 text-rose-500 hover:bg-rose-50 p-1 px-2 rounded-xl border border-transparent hover:border-rose-200 transition" title="Energía">
-          <i class="fa-solid fa-heart text-xl animate-bounce-short"></i>
-          <span id="user-hearts">5</span>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-5xl mx-auto w-full flex-1 p-4 pb-24 md:pb-8 flex flex-col md:flex-row gap-8 justify-center">
-
-    <!-- VIEW 1: LEARN PATH (SNAKE ROAD) -->
-    <section id="view-learn" class="flex-1 max-w-xl mx-auto w-full flex flex-col items-center">
-      
-      <!-- Current Section Banner -->
-      <div id="section-banner" class="w-full bg-emerald-500 text-white rounded-3xl p-5 mb-8 shadow-lg border-b-4 border-emerald-700 relative overflow-hidden">
-        <div class="relative z-10">
-          <span class="bg-emerald-700/60 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">Sección Actual</span>
-          <h2 id="section-title" class="font-duo text-2xl font-bold mt-1">Edad Antigua y Numancia</h2>
-          <p id="section-desc" class="text-emerald-100 text-sm mt-1">Conoce los primeros pobladores, la llegada de los romanos y la geografía íbera.</p>
-        </div>
-        <i class="fa-solid fa-landmark absolute -right-4 -bottom-4 text-8xl opacity-20"></i>
-      </div>
-
-      <!-- Snake Path Container -->
-      <div id="path-container" class="w-full flex flex-col items-center gap-6 relative py-4">
-        <!-- Rendered dynamically via JavaScript -->
-      </div>
-
-    </section>
-
-    <!-- VIEW 2: MAP & GEOGRAPHY -->
-    <section id="view-map" class="hidden flex-1 max-w-2xl mx-auto w-full flex flex-col">
-      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-md mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="font-duo text-2xl font-bold text-slate-800">Atlas Histórico Interactivo</h2>
-            <p class="text-slate-500 text-sm">Explora las fronteras y los imperios según el año elegido.</p>
-          </div>
-          <span class="bg-sky-100 text-sky-700 font-bold px-3 py-1 rounded-xl text-sm" id="map-era-badge">Año 218 a.C.</span>
-        </div>
-
-        <!-- SVG Interactive Geography Canvas -->
-        <div class="relative w-full aspect-video bg-sky-100 rounded-2xl border-2 border-slate-200 overflow-hidden flex items-center justify-center p-4" id="svg-map-wrapper">
-          <!-- Rendered dynamically -->
-        </div>
-
-        <div class="mt-4 flex flex-wrap gap-2" id="map-era-tabs">
-          <!-- Era tabs rendered dynamically -->
-        </div>
-      </div>
-
-      <div id="map-info-card" class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 text-amber-900 flex items-start gap-3">
-        <i class="fa-solid fa-map-location-dot text-2xl text-amber-600 mt-1"></i>
-        <div>
-          <h4 class="font-bold text-base" id="map-info-title">Península Ibérica Prerromana</h4>
-          <p class="text-sm mt-0.5" id="map-info-desc">Selecciona los territorios señalados en el mapa para descubrir las diferentes tribus íberas, celtas y colonias fenicias.</p>
-        </div>
-      </div>
-    </section>
-
+<!-- ... existing code ... -->
     <!-- VIEW 3: PROFILE -->
     <section id="view-profile" class="hidden flex-1 max-w-xl mx-auto w-full flex flex-col gap-6">
       
       <!-- Profile Header Card -->
       <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
-        <div class="relative">
-          <div class="w-24 h-24 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center text-4xl text-emerald-600 font-duo font-bold">
+        <div class="relative" id="profile-avatar-container">
+          <div class="w-24 h-24 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center text-4xl text-emerald-600 font-duo font-bold overflow-hidden">
             <i class="fa-solid fa-user-astronaut"></i>
           </div>
           <span class="absolute bottom-0 right-0 bg-amber-400 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-full border-2 border-white">Niv 5</span>
         </div>
         <div class="text-center sm:text-left flex-1">
           <h2 class="font-duo text-2xl font-bold text-slate-800" id="profile-username">Historiador Explorador</h2>
-          <p class="text-slate-400 text-sm">Se unió en Agosto 2026</p>
+          <p class="text-slate-400 text-sm" id="profile-email">Usuario de HistoriGO</p>
 
           <div class="mt-3 flex flex-wrap justify-center sm:justify-start gap-4 text-sm font-bold">
             <div class="flex items-center gap-1.5 text-amber-500">
@@ -244,246 +184,42 @@
               <span>XP Total: <strong id="profile-total-xp" class="text-slate-800">1,240</strong></span>
             </div>
           </div>
+
+          <button onclick="logoutGoogle()" class="mt-4 px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100 transition flex items-center gap-2 mx-auto sm:mx-0">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
       </div>
 
       <!-- Active Courses -->
-      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
-        <h3 class="font-duo text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-graduation-cap text-emerald-500"></i> Cursos Iniciados
-        </h3>
-        <div id="profile-courses-list" class="flex flex-col gap-3">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
+<!-- ... existing code ... -->
+  <!-- JAVASCRIPT LOGIC & FIREBASE MODULE INTEGRATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      <!-- Badges & Achievements -->
-      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
-        <h3 class="font-duo text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-trophy text-amber-500"></i> Logros e Insignias
-        </h3>
-        <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="bg-slate-50 border-2 border-slate-200 p-3 rounded-2xl flex flex-col items-center">
-            <div class="text-3xl mb-1">📜</div>
-            <span class="font-bold text-xs text-slate-700">Primer Trazo</span>
-            <span class="text-[10px] text-slate-400">Completa 1 lección</span>
-          </div>
-          <div class="bg-slate-50 border-2 border-slate-200 p-3 rounded-2xl flex flex-col items-center">
-            <div class="text-3xl mb-1">🗺️</div>
-            <span class="font-bold text-xs text-slate-700">Cartógrafo</span>
-            <span class="text-[10px] text-slate-400">Explora 3 mapas</span>
-          </div>
-          <div class="bg-amber-50 border-2 border-amber-300 p-3 rounded-2xl flex flex-col items-center">
-            <div class="text-3xl mb-1">🔥</div>
-            <span class="font-bold text-xs text-amber-900">En Racha</span>
-            <span class="text-[10px] text-amber-700">3 días seguidos</span>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- VIEW 4: DAILY QUESTS -->
-    <section id="view-quests" class="hidden flex-1 max-w-xl mx-auto w-full flex flex-col gap-4">
-      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
-        <h2 class="font-duo text-2xl font-bold text-slate-800 mb-1">Misiones Diarias</h2>
-        <p class="text-slate-500 text-sm mb-6">Gana gemas y experiencia completando tus metas de hoy.</p>
-
-        <div class="space-y-4">
-          <!-- Quest 1 -->
-          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
-            <div class="text-3xl bg-amber-100 p-3 rounded-2xl">⚡</div>
-            <div class="flex-1">
-              <div class="flex justify-between font-bold text-sm mb-1">
-                <span>Gana 50 XP hoy</span>
-                <span class="text-emerald-600">30 / 50</span>
-              </div>
-              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full" style="width: 60%"></div>
-              </div>
-            </div>
-            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+20 💎</span>
-          </div>
-
-          <!-- Quest 2 -->
-          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
-            <div class="text-3xl bg-sky-100 p-3 rounded-2xl">🎯</div>
-            <div class="flex-1">
-              <div class="flex justify-between font-bold text-sm mb-1">
-                <span>Completa 2 lecciones perfectas</span>
-                <span class="text-emerald-600">1 / 2</span>
-              </div>
-              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full" style="width: 50%"></div>
-              </div>
-            </div>
-            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+30 💎</span>
-          </div>
-
-          <!-- Quest 3 -->
-          <div class="border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4">
-            <div class="text-3xl bg-rose-100 p-3 rounded-2xl">🗺️</div>
-            <div class="flex-1">
-              <div class="flex justify-between font-bold text-sm mb-1">
-                <span>Completa 1 lección de Geografía</span>
-                <span class="text-emerald-600">0 / 1</span>
-              </div>
-              <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full" style="width: 0%"></div>
-              </div>
-            </div>
-            <span class="font-duo font-bold text-amber-500 flex items-center gap-1">+15 💎</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- BOTTOM NAVIGATION BAR (DUOLINGO STYLE) -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-slate-200 px-4 py-2">
-    <div class="max-w-md mx-auto flex items-center justify-around">
-      <button onclick="switchTab('learn')" id="nav-btn-learn" class="nav-btn flex flex-col items-center gap-1 text-emerald-500 font-bold text-xs p-2 rounded-xl">
-        <i class="fa-solid fa-house text-2xl"></i>
-        <span>Aprender</span>
-      </button>
-
-      <button onclick="switchTab('map')" id="nav-btn-map" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
-        <i class="fa-solid fa-map-location-dot text-2xl"></i>
-        <span>Mapas</span>
-      </button>
-
-      <button onclick="switchTab('quests')" id="nav-btn-quests" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
-        <i class="fa-solid fa-scroll text-2xl"></i>
-        <span>Misiones</span>
-      </button>
-
-      <button onclick="switchTab('profile')" id="nav-btn-profile" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 font-bold text-xs p-2 rounded-xl">
-        <i class="fa-solid fa-circle-user text-2xl"></i>
-        <span>Perfil</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- MODAL: COUNTRY SELECTOR -->
-  <div id="modal-country" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-200 transform transition-all">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-duo text-2xl font-bold text-slate-800">Elige un País / Región</h3>
-        <button onclick="closeCountryModal()" class="text-slate-400 hover:text-slate-600 text-xl p-2">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <p class="text-slate-500 text-sm mb-4">Cada región mantiene su propio progreso e historia independiente.</p>
-
-      <div id="country-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: REFILL ENERGY / WATCH AD -->
-  <div id="modal-energy" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-200 text-center">
-      <div class="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-rose-500">
-        <i class="fa-solid fa-heart-pulse animate-pulse"></i>
-      </div>
-
-      <h3 class="font-duo text-2xl font-bold text-slate-800 mb-2">¿Te quedaste sin energía?</h3>
-      <p class="text-slate-500 text-sm mb-6">Necesitas energía para realizar lecciones. ¡Mira un video publicitario para recargar completas tus vidas o intercambia gemas!</p>
-
-      <div class="space-y-3">
-        <button onclick="simulateWatchAd()" class="w-full btn-duo-green text-white font-duo font-bold py-3 rounded-2xl text-lg flex items-center justify-center gap-2">
-          <i class="fa-solid fa-circle-play text-xl"></i>
-          <span>Ver Anuncio (+5 ❤️ Gratis)</span>
-        </button>
-
-        <button onclick="buyEnergyWithGems()" class="w-full btn-duo-blue text-white font-duo font-bold py-3 rounded-2xl text-lg flex items-center justify-center gap-2">
-          <i class="fa-solid fa-gem text-xl"></i>
-          <span>Comprar Vidas por 100 💎</span>
-        </button>
-
-        <button onclick="closeEnergyModal()" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-2xl hover:bg-slate-200 transition">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: SIMULATED AD RUNNER -->
-  <div id="modal-ad-sim" class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-6 text-white text-center">
-    <div class="max-w-sm w-full bg-slate-800 rounded-3xl p-6 border-2 border-slate-700 flex flex-col items-center">
-      <span class="bg-amber-400 text-slate-900 text-xs font-black uppercase px-2.5 py-1 rounded-md mb-4">Anuncio de Historia</span>
-      <div class="w-16 h-16 bg-slate-700 rounded-2xl flex items-center justify-center text-3xl mb-4 text-amber-400">
-        <i class="fa-solid fa-film"></i>
-      </div>
-      <h4 class="font-duo text-xl font-bold mb-2">Patrocinios HistoriGO</h4>
-      <p class="text-slate-300 text-sm mb-6">"Los grandes imperios no se construyeron en un día. ¡Sigue aprendiendo!"</p>
-      
-      <!-- Ad Timer Progress -->
-      <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden mb-4">
-        <div id="ad-progress-bar" class="bg-amber-400 h-full rounded-full w-0 transition-all duration-100"></div>
-      </div>
-
-      <p id="ad-timer-text" class="text-xs text-slate-400">Espera 5 segundos...</p>
-      
-      <button id="ad-claim-btn" onclick="finishAdReward()" disabled class="mt-4 w-full btn-duo-gray font-duo font-bold py-3 rounded-2xl cursor-not-allowed">
-        Reclamar Recompensa
-      </button>
-    </div>
-  </div>
-
-  <!-- FULLSCREEN LESSON ENGINE -->
-  <div id="lesson-screen" class="fixed inset-0 z-50 bg-white hidden flex flex-col justify-between p-4 sm:p-6">
-    
-    <!-- Lesson Header -->
-    <div class="max-w-2xl mx-auto w-full flex items-center justify-between gap-4">
-      <button onclick="exitLessonConfirm()" class="text-slate-400 hover:text-slate-600 text-2xl">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <!-- Progress bar -->
-      <div class="flex-1 bg-slate-100 h-4 rounded-full overflow-hidden border-2 border-slate-200">
-        <div id="lesson-progress-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-      </div>
-
-      <!-- Hearts counter -->
-      <div class="flex items-center gap-1.5 text-rose-500 font-duo font-bold text-lg">
-        <i class="fa-solid fa-heart"></i>
-        <span id="lesson-hearts-val">5</span>
-      </div>
-    </div>
-
-    <!-- Lesson Content Body -->
-    <div class="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center my-4 overflow-y-auto pr-1" id="lesson-content-area">
-      <!-- Question / Curiosity card rendered here dynamically -->
-    </div>
-
-    <!-- Lesson Footer / Check Button Container -->
-    <div id="lesson-footer" class="border-t-2 border-slate-200 pt-4 max-w-2xl mx-auto w-full">
-      <div id="lesson-feedback-banner" class="hidden rounded-2xl p-4 mb-4 flex items-center gap-3">
-        <!-- Banner dynamics -->
-      </div>
-      <button id="lesson-action-btn" onclick="checkAnswer()" class="w-full btn-duo-green text-white font-duo text-xl font-bold py-4 rounded-2xl">
-        COMPROBAR
-      </button>
-    </div>
-
-  </div>
-
-  <!-- JAVASCRIPT LOGIC & DEMO DATA -->
-  <script>
-
-    // FIREBASE ACCESS CONFIGURATION TEMPLATE
-    // Inserte sus credenciales de Firebase aquí cuando desee habilitar la persistencia en la nube:
+    // Firebase Credentials provided by User
     const firebaseConfig = {
-      apiKey: "",
-      authDomain: "",
-      projectId: "",
-      storageBucket: "",
-      messagingSenderId: "",
-      appId: ""
+      apiKey: "AIzaSyCR9bZmnjAMR3ef1jndaP0FyeJDKsDj354",
+      authDomain: "history-go-1d027.firebaseapp.com",
+      databaseURL: "https://history-go-1d027-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "history-go-1d027",
+      storageBucket: "history-go-1d027.firebasestorage.app",
+      messagingSenderId: "772487133215",
+      appId: "1:772487133215:web:dfdbe57fcd5d30260f7d2a"
     };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'history-go-1d027';
+    let currentUser = null;
+    let unsubscribeUserDoc = null;
 
     // Global Demo Data for History Courses
     const COURSES_DATA = {
@@ -642,12 +378,70 @@
     };
 
     let activeLesson = null;
-    let currentQuestionIdx = 0;
     let selectedOptionIdx = null;
     let selectedMapLocId = null;
 
+    // Google Sign-In Function
+    window.signInWithGoogle = async function() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        console.log("Sesión iniciada con éxito:", result.user.displayName);
+      } catch (error) {
+        console.error("Error al iniciar sesión con Google:", error);
+        document.getElementById('auth-status-msg').innerText = "Error al conectar con Google. Por favor intenta de nuevo.";
+      }
+    };
 
-    // Sound Synth using Web Audio API (Duolingo style audio response)
+    // Logout Function
+    window.logoutGoogle = async function() {
+      try {
+        if (unsubscribeUserDoc) unsubscribeUserDoc();
+        await signOut(auth);
+        console.log("Sesión cerrada");
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+      }
+    };
+
+    // Firestore Save Function
+    async function saveUserData() {
+      if (!currentUser) return;
+      const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+      try {
+        await setDoc(userDocRef, userState, { merge: true });
+      } catch (e) {
+        console.error("Error al guardar datos en Firestore:", e);
+      }
+    }
+
+    // Listen to Auth State Changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('login-screen').classList.add('hidden');
+        
+        // Listen to Firestore profile document
+        const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
+        unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            userState = { ...userState, ...docSnap.data() };
+            updateTopCounters();
+            renderLearnPath();
+          } else {
+            // First time login - set initial user data
+            saveUserData();
+          }
+        }, (err) => {
+          console.error("Error de lectura en Firestore:", err);
+        });
+
+      } else {
+        currentUser = null;
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
+    });
+
+    // Sound Synth using Web Audio API
     function playAudioTone(type) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -658,16 +452,16 @@
 
         if (type === 'correct') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
           gain.gain.setValueAtTime(0.3, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
           osc.start(ctx.currentTime);
           osc.stop(ctx.currentTime + 0.3);
         } else if (type === 'wrong') {
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
-          osc.frequency.setValueAtTime(196, ctx.currentTime + 0.15); // G3
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.setValueAtTime(196, ctx.currentTime + 0.15);
           gain.gain.setValueAtTime(0.3, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
           osc.start(ctx.currentTime);
@@ -683,28 +477,15 @@
           osc.stop(ctx.currentTime + 0.5);
         }
       } catch (e) {
-        console.log('Audio disabled or blocked by browser interactions');
+        console.log('Audio disabled or blocked');
       }
     }
 
-
-    // Initializer function for Firebase setup (when user provides keys)
-    function initFirebaseIfAvailable() {
-      if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 0) {
-        console.log("Conectando con Firebase...");
-        // Placeholder handler for user's eventual Firebase integration
-      } else {
-        console.log("HistoriGO usando estado local (plantilla demo).");
-      }
-    }
-
-
-    // Tab Switching
-    function switchTab(tabId) {
+    // Navigation Tab Switching
+    window.switchTab = function(tabId) {
       document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
 
-      // Update Nav active style
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('text-emerald-500');
         btn.classList.add('text-slate-400');
@@ -717,18 +498,17 @@
 
       if (tabId === 'map') renderMapTabContent();
       if (tabId === 'profile') renderProfileTabContent();
-    }
+    };
 
-    // Render Main Learn Path (Duolingo Path Snake)
+    // Render Main Learn Path
     function renderLearnPath() {
       const countryData = COURSES_DATA[userState.activeCountry];
       if (!countryData) return;
 
-      // Update Header Flag & Name
       document.getElementById('header-country-flag').innerText = countryData.flag;
       document.getElementById('header-country-name').innerText = countryData.name;
 
-      const section = countryData.sections[0]; // Active section demo
+      const section = countryData.sections[0];
       document.getElementById('section-title').innerText = section.title;
       document.getElementById('section-desc').innerText = section.desc;
 
@@ -737,12 +517,10 @@
 
       const completed = userState.completedLessons[userState.activeCountry] || [];
 
-      // Generate Snake Nodes
       section.lessons.forEach((lesson, index) => {
         const isDone = completed.includes(lesson.id);
         const isCurrent = !isDone && (index === 0 || completed.includes(section.lessons[index - 1].id));
 
-        // Horizontal offset for Duolingo snake effect
         const offsets = ['translate-x-0', 'translate-x-8', '-translate-x-8', 'translate-x-0'];
         const offsetClass = offsets[index % offsets.length];
 
@@ -760,24 +538,28 @@
           iconHtml = '<i class="fa-solid fa-star text-2xl text-white"></i>';
         }
 
-        nodeWrapper.innerHTML = `
-          <button onclick="${isCurrent || isDone ? `startLesson('${lesson.id}')` : ''}" 
-            class="w-20 h-20 rounded-full ${btnStyle} flex items-center justify-center border-4 border-white shadow-xl relative z-10">
-            ${iconHtml}
-          </button>
-          <span class="font-duo font-bold text-sm text-slate-700 mt-2 bg-white px-3 py-1 rounded-xl shadow-sm border border-slate-200">
-            ${lesson.title}
-          </span>
-        `;
+        const btn = document.createElement('button');
+        btn.className = `w-20 h-20 rounded-full ${btnStyle} flex items-center justify-center border-4 border-white shadow-xl relative z-10`;
+        btn.innerHTML = iconHtml;
+        if (isCurrent || isDone) {
+          btn.onclick = () => window.startLesson(lesson.id);
+        }
+
+        nodeWrapper.appendChild(btn);
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.className = "font-duo font-bold text-sm text-slate-700 mt-2 bg-white px-3 py-1 rounded-xl shadow-sm border border-slate-200";
+        titleSpan.innerText = lesson.title;
+        nodeWrapper.appendChild(titleSpan);
 
         pathContainer.appendChild(nodeWrapper);
       });
     }
 
-    // Start Lesson Mode
-    function startLesson(lessonId) {
+    // Start Lesson
+    window.startLesson = function(lessonId) {
       if (userState.hearts <= 0) {
-        openEnergyModal();
+        window.openEnergyModal();
         return;
       }
 
@@ -793,16 +575,14 @@
       if (!foundLesson) return;
 
       activeLesson = foundLesson;
-      currentQuestionIdx = 0;
       selectedOptionIdx = null;
       selectedMapLocId = null;
 
       document.getElementById('lesson-screen').classList.remove('hidden');
       document.getElementById('lesson-hearts-val').innerText = userState.hearts;
       renderLessonQuestion();
-    }
+    };
 
-    // Render Current Question Inside Lesson
     function renderLessonQuestion() {
       const area = document.getElementById('lesson-content-area');
       const actionBtn = document.getElementById('lesson-action-btn');
@@ -811,7 +591,7 @@
       feedbackBanner.className = 'hidden rounded-2xl p-4 mb-4 flex items-center gap-3';
       actionBtn.className = 'w-full btn-duo-green text-white font-duo text-xl font-bold py-4 rounded-2xl';
       actionBtn.innerText = 'COMPROBAR';
-      actionBtn.onclick = checkAnswer;
+      actionBtn.onclick = window.checkAnswer;
 
       selectedOptionIdx = null;
       selectedMapLocId = null;
@@ -844,7 +624,6 @@
             
             <div class="relative w-full aspect-video bg-sky-100 rounded-2xl border-2 border-slate-300 overflow-hidden shadow-inner p-2">
               <svg class="w-full h-full" viewBox="0 0 100 100">
-                <!-- Iberia outline simulation -->
                 <path d="M 20,20 L 70,15 L 85,40 L 75,85 L 35,90 L 15,65 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
                 ${activeLesson.mapLocations.map(loc => `
                   <g onclick="selectMapLoc('${loc.id}')" class="cursor-pointer">
@@ -861,7 +640,7 @@
       document.getElementById('lesson-progress-bar').style.width = '50%';
     }
 
-    function selectOption(idx) {
+    window.selectOption = function(idx) {
       selectedOptionIdx = idx;
       activeLesson.options.forEach((_, i) => {
         const btn = document.getElementById(`opt-btn-${i}`);
@@ -873,9 +652,9 @@
           }
         }
       });
-    }
+    };
 
-    function selectMapLoc(locId) {
+    window.selectMapLoc = function(locId) {
       selectedMapLocId = locId;
       activeLesson.mapLocations.forEach(loc => {
         const pin = document.getElementById(`map-pin-${loc.id}`);
@@ -887,9 +666,9 @@
           }
         }
       });
-    }
+    };
 
-    function checkAnswer() {
+    window.checkAnswer = function() {
       const feedbackBanner = document.getElementById('lesson-feedback-banner');
       const actionBtn = document.getElementById('lesson-action-btn');
 
@@ -941,16 +720,16 @@
           actionBtn.className = 'w-full btn-duo-red text-white font-duo text-xl font-bold py-4 rounded-2xl';
           actionBtn.onclick = () => {
             document.getElementById('lesson-screen').classList.add('hidden');
-            openEnergyModal();
+            window.openEnergyModal();
           };
         }
+        saveUserData();
       }
-    }
+    };
 
     function finishLessonSuccess() {
       playAudioTone('complete');
 
-      // Update progress
       if (!userState.completedLessons[userState.activeCountry]) {
         userState.completedLessons[userState.activeCountry] = [];
       }
@@ -963,14 +742,14 @@
 
       updateTopCounters();
       renderLearnPath();
+      saveUserData();
 
       document.getElementById('lesson-screen').classList.add('hidden');
     }
 
-    function exitLessonConfirm() {
+    window.exitLessonConfirm = function() {
       document.getElementById('lesson-screen').classList.add('hidden');
-    }
-
+    };
 
     function updateTopCounters() {
       document.getElementById('user-streak').innerText = userState.streak;
@@ -979,9 +758,8 @@
       document.getElementById('user-hearts').innerText = userState.hearts;
     }
 
-
-    // Render Country Selector Modal
-    function openCountryModal() {
+    // Modal country
+    window.openCountryModal = function() {
       const list = document.getElementById('country-list');
       list.innerHTML = '';
 
@@ -991,7 +769,8 @@
         item.onclick = () => {
           userState.activeCountry = c.id;
           renderLearnPath();
-          closeCountryModal();
+          saveUserData();
+          window.closeCountryModal();
         };
         item.className = `w-full p-3 rounded-2xl border-2 flex items-center justify-between transition ${
           isActive ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:bg-slate-50'
@@ -1010,22 +789,21 @@
       });
 
       document.getElementById('modal-country').classList.remove('hidden');
-    }
+    };
 
-    function closeCountryModal() {
+    window.closeCountryModal = function() {
       document.getElementById('modal-country').classList.add('hidden');
-    }
+    };
 
-    // Energy Modal Logic
-    function openEnergyModal() {
+    window.openEnergyModal = function() {
       document.getElementById('modal-energy').classList.remove('hidden');
-    }
-    function closeEnergyModal() {
+    };
+    window.closeEnergyModal = function() {
       document.getElementById('modal-energy').classList.add('hidden');
-    }
+    };
 
-    function simulateWatchAd() {
-      closeEnergyModal();
+    window.simulateWatchAd = function() {
+      window.closeEnergyModal();
       const adModal = document.getElementById('modal-ad-sim');
       const progressBar = document.getElementById('ad-progress-bar');
       const timerText = document.getElementById('ad-timer-text');
@@ -1052,24 +830,25 @@
           claimBtn.className = 'mt-4 w-full btn-duo-green text-white font-duo font-bold py-3 rounded-2xl';
         }
       }, 500);
-    }
+    };
 
-    function finishAdReward() {
+    window.finishAdReward = function() {
       userState.hearts = 5;
       updateTopCounters();
+      saveUserData();
       document.getElementById('modal-ad-sim').classList.add('hidden');
-    }
+    };
 
-    function buyEnergyWithGems() {
+    window.buyEnergyWithGems = function() {
       if (userState.gems >= 100) {
         userState.gems -= 100;
         userState.hearts = 5;
         updateTopCounters();
-        closeEnergyModal();
+        saveUserData();
+        window.closeEnergyModal();
       }
-    }
+    };
 
-    // Interactive Geography Tab Renderer
     function renderMapTabContent() {
       const wrapper = document.getElementById('svg-map-wrapper');
       wrapper.innerHTML = `
@@ -1082,15 +861,26 @@
       `;
     }
 
-    function updateMapInfo(title, desc) {
+    window.updateMapInfo = function(title, desc) {
       document.getElementById('map-info-title').innerText = title;
       document.getElementById('map-info-desc').innerText = desc;
-    }
+    };
 
-    // Profile Tab Renderer
     function renderProfileTabContent() {
       document.getElementById('profile-total-xp').innerText = userState.xp.toLocaleString();
       document.getElementById('profile-max-streak').innerText = `${userState.maxStreak} días`;
+
+      if (currentUser) {
+        document.getElementById('profile-username').innerText = currentUser.displayName || 'Historiador Explorador';
+        document.getElementById('profile-email').innerText = currentUser.email || 'Usuario de HistoriGO';
+
+        if (currentUser.photoURL) {
+          document.getElementById('profile-avatar-container').innerHTML = `
+            <img src="${currentUser.photoURL}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-emerald-500 object-cover">
+            <span class="absolute bottom-0 right-0 bg-amber-400 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-full border-2 border-white">Niv 5</span>
+          `;
+        }
+      }
 
       const coursesList = document.getElementById('profile-courses-list');
       coursesList.innerHTML = '';
@@ -1113,7 +903,6 @@
     }
 
     window.onload = function() {
-      initFirebaseIfAvailable();
       renderLearnPath();
       updateTopCounters();
     };
